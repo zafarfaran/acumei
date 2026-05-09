@@ -1,0 +1,83 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#a-scroll {
+  scrollbar-width: thin;
+}
+
+.display {
+  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-weight: 380;
+  letter-spacing: -0.022em;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+}
+
+.display-ital {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 380;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Offset for sticky nav when scrolling to anchors */
+section[id] {
+  scroll-margin-top: 70px;
+}
+
+.marquee {
+  display: flex;
+  gap: 64px;
+  animation: a-marq 40s linear infinite;
+  white-space: nowrap;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.pulse-dot {
+  animation: a-pulse 2s ease-in-out infinite;
+}
+
+.reveal {
+  animation: a-reveal 0.8s ease-out both;
+}
+
+.arrow-loop {
+  animation: a-arrow 2.4s ease-in-out infinite;
+}
+
+.play-btn {
+  transition: transform 0.3s;
+}
+.play-card:hover .play-btn {
+  transform: scale(1.1);
+}

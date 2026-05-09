@@ -1,0 +1,122 @@
+@keyframes a-marq {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes a-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+@keyframes a-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes a-arrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+@keyframes a-brain-pulse {
+  0% { transform: scale(0.5); opacity: 0.7; }
+  80% { opacity: 0; }
+  100% { transform: scale(3.4); opacity: 0; }
+}
+
+@keyframes a-brain-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes a-brain-orbit-rev {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes a-brain-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+@keyframes demoFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes acumeiBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* Scroll-triggered fade in up */
+.animate-in {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.animate-in.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children */
+.animate-in.in-view > .stagger {
+  opacity: 0;
+  animation: staggerIn 0.6s ease-out forwards;
+}
+.animate-in.in-view > .stagger:nth-child(1) { animation-delay: 0s; }
+.animate-in.in-view > .stagger:nth-child(2) { animation-delay: 0.1s; }
+.animate-in.in-view > .stagger:nth-child(3) { animation-delay: 0.2s; }
+.animate-in.in-view > .stagger:nth-child(4) { animation-delay: 0.3s; }
+
+@keyframes staggerIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+/* Button hover glow */
+.btn-glow {
+  transition: box-shadow 0.3s ease, transform 0.15s ease;
+}
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(232, 160, 75, 0.25);
+  transform: translateY(-1px);
+}
+.btn-glow:active {
+  transform: translateY(0);
+}
+
+/* Image hover zoom + warm hue blend */
+.img-zoom {
+  overflow: hidden;
+  position: relative;
+}
+.img-zoom img {
+  transition: transform 0.6s ease;
+  filter: saturate(0.5) brightness(0.85) sepia(0.25);
+}
+.img-zoom:hover img {
+  transform: scale(1.05);
+  filter: saturate(0.6) brightness(0.9) sepia(0.15);
+}
+/* Warm ochre tint overlay on all image cards */
+.img-zoom::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(232, 160, 75, 0.08);
+  mix-blend-mode: color;
+  pointer-events: none;
+  z-index: 1;
+}

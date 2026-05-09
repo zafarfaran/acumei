@@ -1,0 +1,262 @@
+/* ==========================================================
+   RESPONSIVE OVERRIDES — Acumei
+   Uses !important to override inline styles.
+   ========================================================== */
+
+/* ---- Tablet: max-width 1024px ---- */
+@media (max-width: 1024px) {
+  /* Reduce section padding */
+  .nav-bar { padding: 16px 24px !important; }
+
+  .hero-section,
+  .hiw-section,
+  .about-section,
+  .industries-section,
+  .demo-section,
+  .gallery-section,
+  .stats-section,
+  .cases-section,
+  .roi-section,
+  .services-section,
+  .faq-section,
+  .book-section {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr 1.2fr !important;
+    gap: 48px !important;
+  }
+
+  .industries-grid {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+  .industries-grid > div:first-child {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    overflow-x: auto !important;
+  }
+
+  .footer { padding: 32px 24px !important; }
+
+  /* Stack grids */
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 48px !important;
+  }
+
+  .hiw-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .demo-grid {
+    grid-template-columns: 1fr !important;
+    gap: 48px !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .cases-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .roi-grid {
+    grid-template-columns: 1fr !important;
+    gap: 48px !important;
+  }
+
+  .roi-left {
+    position: static !important;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .faq-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr !important;
+    gap: 48px !important;
+  }
+
+  /* Gallery simplify */
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: 200px !important;
+  }
+
+  .gallery-grid > div {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+
+  .gallery-grid > div:first-child {
+    grid-column: span 2 !important;
+    grid-row: span 1 !important;
+  }
+
+  /* Hero font sizes */
+  .hero-title {
+    font-size: 64px !important;
+  }
+
+  .hero-section {
+    padding-top: 80px !important;
+    padding-bottom: 60px !important;
+  }
+}
+
+/* ---- Mobile: max-width 768px ---- */
+@media (max-width: 768px) {
+  /* Nav hamburger */
+  .nav-links { display: none !important; }
+  .nav-cta { display: none !important; }
+  .nav-hamburger { display: block !important; }
+
+  /* Hero */
+  .hero-title { font-size: 48px !important; }
+  .hero-body { font-size: 17px !important; }
+  .hero-section {
+    padding-top: 60px !important;
+    padding-bottom: 48px !important;
+  }
+
+  /* About section */
+  .about-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+
+  /* Section titles - scale down */
+  .hiw-title,
+  .stats-title {
+    font-size: 40px !important;
+  }
+
+  .about-title,
+  .industries-title,
+  .demo-title,
+  .gallery-title,
+  .cases-title,
+  .roi-title,
+  .services-title,
+  .faq-title {
+    font-size: 36px !important;
+  }
+
+  .book-title { font-size: 40px !important; }
+
+  /* Grids to single column */
+  .hiw-grid { grid-template-columns: 1fr !important; }
+  .stats-grid { grid-template-columns: 1fr !important; }
+  .roi-inner-grid { grid-template-columns: 1fr !important; }
+
+  /* Gallery single col */
+  .gallery-grid { grid-template-columns: 1fr !important; }
+  .gallery-grid > div { grid-column: span 1 !important; }
+  .gallery-grid > div:first-child {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+  .gallery-header { flex-direction: column !important; }
+
+  /* Footer stack */
+  .footer {
+    flex-direction: column !important;
+    gap: 16px !important;
+    text-align: center !important;
+  }
+
+  /* Marquee smaller */
+  .marquee span { font-size: 20px !important; }
+
+  /* Section vertical padding */
+  .hiw-section,
+  .about-section,
+  .industries-section,
+  .demo-section,
+  .gallery-section,
+  .stats-section,
+  .cases-section,
+  .roi-section,
+  .services-section,
+  .faq-section,
+  .book-section {
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
+  }
+
+  /* Industries row */
+  .hero-industries {
+    gap: 16px !important;
+    margin-top: 48px !important;
+  }
+
+  /* BookingFlow time slots */
+  .booking-slots {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ---- Small mobile: max-width 480px ---- */
+@media (max-width: 480px) {
+  .hero-title { font-size: 36px !important; }
+
+  .hiw-title,
+  .stats-title {
+    font-size: 32px !important;
+  }
+
+  .demo-title,
+  .gallery-title,
+  .cases-title,
+  .roi-title,
+  .services-title,
+  .faq-title {
+    font-size: 28px !important;
+  }
+
+  .book-title { font-size: 32px !important; }
+
+  .nav-bar { padding: 12px 16px !important; }
+
+  .hero-section,
+  .hiw-section,
+  .about-section,
+  .industries-section,
+  .demo-section,
+  .gallery-section,
+  .stats-section,
+  .cases-section,
+  .roi-section,
+  .services-section,
+  .faq-section,
+  .book-section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .about-title,
+  .industries-title { font-size: 28px !important; }
+
+  .footer { padding: 24px 16px !important; }
+
+  /* Gallery all single column */
+  .gallery-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .gallery-grid > div:first-child {
+    grid-column: span 1 !important;
+  }
+}
