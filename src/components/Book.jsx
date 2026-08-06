@@ -87,7 +87,7 @@ export default function Book() {
             </div>
             <div style={{ fontSize: 18 }}>hello@acumei.co.uk</div>
             <div style={{ fontSize: 14, color: 'rgba(14, 14, 16, 0.5)', marginTop: 6 }}>
-              Studio: 12 Rivington Street, London EC2A · By appointment
+              Remote discovery calls · On-site visits by appointment
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@
   .gallery-section,
   .stats-section,
   .cases-section,
+  .testimonials-section,
   .roi-section,
   .services-section,
   .faq-section,
@@ -64,6 +65,10 @@
 
   .cases-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  .testimonials-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
   .roi-grid {
@@ -148,6 +153,7 @@
   .demo-title,
   .gallery-title,
   .cases-title,
+  .testimonials-title,
   .roi-title,
   .services-title,
   .faq-title {
@@ -159,6 +165,7 @@
   /* Grids to single column */
   .hiw-grid { grid-template-columns: 1fr !important; }
   .stats-grid { grid-template-columns: 1fr !important; }
+  .testimonials-grid { grid-template-columns: 1fr !important; }
   .roi-inner-grid { grid-template-columns: 1fr !important; }
 
   /* Gallery single col */
@@ -188,6 +195,7 @@
   .gallery-section,
   .stats-section,
   .cases-section,
+  .testimonials-section,
   .roi-section,
   .services-section,
   .faq-section,
@@ -220,6 +228,7 @@
   .demo-title,
   .gallery-title,
   .cases-title,
+  .testimonials-title,
   .roi-title,
   .services-title,
   .faq-title {
@@ -238,6 +247,7 @@
   .gallery-section,
   .stats-section,
   .cases-section,
+  .testimonials-section,
   .roi-section,
   .services-section,
   .faq-section,

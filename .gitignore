@@ -35,3 +35,9 @@ Thumbs.db
 
 # Test / coverage
 coverage/
+
+# Outbound platform local data (SQLite DB)
+outbound/data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

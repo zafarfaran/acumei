@@ -9,6 +9,7 @@ import DemoSection from './components/DemoSection';
 import Gallery from './components/Gallery';
 import Stats from './components/Stats';
 import CaseStudies from './components/CaseStudies';
+import Testimonials from './components/Testimonials';
 import ROICalculator from './components/ROICalculator';
 import Services from './components/Services';
 import FAQ from './components/FAQ';
@@ -39,6 +40,7 @@ export default function App() {
         <Gallery />
         <Stats />
         <CaseStudies />
+        <Testimonials />
         <Services />
         <FAQ />
       </main>

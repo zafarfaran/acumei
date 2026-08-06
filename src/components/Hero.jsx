@@ -78,7 +78,7 @@ export default function Hero({ scrollY = 0 }) {
                 verticalAlign: 'middle',
               }}
             />
-            AI for British businesses · London
+            AI for British businesses
           </div>
 
           <h1 className="display hero-title" style={{

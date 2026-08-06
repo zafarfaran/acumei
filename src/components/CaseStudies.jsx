@@ -9,6 +9,8 @@ const CASES = [
     after: 'A voicemail-to-dispatch agent triages, texts the on-call engineer and confirms the slot.',
     metric: '14 sec',
     metricLabel: 'avg dispatch',
+    quote: 'First weekend it ran, it caught a burst-pipe callout at 2am that we\u2019d have slept through. Paid for itself that night.',
+    author: 'Dave M., owner',
   },
   {
     tag: 'Restaurant \u00b7 Leeds',
@@ -17,6 +19,8 @@ const CASES = [
     after: 'A POS-aware ordering agent drafts the weekly order. The chef approves with a single tap.',
     metric: '\u221224%',
     metricLabel: 'food waste',
+    quote: 'Sunday nights used to be me, a spreadsheet and a calculator. Now it\u2019s one tap and I\u2019m done by eight.',
+    author: 'Priya K., general manager',
   },
   {
     tag: 'Salon \u00b7 Manchester',
@@ -25,6 +29,8 @@ const CASES = [
     after: "A daily rebooking agent sends personalised messages in the owner's voice.",
     metric: '7\u00d7',
     metricLabel: 'rebookings/wk',
+    quote: 'It sounds like me, not a robot. Clients reply thinking I texted them myself \u2014 honestly that\u2019s the bit that sold me.',
+    author: 'Sophie T., owner',
   },
 ];
 
@@ -97,6 +103,30 @@ export default function CaseStudies() {
               </div>
               <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.5 }}>{c.after}</div>
             </div>
+            <figure style={{
+              margin: '20px 0 0',
+              padding: '16px 18px',
+              background: 'var(--surface)',
+              borderLeft: '2px solid var(--accent)',
+            }}>
+              <blockquote className="display-ital" style={{
+                margin: 0,
+                fontSize: 16,
+                lineHeight: 1.45,
+                color: 'var(--ink)',
+              }}>
+                &ldquo;{c.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mono" style={{
+                marginTop: 10,
+                fontSize: 10,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--muted)',
+              }}>
+                {c.author}
+              </figcaption>
+            </figure>
             <div style={{
               marginTop: 24,
               paddingTop: 20,

@@ -74,10 +74,3 @@ section[id] {
 .arrow-loop {
   animation: a-arrow 2.4s ease-in-out infinite;
 }
-
-.play-btn {
-  transition: transform 0.3s;
-}
-.play-card:hover .play-btn {
-  transform: scale(1.1);
-}
