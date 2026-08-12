@@ -1,128 +1,89 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useDither from '../hooks/useDither';
+import { subscribeScroll } from '../lib/scrollLoop';
 
-function scrollTo(id) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth' });
-}
+const LINKS = [
+  { href: '#industries', label: 'The AI Brain' },
+  { href: '#how', label: 'How it works' },
+  { href: '#calc', label: 'Calculator' },
+  { href: '#work', label: 'Work' },
+  { href: '#notes', label: 'Notes' },
+];
 
 export default function Nav() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const navRef = useRef(null);
+  const progRef = useRef(null);
+  const [markRef] = useDither({ mode: 'brain', cell: 2, dot: 1, color: 'rgba(232,160,75,.9)', gain: 1.15 });
 
-  const go = (id) => {
-    setMenuOpen(false);
-    scrollTo(id);
-  };
+  // background cross-fades at 40px; the progress bar tracks every frame
+  useEffect(() => subscribeScroll((y, vh) => {
+    navRef.current?.classList.toggle('stuck', y > 40);
+    const travel = document.body.scrollHeight - vh;
+    if (progRef.current) {
+      progRef.current.style.width = travel > 0 ? `${(y / travel) * 100}%` : '0%';
+    }
+  }), []);
+
+  useEffect(() => {
+    document.body.classList.toggle('menu', open);
+    return () => document.body.classList.remove('menu');
+  }, [open]);
+
+  // escape closes the overlay
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
 
   return (
-    <nav className="nav-bar" style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 50,
-      background: '#0e0e10d9',
-      backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid var(--border)',
-      padding: '16px 56px',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="var(--ink)" strokeWidth="1.5" />
-          <circle cx="12" cy="12" r="3" fill="var(--accent)" />
-          <path d="M12 2 L12 22 M2 12 L22 12" stroke="var(--ink)" strokeWidth="0.5" opacity="0.3" />
-        </svg>
-        <span className="display" style={{ fontSize: 26, letterSpacing: '-0.01em' }}>Acumei</span>
-      </div>
+    <>
+      <div className="prog" ref={progRef} />
 
-      <div className="nav-links" style={{
-        display: 'flex',
-        gap: 32,
-        fontSize: 14,
-        color: 'var(--ink-soft)',
-      }}>
-        <a onClick={() => go('industries')} style={{ cursor: 'pointer' }}>The AI Brain</a>
-        <a onClick={() => go('how')} style={{ cursor: 'pointer' }}>How it works</a>
-        <a onClick={() => go('customers')} style={{ cursor: 'pointer' }}>Customers</a>
-        <a onClick={() => go('services')} style={{ cursor: 'pointer' }}>Pricing</a>
-        <a onClick={() => go('faq')} style={{ cursor: 'pointer' }}>FAQ</a>
-      </div>
+      <nav className="nav" ref={navRef}>
+        <a href="#top" className="wordmark">
+          <canvas ref={markRef} aria-hidden="true" />
+          Acumei
+        </a>
 
-      <button className="nav-cta btn-glow" onClick={() => go('book')} style={{
-        padding: '10px 18px',
-        background: 'var(--ink)',
-        color: 'var(--bg)',
-        border: 'none',
-        borderRadius: 999,
-        fontSize: 13,
-        cursor: 'pointer',
-        fontFamily: 'inherit',
-      }}>Book a call →</button>
-
-      {/* Hamburger button — hidden on desktop via CSS */}
-      <button
-        className="nav-hamburger"
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label="Toggle menu"
-        style={{
-          display: 'none',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          padding: 4,
-        }}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" stroke="var(--ink)" strokeWidth="2" strokeLinecap="round">
-          {menuOpen ? (
-            <>
-              <line x1="6" y1="6" x2="18" y2="18" />
-              <line x1="6" y1="18" x2="18" y2="6" />
-            </>
-          ) : (
-            <>
-              <line x1="4" y1="7" x2="20" y2="7" />
-              <line x1="4" y1="12" x2="20" y2="12" />
-              <line x1="4" y1="17" x2="20" y2="17" />
-            </>
-          )}
-        </svg>
-      </button>
-
-      {/* Mobile dropdown menu */}
-      {menuOpen && (
-        <div className="nav-mobile-menu" style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          right: 0,
-          background: '#0e0e10f0',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid var(--border)',
-          padding: '16px 24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16,
-          fontSize: 16,
-          color: 'var(--ink-soft)',
-        }}>
-          <a onClick={() => go('industries')} style={{ cursor: 'pointer' }}>The AI Brain</a>
-          <a onClick={() => go('how')} style={{ cursor: 'pointer' }}>How it works</a>
-          <a onClick={() => go('customers')} style={{ cursor: 'pointer' }}>Customers</a>
-          <a onClick={() => go('services')} style={{ cursor: 'pointer' }}>Pricing</a>
-          <a onClick={() => go('faq')} style={{ cursor: 'pointer' }}>FAQ</a>
-          <button onClick={() => go('book')} style={{
-            padding: '12px 18px',
-            background: 'var(--ink)',
-            color: 'var(--bg)',
-            border: 'none',
-            borderRadius: 999,
-            fontSize: 14,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            marginTop: 8,
-          }}>Book a call →</button>
+        <div className="navlinks">
+          {LINKS.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
         </div>
-      )}
-    </nav>
+
+        <a href="#book" className="navcta">Book a call</a>
+
+        <button
+          className="burger"
+          aria-label="Menu"
+          aria-expanded={open}
+          aria-controls="menu"
+          onClick={() => setOpen((o) => !o)}
+        >
+          <i /><i /><i />
+        </button>
+      </nav>
+
+      <div className="menu" id="menu" aria-hidden={!open}>
+        {LINKS.map((l, i) => (
+          <a
+            key={l.href}
+            href={l.href}
+            style={{ '--d': `${60 + i * 60}ms` }}
+            onClick={() => setOpen(false)}
+            tabIndex={open ? 0 : -1}
+          >
+            {l.label}
+          </a>
+        ))}
+        <div className="foot" style={{ '--d': '360ms' }}>
+          <a href="#book" onClick={() => setOpen(false)} tabIndex={open ? 0 : -1}>
+            Book a 30-minute discovery call →
+          </a>
+          <span className="mono" style={{ marginTop: 10 }}>hello@acumei.co.uk</span>
+        </div>
+      </div>
+    </>
   );
 }

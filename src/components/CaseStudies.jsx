@@ -1,153 +1,57 @@
-import useInView from '../hooks/useInView';
-import SectionLabel from './SectionLabel';
-
+// Copy and metrics unchanged. `img` dropped — no photography in this design,
+// and the quote/author no longer have a slot in the record row.
 const CASES = [
   {
-    tag: 'Plumbing & heating \u00b7 Bristol',
-    img: '/images/plumber.jpg',
-    before: 'After-hours calls slipped to voicemail until morning. Roughly \u00a324,000 a year in lost emergency callouts.',
+    tag: 'Plumbing & heating · Bristol',
+    before: 'After-hours calls slipped to voicemail until morning. Roughly £24,000 a year in lost emergency callouts.',
     after: 'A voicemail-to-dispatch agent triages, texts the on-call engineer and confirms the slot.',
     metric: '14 sec',
     metricLabel: 'avg dispatch',
-    quote: 'First weekend it ran, it caught a burst-pipe callout at 2am that we\u2019d have slept through. Paid for itself that night.',
-    author: 'Dave M., owner',
   },
   {
-    tag: 'Restaurant \u00b7 Leeds',
-    img: '/images/restaurant.jpg',
+    tag: 'Restaurant · Leeds',
     before: 'Weekly orders done by hand on a Sunday night. Persistent overstock on perishables.',
     after: 'A POS-aware ordering agent drafts the weekly order. The chef approves with a single tap.',
-    metric: '\u221224%',
+    metric: '−24%',
     metricLabel: 'food waste',
-    quote: 'Sunday nights used to be me, a spreadsheet and a calculator. Now it\u2019s one tap and I\u2019m done by eight.',
-    author: 'Priya K., general manager',
   },
   {
-    tag: 'Salon \u00b7 Manchester',
-    img: '/images/salon-interior.jpg',
-    before: 'Lapsed clients drifted away. The owner felt awkward "chasing" them.',
-    after: "A daily rebooking agent sends personalised messages in the owner's voice.",
-    metric: '7\u00d7',
+    tag: 'Salon · Manchester',
+    before: 'Lapsed clients drifted away. The owner felt awkward “chasing” them.',
+    after: 'A daily rebooking agent sends personalised messages in the owner’s voice.',
+    metric: '7×',
     metricLabel: 'rebookings/wk',
-    quote: 'It sounds like me, not a robot. Clients reply thinking I texted them myself \u2014 honestly that\u2019s the bit that sold me.',
-    author: 'Sophie T., owner',
   },
 ];
 
 export default function CaseStudies() {
-  const [ref, inView] = useInView();
-
   return (
-    <section id="customers" className="cases-section" style={{
-      padding: '120px 56px',
-      background: 'var(--surface)',
-      borderBottom: '1px solid var(--border)',
-    }}>
-      <SectionLabel n="05" label="Customers, quietly running" />
-      <h2 className="display cases-title" style={{
-        fontSize: 60,
-        margin: 0,
-        letterSpacing: '-0.025em',
-        maxWidth: 860,
-        lineHeight: 1.05,
-      }}>
-        Quietly running in the background of real British businesses.
+    <section id="work">
+      <div className="shead" data-reveal>
+        <span className="mono">04</span>
+        <span className="mono">Customers, quietly running</span>
+      </div>
+
+      <h2 className="swipe" data-reveal>
+        Quietly running in the background of <span className="amb">real British businesses.</span>
       </h2>
-      <div
-        ref={ref}
-        className={`cases-grid animate-in${inView ? ' in-view' : ''}`}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 24,
-          marginTop: 60,
-        }}
-      >
+
+      <div className="cases">
         {CASES.map((c, i) => (
-          <div key={i} className="card-hover stagger" style={{
-            background: 'var(--bg)',
-            border: '1px solid var(--border)',
-            padding: 28,
-          }}>
-            <div className="mono" style={{
-              fontSize: 11,
-              letterSpacing: '0.12em',
-              color: 'var(--accent)',
-              textTransform: 'uppercase',
-              marginBottom: 24,
-            }}>
-              {c.tag}
+          <a className="case" href="#book" key={c.tag} data-reveal style={{ '--d': `${i * 90}ms` }}>
+            <div className="tag">{c.tag}</div>
+            <div className="ba before"><span className="k">Before</span>{c.before}</div>
+            <div className="ba after"><span className="k">After</span>{c.after}</div>
+            <div className="m">
+              <b>{c.metric}</b>
+              <span>{c.metricLabel}</span>
             </div>
-            <div className="img-zoom" style={{ height: 140, overflow: 'hidden', border: '1px solid var(--border)' }}>
-              <img src={c.img} alt={c.tag} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            </div>
-            <div style={{ marginTop: 20 }}>
-              <div className="mono" style={{
-                fontSize: 10,
-                color: 'var(--muted)',
-                letterSpacing: '0.15em',
-                marginBottom: 6,
-              }}>
-                BEFORE
-              </div>
-              <div style={{ fontSize: 14, color: 'var(--ink-soft)', lineHeight: 1.5, marginBottom: 16 }}>
-                {c.before}
-              </div>
-              <div className="mono" style={{
-                fontSize: 10,
-                color: 'var(--accent)',
-                letterSpacing: '0.15em',
-                marginBottom: 6,
-              }}>
-                AFTER
-              </div>
-              <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.5 }}>{c.after}</div>
-            </div>
-            <figure style={{
-              margin: '20px 0 0',
-              padding: '16px 18px',
-              background: 'var(--surface)',
-              borderLeft: '2px solid var(--accent)',
-            }}>
-              <blockquote className="display-ital" style={{
-                margin: 0,
-                fontSize: 16,
-                lineHeight: 1.45,
-                color: 'var(--ink)',
-              }}>
-                &ldquo;{c.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mono" style={{
-                marginTop: 10,
-                fontSize: 10,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--muted)',
-              }}>
-                {c.author}
-              </figcaption>
-            </figure>
-            <div style={{
-              marginTop: 24,
-              paddingTop: 20,
-              borderTop: '1px solid var(--border)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'baseline',
-            }}>
-              <span className="display" style={{
-                fontSize: 44,
-                color: 'var(--accent)',
-                letterSpacing: '-0.02em',
-              }}>
-                {c.metric}
-              </span>
-              <span style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.05em' }}>
-                {c.metricLabel}
-              </span>
-            </div>
-          </div>
+          </a>
         ))}
+      </div>
+
+      <div className="more" data-reveal>
+        <a className="act" href="#book">Read the full case studies <span>→</span></a>
       </div>
     </section>
   );

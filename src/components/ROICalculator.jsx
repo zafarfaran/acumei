@@ -1,197 +1,139 @@
-import { useState, useEffect } from 'react';
-import useInView from '../hooks/useInView';
-import SectionLabel from './SectionLabel';
+import { useState, useEffect, useRef } from 'react';
+import useDither from '../hooks/useDither';
+import useParallax from '../hooks/useParallax';
 
-function useCountUp(target, durationMs = 600) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    let raf;
-    let start;
-    const to = Number(target) || 0;
-    const tick = (t) => {
-      if (!start) start = t;
-      const p = Math.min(1, (t - start) / durationMs);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setVal(to * eased);
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, durationMs]);
-  return val;
-}
+const gbp = (n) => '£' + Math.round(n).toLocaleString('en-GB');
 
-function Slider({ label, value, setValue, min, max, step, format }) {
-  return (
-    <div style={{ marginBottom: 22 }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'baseline',
-        marginBottom: 8,
-      }}>
-        <span style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.02em' }}>{label}</span>
-        <span style={{ fontSize: 15, fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
-          {format(value)}
-        </span>
-      </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
-        style={{ width: '100%', accentColor: 'var(--accent)', height: 4 }}
-      />
-    </div>
-  );
-}
+const FIELDS = [
+  { key: 'hours', label: 'Hours/week on manual work (per person)', min: 2, max: 40, step: 1, format: (v) => `${v} hrs` },
+  { key: 'rate', label: 'Hourly value of that time', min: 10, max: 250, step: 5, format: (v) => `£${v}` },
+  { key: 'people', label: 'People doing this work', min: 1, max: 50, step: 1, format: (v) => `${v}` },
+  { key: 'cost', label: 'One-off build investment', min: 1000, max: 100000, step: 500, format: gbp },
+];
+
+const TWEEN_MS = 520;
 
 export default function ROICalculator() {
-  const [hours, setHours] = useState(12);
-  const [rate, setRate] = useState(35);
-  const [employees, setEmployees] = useState(3);
-  const [buildCost, setBuildCost] = useState(2500);
+  const [inputs, setInputs] = useState({ hours: 12, rate: 35, people: 3, cost: 2500 });
+  const [out, setOut] = useState({ annual: 0, hours: 0, payback: 0 });
+  const [started, setStarted] = useState(false);
 
-  const hoursSavedWeekly = hours * employees * 0.75;
-  const weeklySavings = hoursSavedWeekly * rate;
-  const annualSavings = weeklySavings * 50;
-  const paybackWeeks = Math.max(0.5, buildCost / Math.max(weeklySavings, 1));
+  const sectionRef = useRef(null);
+  const from = useRef({ annual: 0, hours: 0, payback: 0 });
+  const raf = useRef(0);
 
-  const animatedAnnual = useCountUp(annualSavings);
-  const animatedHours = useCountUp(hoursSavedWeekly);
-  const animatedPayback = useCountUp(paybackWeeks);
-  const [ref, inView] = useInView();
+  const [flowRef, flow] = useDither({
+    mode: 'flow',
+    cell: 3,
+    dot: 1.4,
+    color: 'rgba(232,160,75,.6)',
+  });
+  const parRef = useParallax(0.05, 0.6);
+
+  // the first computation fires when the section scrolls into view, not on mount
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      setStarted(true);
+      io.disconnect();
+    }, { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+
+    const { hours, rate, people, cost } = inputs;
+    const hoursSaved = hours * people * 0.75;
+    const weekly = hoursSaved * rate;
+    const annual = weekly * 50;
+    const payback = Math.max(0.5, cost / Math.max(weekly, 1));
+
+    flow.current?.set('k', Math.min(1, annual / 600000));
+
+    // ease from the previous value, not from zero
+    const start = from.current;
+    const target = { annual, hours: hoursSaved, payback };
+    const t0 = performance.now();
+
+    const step = (now) => {
+      const p = Math.min(1, (now - t0) / TWEEN_MS);
+      const e = 1 - Math.pow(1 - p, 3);
+      const v = {
+        annual: start.annual + (target.annual - start.annual) * e,
+        hours: start.hours + (target.hours - start.hours) * e,
+        payback: start.payback + (target.payback - start.payback) * e,
+      };
+      from.current = v;
+      setOut(v);
+      if (p < 1) raf.current = requestAnimationFrame(step);
+    };
+
+    raf.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf.current);
+  }, [inputs, started, flow]);
 
   return (
-    <section className="roi-section" style={{ padding: '120px 56px', borderBottom: '1px solid var(--border)' }}>
-      <SectionLabel n="06" label="Calculator" />
-      <div
-        ref={ref}
-        className={`roi-grid animate-in${inView ? ' in-view' : ''}`}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1.4fr',
-          gap: 64,
-          alignItems: 'start',
-        }}
-      >
-        <div className="roi-left" style={{ position: 'sticky', top: 100 }}>
-          <h2 className="display roi-title" style={{
-            fontSize: 60,
-            margin: 0,
-            letterSpacing: '-0.025em',
-            lineHeight: 1.05,
-          }}>
-            What is manual work{' '}
-            <span className="display-ital" style={{ color: 'var(--accent)' }}>actually costing you?</span>
-          </h2>
-          <p style={{
-            fontSize: 16,
-            color: 'var(--ink-soft)',
-            lineHeight: 1.6,
-            marginTop: 24,
-            maxWidth: 420,
-          }}>
+    <section id="calc" ref={sectionRef}>
+      <div className="shead" data-reveal>
+        <span className="mono">03</span>
+        <span className="mono">Calculator</span>
+      </div>
+
+      <h2 className="swipe" data-reveal>
+        What is manual work <span className="amb">actually costing you?</span>
+      </h2>
+
+      <div className="calc">
+        <div className="inputs" data-reveal style={{ '--d': '140ms' }}>
+          {FIELDS.map((f) => (
+            <div className="field" key={f.key}>
+              <div className="top">
+                <label className="lb" htmlFor={`i-${f.key}`}>{f.label}</label>
+                <span className="vl num">{f.format(inputs[f.key])}</span>
+              </div>
+              <input
+                id={`i-${f.key}`}
+                type="range"
+                min={f.min}
+                max={f.max}
+                step={f.step}
+                value={inputs[f.key]}
+                onChange={(e) => setInputs((s) => ({ ...s, [f.key]: +e.target.value }))}
+              />
+            </div>
+          ))}
+          <p className="assume">
             Drag the sliders. We assume automation captures 75% of the hours described.
           </p>
         </div>
 
-        <div className="roi-card" style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          padding: 32,
-          borderRadius: 4,
-        }}>
-          <div className="roi-inner-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+        <div className="readout" data-reveal style={{ '--d': '220ms' }}>
+          <div>
+            <div className="mono" style={{ marginBottom: 14 }}>Annual savings</div>
+            <div className="headline-num">{gbp(out.annual)}</div>
+          </div>
+
+          <canvas
+            className="flow"
+            ref={(el) => { flowRef.current = el; parRef.current = el; }}
+            aria-hidden="true"
+          />
+
+          <div className="pair">
             <div>
-              <div style={{
-                fontSize: 11,
-                letterSpacing: '0.18em',
-                color: 'var(--muted)',
-                marginBottom: 18,
-                textTransform: 'uppercase',
-              }}>
-                Inputs
-              </div>
-              <Slider
-                label="Hours/week on manual work (per person)"
-                value={hours}
-                setValue={setHours}
-                min={2}
-                max={40}
-                step={1}
-                format={(v) => `${v} hrs`}
-              />
-              <Slider
-                label="Hourly value of that time"
-                value={rate}
-                setValue={setRate}
-                min={10}
-                max={250}
-                step={5}
-                format={(v) => `\u00a3${v}`}
-              />
-              <Slider
-                label="People doing this work"
-                value={employees}
-                setValue={setEmployees}
-                min={1}
-                max={50}
-                step={1}
-                format={(v) => `${v}`}
-              />
-              <Slider
-                label="One-off build investment"
-                value={buildCost}
-                setValue={setBuildCost}
-                min={1000}
-                max={100000}
-                step={500}
-                format={(v) => `\u00a3${v.toLocaleString()}`}
-              />
+              <div className="mono">Hours saved / wk</div>
+              <div className="v">{out.hours.toFixed(1)}</div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div style={{
-                fontSize: 11,
-                letterSpacing: '0.18em',
-                color: 'var(--muted)',
-                marginBottom: 18,
-                textTransform: 'uppercase',
-              }}>
-                Result
-              </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 24 }}>
-                <div>
-                  <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 6 }}>Annual savings</div>
-                  <div style={{
-                    fontSize: 52,
-                    fontWeight: 300,
-                    letterSpacing: '-0.03em',
-                    color: 'var(--accent)',
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1,
-                  }}>
-                    £{Math.round(animatedAnnual).toLocaleString()}
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <div>
-                    <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>Hours saved/wk</div>
-                    <div style={{ fontSize: 24, fontWeight: 400, fontVariantNumeric: 'tabular-nums' }}>
-                      {animatedHours.toFixed(1)}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>Payback</div>
-                    <div style={{ fontSize: 24, fontWeight: 400, fontVariantNumeric: 'tabular-nums' }}>
-                      {animatedPayback < 4
-                        ? `${animatedPayback.toFixed(1)} wks`
-                        : `${(animatedPayback / 4.33).toFixed(1)} mos`}
-                    </div>
-                  </div>
-                </div>
+            <div>
+              <div className="mono">Payback</div>
+              <div className="v">
+                {out.payback < 4
+                  ? `${out.payback.toFixed(1)} wks`
+                  : `${(out.payback / 4.33).toFixed(1)} mos`}
               </div>
             </div>
           </div>
