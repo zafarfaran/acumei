@@ -109,7 +109,14 @@ export function dither(canvas, opts) {
   const gain = opts.gain == null ? 1 : opts.gain;
   let field = FIELDS[opts.mode] || FIELDS.orb;
   let color = opts.color || 'rgba(241,237,228,0.72)';
-  const params = Object.assign({ mx: 0, my: 0, k: 0 }, opts.params);
+  // ox   horizontal offset of the shape within the field
+  // boot 0..1 — below 1, cells mix toward hashed noise (the resolve-in)
+  // lens strength of the hole opened around px,py — 0 disables the whole test
+  // px/py centre of that hole, in field space; (9,9) parks it off-field
+  const params = Object.assign(
+    { mx: 0, my: 0, k: 0, ox: 0, boot: 1, lens: 0, px: 9, py: 9 },
+    opts.params
+  );
   let cols = 0, rows = 0, w = 0, h = 0, t = opts.seed || 0, last = 0, running = true, raf = 0;
 
   const still = typeof matchMedia === 'function'
@@ -135,8 +142,17 @@ export function dither(canvas, opts) {
       const v = (ry / rows) * 2 - 1;
       const brow = BAYER[ry & 3];
       for (let cx = 0; cx < cols; cx++) {
-        const u = ((cx / cols) * 2 - 1) * (ar > 1 ? ar : 1);
-        const val = field(u, v, t, params) * gain;
+        const u = ((cx / cols) * 2 - 1) * (ar > 1 ? ar : 1) - params.ox;
+        let val = field(u, v, t, params) * gain;
+        if (params.lens) {
+          const dx = u - params.px, dy = v - params.py;
+          val *= 1 - params.lens * Math.exp(-(dx * dx + dy * dy) * 16);
+        }
+        if (params.boot < 1) {
+          const s = Math.sin((cx * 12.9898 + ry * 78.233 + Math.floor(t * 12)) * 0.577) * 43758.5453;
+          const n = s - Math.floor(s);
+          val = val * params.boot + n * (1 - params.boot) * 0.85;
+        }
         if (ascii) {
           const q = val + (brow[cx & 3] - 0.5) * 0.14;
           if (q <= 0.06) continue;
