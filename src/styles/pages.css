@@ -5,25 +5,35 @@
 /* Two columns: the reading column, and a sticky field occupying the space the
    72ch measure leaves empty on a wide screen. */
 .page {
-  padding-top: clamp(130px, 18vh, 210px);
+  --page-top: clamp(130px, 18vh, 210px);
+  padding-top: var(--page-top);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(150px, 26vw, 420px);
-  gap: clamp(24px, 5vw, 80px);
+  grid-template-columns: minmax(0, 1fr) clamp(200px, 32vw, 540px);
+  gap: clamp(24px, 5vw, 72px);
   align-items: start;
 }
 
 .page-main { min-width: 0; }
 
+/* A full-height sticky box so the field sits centred in the viewport for the
+   whole length of the page, rather than pinned near the top. */
 .page-rail {
   position: sticky;
-  top: clamp(120px, 16vh, 180px);
+  top: 0;
+  height: 100vh;
+  /* cancel the section's top padding so the field is centred in the viewport
+     at rest, not pushed a padding's worth below it */
+  margin-top: calc(-1 * var(--page-top));
   min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .page-field {
   display: block;
   width: 100%;
-  height: min(58vh, 460px);
+  height: min(72vh, 640px);
   opacity: 0.68;
   -webkit-mask-image: radial-gradient(ellipse 70% 62% at 50% 50%, #000 34%, transparent 76%);
   mask-image: radial-gradient(ellipse 70% 62% at 50% 50%, #000 34%, transparent 76%);
