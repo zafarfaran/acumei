@@ -1,11 +1,26 @@
 :root {
-  --bg: #0e0e10;
-  --bg-alt: #16161a;
-  --ink: #f3eee2;
-  --ink-soft: #b9b3a4;
-  --muted: #7a746a;
-  --border: #2a2a2e;
-  --accent: #e8a04b;
-  --accent-soft: #3a2e1c;
-  --surface: #18181c;
+  --bg: #0a0a0b;                  /* page background */
+  --ink: #f1ede4;                 /* primary text, and the Book section background */
+  --soft: #9b958a;                /* secondary text */
+  --dim: #5f5b53;                 /* labels, mono microcopy, tertiary */
+  --line: rgba(241, 237, 228, 0.11);  /* every hairline rule */
+  --amber: #e8a04b;               /* accent — max two uses per viewport */
+  --pad: clamp(24px, 5vw, 88px);  /* horizontal page gutter */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --body: 'Instrument Sans', system-ui, sans-serif;
+  --display: 'Instrument Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* display rule — applied to every h1/h2/h3 and to large numerals */
+  --dw: 500;
+  --dls: -0.042em;
+  --dlh: 0.98;
+
+  /* inverted (Book) section equivalents — --amber fails contrast on --ink */
+  --ink-on-light: #0a0a0b;
+  --soft-on-light: rgba(10, 10, 11, 0.66);
+  --dim-on-light: rgba(10, 10, 11, 0.45);
+  --line-on-light: rgba(10, 10, 11, 0.16);
+  --amber-on-light: #a9701e;
 }

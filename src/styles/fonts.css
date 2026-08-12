@@ -1,30 +1,14 @@
-/* Inter — variable weight */
+/* Instrument Sans — variable weight (400–700), width axis flattened to 100.
+   Subset to latin + general punctuation + arrows. Display and body. */
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Instrument Sans';
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400 700;
   font-display: swap;
-  src: url('../fonts/Inter-Variable.woff2') format('woff2');
+  src: url('../fonts/InstrumentSans-Variable.woff2') format('woff2');
 }
 
-/* Fraunces — variable weight, optical size, SOFT, WONK */
-@font-face {
-  font-family: 'Fraunces';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url('../fonts/Fraunces-Variable.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fraunces';
-  font-style: italic;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url('../fonts/Fraunces-Italic-Variable.woff2') format('woff2');
-}
-
-/* JetBrains Mono — variable weight */
+/* JetBrains Mono — variable weight. Labels, timestamps, microcopy, legal. */
 @font-face {
   font-family: 'JetBrains Mono';
   font-style: normal;

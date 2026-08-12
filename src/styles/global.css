@@ -1,76 +1,128 @@
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* Base type, shared primitives and the handful of elements every section uses.
+   Per-section layout lives in sections.css; motion in animations.css. */
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
 }
 
 body {
+  margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--body);
   font-size: 16px;
-  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  text-wrap: pretty;
+  overflow-x: hidden;
 }
 
-#a-scroll {
-  scrollbar-width: thin;
-}
-
-.display {
-  font-family: 'Fraunces', 'Times New Roman', serif;
-  font-weight: 380;
-  letter-spacing: -0.022em;
-  font-variation-settings: "opsz" 144, "SOFT" 50;
-}
-
-.display-ital {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-weight: 380;
-  font-variation-settings: "opsz" 144, "SOFT" 100;
-}
-
-.mono {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+h1, h2, h3 {
+  font-family: var(--display);
+  font-weight: var(--dw);
+  letter-spacing: var(--dls);
+  line-height: var(--dlh);
+  margin: 0;
 }
 
 a {
-  color: inherit;
+  color: var(--ink);
   text-decoration: none;
-  cursor: pointer;
 }
 
-/* Offset for sticky nav when scrolling to anchors */
-section[id] {
-  scroll-margin-top: 70px;
+a:hover { color: var(--amber); }
+
+button { font-family: inherit; }
+
+.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  font-weight: 400;
 }
 
-.marquee {
+.rule {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+  margin: 0;
+}
+
+section {
+  padding: clamp(90px, 13vh, 170px) var(--pad);
+  position: relative;
+}
+
+/* every numeric readout */
+.num { font-variant-numeric: tabular-nums; }
+
+/* section head: 01 / label */
+.shead {
   display: flex;
-  gap: 64px;
-  animation: a-marq 40s linear infinite;
-  white-space: nowrap;
+  gap: 18px;
+  align-items: baseline;
+  margin-bottom: clamp(28px, 4vh, 46px);
 }
 
-.grain {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.06;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+h1 {
+  font-size: clamp(46px, 7.6vw, 116px);
+  max-width: 15ch;
 }
 
-.pulse-dot {
-  animation: a-pulse 2s ease-in-out infinite;
+h2 {
+  font-size: clamp(30px, 4.4vw, 64px);
+  max-width: 24ch;
 }
 
-.reveal {
-  animation: a-reveal 0.8s ease-out both;
+h1 .amb, h2 .amb { color: var(--amber); }
+
+.lede {
+  font-size: clamp(16px, 1.35vw, 20px);
+  line-height: 1.55;
+  color: var(--soft);
+  max-width: 56ch;
+  margin: clamp(24px, 3.4vh, 38px) 0 0;
 }
 
-.arrow-loop {
-  animation: a-arrow 2.4s ease-in-out infinite;
+.lede strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.sub {
+  font-size: 16px;
+  color: var(--soft);
+  margin: 22px 0 0;
+  max-width: 52ch;
+  line-height: 1.55;
+}
+
+/* arrow text link — the only call to action shape on the site */
+.act {
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line);
+  transition: border-color 0.35s, color 0.35s;
+}
+
+.act:hover { border-color: var(--amber); }
+.act span { transition: transform 0.4s var(--ease); }
+.act:hover span { transform: translateX(6px); }
+
+.more { margin-top: 32px; }
+
+/* 5px status dot — the only border-radius on the page */
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: pulse 3.2s ease-in-out infinite;
 }
