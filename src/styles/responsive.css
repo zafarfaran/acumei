@@ -3,21 +3,20 @@
 @media (max-width: 900px) {
   .hero { padding-top: 112px; min-height: 100svh; }
 
-  /* the brain stops being an object and becomes atmosphere behind the text */
+  /* still fills the hero, but sits behind the text as atmosphere rather than
+     reading as an object */
   .hero-brain {
     position: absolute;
-    left: 50%;
+    left: 0;
     right: auto;
-    top: 44%;
-    width: 130vw;
-    height: 130vw;
+    top: 0;
+    width: 100%;
+    height: 100%;
     opacity: 0.3;
-    transform: translate(-50%, -50%) !important;
-    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 26%, transparent 62%);
-    mask-image: radial-gradient(circle at 50% 50%, #000 26%, transparent 62%);
+    transform: none !important;
+    -webkit-mask-image: radial-gradient(ellipse 62% 42% at 50% 46%, #000 26%, transparent 68%);
+    mask-image: radial-gradient(ellipse 62% 42% at 50% 46%, #000 26%, transparent 68%);
   }
-
-  .caps { grid-template-columns: repeat(2, 1fr); }
 
   .ind, .calc { grid-template-columns: 1fr; }
 
@@ -69,9 +68,8 @@
   .note .t { grid-column: 1 / -1; order: 2; }
   .note .ar { display: none; }
 
-  .caps { grid-template-columns: 1fr; gap: 0; }
-
-  .feed { min-height: 150px; }
+  /* the feed's height is measured, so it needs no breakpoint of its own —
+     rows are two lines tall here and the measurement follows */
 
   .steps4 { grid-template-columns: 1fr; gap: 26px; }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 // [time, label, status, notable]
 const EVENTS = [
@@ -12,67 +12,81 @@ const EVENTS = [
   ['21:55', 'Enquiry onboarded · Bath', 'letter queued', 0],
 ];
 
-const VISIBLE = 4;
+const VISIBLE = 3;
 const INTERVAL = 4200;
-const EXIT = 560;
+const EXIT = 820;
 
+// Rows live in a fixed-height container and are moved by transform alone —
+// never inserted into or removed from normal flow. Inserting in flow changes
+// the document height every 4.2s, which resizes the scrollbar and jitters the
+// whole page.
 export default function LiveFeed() {
-  // rows hold a monotonic key so React can animate the same event twice
   const [rows, setRows] = useState(() =>
-    Array.from({ length: VISIBLE }, (_, i) => ({ key: i, event: EVENTS[i % EVENTS.length] }))
+    Array.from({ length: VISIBLE }, (_, i) => ({ key: i, event: EVENTS[i % EVENTS.length], slot: i }))
   );
+  const [rowH, setRowH] = useState(27);
   const next = useRef(VISIBLE);
   const feedRef = useRef(null);
+  const timers = useRef([]);
 
-  // Pin the feed to exactly VISIBLE rows, plus one row of padding for the row
-  // on its way out. Otherwise the outgoing row keeps five rows in flow for
-  // 560ms of every 4.2s, the hero grows, and the scrollbar visibly resizes.
-  // Measured rather than hardcoded: the row is one line tall on desktop and
-  // two below 640px, where the status wraps.
+  // one row is one line on desktop and two below 640px, so the height is
+  // measured rather than assumed
+  const measure = useCallback(() => {
+    const row = feedRef.current?.querySelector('.trow');
+    const h = row?.getBoundingClientRect().height;
+    if (h > 4) setRowH(h);
+  }, []);
+
   useEffect(() => {
-    const el = feedRef.current;
-    const row = el?.querySelector('.trow');
+    const row = feedRef.current?.querySelector('.trow');
     if (!row) return;
-    const apply = () => {
-      const h = row.getBoundingClientRect().height;
-      if (!h) return;
-      el.style.height = `${h * VISIBLE}px`;
-      // +10px covers the 10px the outgoing row translates down as it fades,
-      // which would otherwise be clipped by .ticker's overflow
-      el.style.paddingBottom = `${h + 10}px`;
-    };
-    apply();
-    const ro = new ResizeObserver(apply);
+    measure();
+    const ro = new ResizeObserver(measure);
     ro.observe(row);
     return () => ro.disconnect();
-  }, []);
+  }, [measure]);
 
   useEffect(() => {
     const id = setInterval(() => {
       if (document.hidden) return;
       const key = next.current++;
-      setRows((prev) => {
-        // the outgoing row stays mounted for one exit animation
-        const kept = prev.filter((r) => !r.leaving);
-        const leaving = { ...kept[kept.length - 1], leaving: true };
-        return [
-          { key, event: EVENTS[key % EVENTS.length] },
-          ...kept.slice(0, VISIBLE - 1),
-          leaving,
-        ];
-      });
-      setTimeout(
-        () => setRows((prev) => prev.filter((r) => !r.leaving)),
-        EXIT
-      );
+
+      // the new row is committed one slot above the top, then dropped into
+      // place on the next frame so the transition has somewhere to run from
+      setRows((prev) => [
+        { key, event: EVENTS[key % EVENTS.length], slot: -1 },
+        ...prev.map((r) => ({ ...r, slot: r.slot + 1 })).filter((r) => r.slot <= VISIBLE),
+      ]);
+
+      const raf = requestAnimationFrame(() => requestAnimationFrame(() => {
+        setRows((prev) => prev.map((r) => (r.slot === -1 ? { ...r, slot: 0 } : r)));
+      }));
+
+      const t = setTimeout(() => {
+        setRows((prev) => prev.filter((r) => r.slot < VISIBLE));
+      }, EXIT);
+
+      timers.current.push(() => { cancelAnimationFrame(raf); clearTimeout(t); });
     }, INTERVAL);
-    return () => clearInterval(id);
+
+    return () => {
+      clearInterval(id);
+      timers.current.forEach((cancel) => cancel());
+      timers.current = [];
+    };
   }, []);
 
   return (
-    <div className="feed" ref={feedRef}>
-      {rows.map(({ key, event: [time, label, status, hot], leaving }) => (
-        <div key={key} className={`trow${hot ? ' hot' : ''}${leaving ? ' out' : ''}`}>
+    <div className="feed" ref={feedRef} style={{ height: rowH * VISIBLE }}>
+      {rows.map(({ key, event: [time, label, status, hot], slot }) => (
+        <div
+          key={key}
+          className={`trow${hot ? ' hot' : ''}`}
+          style={{
+            transform: `translateY(${slot * rowH}px)`,
+            opacity: slot >= 0 && slot < VISIBLE ? 1 : 0,
+          }}
+        >
           <b>{time}</b>
           <span>{label}</span>
           <span className="st">{status}</span>
