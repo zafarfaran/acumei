@@ -36,9 +36,6 @@
 
   .bgrid { grid-template-columns: 1fr; }
 
-  .navlinks, .navcta { display: none; }
-  .burger { display: flex; }
-
   .fgrid { grid-template-columns: 1fr 1fr; gap: 34px; }
   .fbrand, .fcontact { grid-column: 1 / -1; }
 
@@ -56,7 +53,8 @@
 }
 
 @media (max-width: 640px) {
-  .nav { padding: 14px var(--pad); }
+  .nav { top: 12px; padding: 9px 10px 9px 15px; }
+  .wordmark { font-size: 17px; }
 
   .hero { padding-top: 96px; padding-bottom: 44px; }
 

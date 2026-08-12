@@ -2,24 +2,29 @@
    where the prototype expresses a size as clamp(), the clamp() is kept. */
 
 /* ------------------------------------------------------------------ nav */
+/* A compact floating bar rather than a full-width one: the section links live
+   behind the toggle instead of sitting across the top of every screen.
+   The corner radius is the one deliberate exception to the no-radius rule. */
 .nav {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 60;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 18px var(--pad);
+  gap: clamp(28px, 6vw, 64px);
+  padding: 10px 12px 10px 18px;
+  border-radius: 15px;
+  border: 1px solid transparent;
+  background: rgba(18, 18, 20, 0.6);
+  backdrop-filter: blur(16px);
   transition: background 0.5s, border-color 0.5s;
-  border-bottom: 1px solid transparent;
 }
 
 .nav.stuck {
-  background: rgba(10, 10, 11, 0.72);
-  backdrop-filter: blur(14px);
-  border-bottom-color: var(--line);
+  background: rgba(13, 13, 14, 0.82);
+  border-color: var(--line);
 }
 
 .prog {
@@ -35,74 +40,50 @@
 
 .wordmark {
   font-family: var(--display);
-  font-size: 21px;
+  font-size: 19px;
   letter-spacing: -0.02em;
   display: flex;
   align-items: center;
   gap: 9px;
+  white-space: nowrap;
 }
 
 .wordmark canvas {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   display: block;
 }
 
-.navlinks { display: flex; gap: 26px; }
-
-.navlinks a {
-  font-size: 13px;
-  color: var(--soft);
-  transition: color 0.3s;
-  position: relative;
-}
-
-.navlinks a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -4px;
-  height: 1px;
-  background: var(--amber);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  transition: transform 0.45s var(--ease);
-}
-
-.navlinks a:hover::after { transform: scaleX(1); }
-
-.navcta {
-  font-size: 13px;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 2px;
-  transition: border-color 0.3s;
-}
-
-.navcta:hover { border-color: var(--amber); }
-
+/* two bars that cross into an X — the menu control at every width */
 .burger {
-  display: none;
+  display: flex;
   flex-direction: column;
-  gap: 5px;
+  justify-content: center;
+  gap: 6px;
+  width: 38px;
+  height: 30px;
+  align-items: center;
   background: none;
   border: 0;
-  padding: 8px 0 8px 8px;
+  padding: 0;
   cursor: pointer;
-  z-index: 2;
+  border-radius: 9px;
+  transition: background 0.3s;
 }
+
+.burger:hover { background: rgba(241, 237, 228, 0.06); }
+.burger:focus-visible { outline: 1px solid var(--amber); outline-offset: 2px; }
 
 .burger i {
   display: block;
-  width: 22px;
+  width: 19px;
   height: 1px;
   background: var(--ink);
   transition: transform 0.45s var(--ease), opacity 0.3s;
 }
 
-body.menu .burger i:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-body.menu .burger i:nth-child(2) { opacity: 0; }
-body.menu .burger i:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+body.menu-open .burger i:nth-child(1) { transform: translateY(3.5px) rotate(45deg); }
+body.menu-open .burger i:nth-child(2) { transform: translateY(-3.5px) rotate(-45deg); }
 
 .menu {
   position: fixed;
@@ -114,48 +95,54 @@ body.menu .burger i:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
   flex-direction: column;
   justify-content: center;
   gap: 6px;
-  padding: 0 var(--pad);
+  padding: 0 clamp(24px, 12vw, 200px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.45s var(--ease);
 }
 
-body.menu .menu {
+body.menu-open .menu {
   opacity: 1;
   pointer-events: auto;
 }
 
 .menu a {
-  font-size: clamp(30px, 9vw, 44px);
+  font-size: clamp(30px, 5.2vw, 54px);
   font-weight: var(--dw);
   letter-spacing: var(--dls);
+  line-height: 1.28;
   color: var(--soft);
   transform: translateY(18px);
   opacity: 0;
-  transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
+  transition: transform 0.6s var(--ease), opacity 0.6s var(--ease), color 0.3s;
   transition-delay: var(--d, 0ms);
+  width: fit-content;
 }
 
-body.menu .menu a {
+body.menu-open .menu a {
   transform: none;
   opacity: 1;
 }
 
 .menu .foot {
-  margin-top: 38px;
+  margin-top: clamp(28px, 5vh, 52px);
+  padding-top: clamp(20px, 3vh, 30px);
+  border-top: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .menu .foot a {
-  font-size: 17px;
+  font-size: clamp(16px, 1.5vw, 19px);
+  letter-spacing: 0;
   color: var(--amber);
   transform: none;
   opacity: 1;
 }
 
-body.menu { overflow: hidden; }
+body.menu-open { overflow: hidden; }
 
 /* ----------------------------------------------------------------- hero */
 .hero {

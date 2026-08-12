@@ -29,8 +29,8 @@ export default function Nav() {
   }), []);
 
   useEffect(() => {
-    document.body.classList.toggle('menu', open);
-    return () => document.body.classList.remove('menu');
+    document.body.classList.toggle('menu-open', open);
+    return () => document.body.classList.remove('menu-open');
   }, [open]);
 
   // escape closes the overlay
@@ -51,20 +51,14 @@ export default function Nav() {
           Acumei
         </Link>
 
-        <div className="navlinks">
-          {LINKS.map((l) => <Link key={l.href} to={l.href}>{l.label}</Link>)}
-        </div>
-
-        <Link to="/#book" className="navcta">Book a call</Link>
-
         <button
           className="burger"
-          aria-label="Menu"
+          aria-label={open ? 'Close menu' : 'Menu'}
           aria-expanded={open}
           aria-controls="menu"
           onClick={() => setOpen((o) => !o)}
         >
-          <i /><i /><i />
+          <i /><i />
         </button>
       </nav>
 
