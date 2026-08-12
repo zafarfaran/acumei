@@ -10,6 +10,7 @@ export default function Privacy() {
       title="Privacy policy"
       lede="How Acumei handles personal data — on this website, and when you get in touch or become a client."
       meta={`Last updated ${LEGAL_UPDATED}`}
+      field={{ mode: 'ridge' }}
     >
       {/* TODO before launch: not reviewed by a solicitor. The facts below describe
           how the site and business actually operate, but the company number,

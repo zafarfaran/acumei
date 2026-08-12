@@ -10,6 +10,7 @@ export default function DataProcessing() {
       title="Data processing terms"
       lede="When we build a system that handles your customers' data, you are the controller and we are the processor. These are the terms that govern that — the summary version of the agreement we sign with every client."
       meta={`Last updated ${LEGAL_UPDATED}`}
+      field={{ mode: 'ridge' }}
     >
       {/* TODO before launch: this is the plain-English website summary, not the
           executable agreement. The signed DPA is the operative document and must be

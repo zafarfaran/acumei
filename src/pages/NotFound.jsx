@@ -9,6 +9,7 @@ export default function NotFound() {
       label="Not found"
       title={<>That page <span className="amb">is not here.</span></>}
       lede="Either it moved or the link was wrong. Neither is your problem to solve."
+      field={{ mode: 'scatter' }}
     >
       <section>
         <ul>

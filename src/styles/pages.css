@@ -2,7 +2,32 @@
    documents. Same system as the home page: hairlines, mono labels, no cards,
    amber sparingly. */
 
-.page { padding-top: clamp(130px, 18vh, 210px); }
+/* Two columns: the reading column, and a sticky field occupying the space the
+   72ch measure leaves empty on a wide screen. */
+.page {
+  padding-top: clamp(130px, 18vh, 210px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(150px, 26vw, 420px);
+  gap: clamp(24px, 5vw, 80px);
+  align-items: start;
+}
+
+.page-main { min-width: 0; }
+
+.page-rail {
+  position: sticky;
+  top: clamp(120px, 16vh, 180px);
+  min-width: 0;
+}
+
+.page-field {
+  display: block;
+  width: 100%;
+  height: min(58vh, 460px);
+  opacity: 0.68;
+  -webkit-mask-image: radial-gradient(ellipse 70% 62% at 50% 50%, #000 34%, transparent 76%);
+  mask-image: radial-gradient(ellipse 70% 62% at 50% 50%, #000 34%, transparent 76%);
+}
 
 .page-head h1 {
   font-size: clamp(38px, 5.2vw, 76px);
@@ -23,6 +48,10 @@
   margin-top: clamp(48px, 8vh, 96px);
   max-width: 72ch;
 }
+
+/* these are sections inside a section — the global rule's page padding would
+   indent the prose by a full gutter and triple its vertical rhythm */
+.prose section { padding: 0; }
 
 .prose > section + section { margin-top: clamp(40px, 6vh, 68px); }
 
@@ -220,6 +249,10 @@
 .page .more { margin-top: clamp(40px, 6vh, 64px); }
 
 @media (max-width: 900px) {
+  /* no empty column left to fill, and the field would only crowd the text */
+  .page { display: block; }
+  .page-rail { display: none; }
+
   .tier { grid-template-columns: 1fr 1fr; }
   .tier .body { grid-column: 1 / -1; order: 3; }
   .tier .price { text-align: left; }

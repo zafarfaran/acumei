@@ -8,6 +8,7 @@ export default function Careers() {
       label="Careers"
       title={<>Small team. <span className="amb">High trust.</span> Real systems.</>}
       lede="We are not hiring for a specific role at the moment. We do read every speculative application, and we keep the good ones on file — the last two people we worked with came in this way."
+      field={{ mode: 'scatter' }}
     >
       <section>
         <h2>Open roles</h2>

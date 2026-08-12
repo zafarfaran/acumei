@@ -55,6 +55,7 @@ export default function Pricing() {
       label="Pricing"
       title={<>Fixed fees, quoted <span className="amb">after we understand the problem.</span></>}
       lede="We do not sell licences, seats or subscriptions. You pay once to have something built, you own it, and you decide afterwards whether you want us on call."
+      field={{ mode: 'flow' }}
     >
       <div className="tiers">
         {TIERS.map((t) => (

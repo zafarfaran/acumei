@@ -9,6 +9,7 @@ export default function About() {
       label="About"
       title={<>AI built by people who have <span className="amb">shipped it before.</span></>}
       lede="We built AI systems at some of the largest technology companies in the world. Acumei exists to bring that capability to British businesses without the jargon or the six-figure price tag that usually comes with it."
+      field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
       <section>
         <p className="lead">

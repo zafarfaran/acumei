@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import Nav from './Nav';
 import Footer from './Footer';
+import PageField from './PageField';
 import useReveal from '../hooks/useReveal';
 
 /**
@@ -10,7 +11,7 @@ import useReveal from '../hooks/useReveal';
  * `n` is the mono index shown beside the label, keeping the numbering habit of
  * the home page without pretending these pages are part of its sequence.
  */
-export default function PageShell({ n, label, title, lede, meta, children }) {
+export default function PageShell({ n, label, title, lede, meta, field, children }) {
   useReveal();
 
   useEffect(() => {
@@ -23,18 +24,22 @@ export default function PageShell({ n, label, title, lede, meta, children }) {
       <Nav />
       <main>
         <section className="page">
-          <div className="shead" data-reveal>
-            <span className="mono">{n}</span>
-            <span className="mono">{label}</span>
+          <div className="page-main">
+            <div className="shead" data-reveal>
+              <span className="mono">{n}</span>
+              <span className="mono">{label}</span>
+            </div>
+
+            <div className="page-head">
+              <h1 className="swipe" data-reveal>{title}</h1>
+              {lede && <p className="lede" data-reveal style={{ '--d': '120ms' }}>{lede}</p>}
+              {meta && <p className="page-meta mono" data-reveal style={{ '--d': '180ms' }}>{meta}</p>}
+            </div>
+
+            <div className="prose">{children}</div>
           </div>
 
-          <div className="page-head">
-            <h1 className="swipe" data-reveal>{title}</h1>
-            {lede && <p className="lede" data-reveal style={{ '--d': '120ms' }}>{lede}</p>}
-            {meta && <p className="page-meta mono" data-reveal style={{ '--d': '180ms' }}>{meta}</p>}
-          </div>
-
-          <div className="prose">{children}</div>
+          <PageField {...field} />
         </section>
       </main>
       <Footer />

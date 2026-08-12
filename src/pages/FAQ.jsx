@@ -74,6 +74,7 @@ export default function FAQ() {
       label="FAQ"
       title={<>The questions we get asked <span className="amb">on every call.</span></>}
       lede="If yours is not here, email it over — we would rather answer it directly than have you guess."
+      field={{ mode: 'grid' }}
     >
       <div className="qa">
         {ITEMS.map((item, i) => (

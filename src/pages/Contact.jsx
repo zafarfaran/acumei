@@ -57,6 +57,7 @@ export default function Contact() {
       label="Contact"
       title={<>One address. <span className="amb">A reply within a working day.</span></>}
       lede="There is no contact form, no ticket queue and no chatbot in the corner. Email reaches a person who can actually answer the question."
+      field={{ mode: 'orb' }}
     >
       <section>
         <p className="lead">

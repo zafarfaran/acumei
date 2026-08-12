@@ -10,6 +10,7 @@ export default function Cookies() {
       title={<>This site sets <span className="amb">no cookies.</span></>}
       lede="Which is why there is no banner asking you to accept any. This page explains what that means and what would have to change for it to stop being true."
       meta={`Last updated ${LEGAL_UPDATED}`}
+      field={{ mode: 'grid' }}
     >
       <section>
         <h2>The short version</h2>

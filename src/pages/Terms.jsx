@@ -10,6 +10,7 @@ export default function Terms() {
       title="Terms of service"
       lede="The terms on which you use this website, and a summary of the terms on which we take on work."
       meta={`Last updated ${LEGAL_UPDATED}`}
+      field={{ mode: 'wave' }}
     >
       {/* TODO before launch: not reviewed by a solicitor, and it needs to be — the
           liability and warranty sections in particular. Company number, registered
