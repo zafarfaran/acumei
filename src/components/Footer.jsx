@@ -1,28 +1,36 @@
+import { Link } from 'react-router-dom';
 import useDither from '../hooks/useDither';
 import useParallax from '../hooks/useParallax';
+import { EMAIL, MAILTO, LINKEDIN } from '../lib/site';
 
-// The prototype's five columns become four: its Legal column listed Privacy,
-// Terms, Cookie and Data-processing pages that do not exist yet, and its
-// Product/Company columns linked Pricing, About, Careers and FAQ at #book.
-// Every link here resolves to a section that is actually on the page. Add the
-// Legal column back — and restore the 1.4fr repeat(3,…) 1.1fr grid — once
-// those pages are written.
 const COLUMNS = [
   {
     heading: 'Product',
     links: [
-      ['The AI Brain', '#industries'],
-      ['How it works', '#how'],
-      ['Calculator', '#calc'],
-      ['Case studies', '#work'],
+      ['The AI Brain', '/#industries'],
+      ['How it works', '/#how'],
+      ['Calculator', '/#calc'],
+      ['Pricing', '/pricing'],
+      ['Case studies', '/#work'],
     ],
   },
   {
     heading: 'Company',
     links: [
-      ['Notes', '#notes'],
-      ['Book a call', '#book'],
-      ['hello@acumei.co.uk', 'mailto:hello@acumei.co.uk'],
+      ['About', '/about'],
+      ['Notes', '/#notes'],
+      ['Careers', '/careers'],
+      ['Contact', '/contact'],
+      ['FAQ', '/faq'],
+    ],
+  },
+  {
+    heading: 'Legal',
+    links: [
+      ['Privacy policy', '/privacy'],
+      ['Terms of service', '/terms'],
+      ['Cookie policy', '/cookies'],
+      ['Data processing', '/data-processing'],
     ],
   },
 ];
@@ -57,10 +65,10 @@ export default function Footer() {
 
       <div className="fgrid">
         <div className="fcol fbrand" data-reveal>
-          <div className="wordmark">
+          <Link to="/" className="wordmark">
             <canvas ref={markRef} style={{ width: 18, height: 18 }} aria-hidden="true" />
             Acumei
-          </div>
+          </Link>
           <p>
             AI systems for British businesses that would rather be running the business than
             chasing it.
@@ -76,16 +84,19 @@ export default function Footer() {
             <h4>{col.heading}</h4>
             <ul>
               {col.links.map(([label, href]) => (
-                <li key={label}><a href={href}>{label}</a></li>
+                <li key={label}><Link to={href}>{label}</Link></li>
               ))}
             </ul>
           </div>
         ))}
 
-        <div className="fcol fcontact" data-reveal style={{ '--d': '200ms' }}>
+        <div className="fcol fcontact" data-reveal style={{ '--d': '260ms' }}>
           <h4>Get in touch</h4>
-          <a className="e" href="mailto:hello@acumei.co.uk">hello@acumei.co.uk</a>
-          <div className="a">12 Rivington Street<br />London EC2A · By appointment</div>
+          <a className="e" href={MAILTO}>{EMAIL}</a>
+          <div className="a">We reply within one working day.</div>
+          <div className="social">
+            <a href={LINKEDIN} target="_blank" rel="noreferrer">LinkedIn</a>
+          </div>
         </div>
       </div>
 
@@ -97,7 +108,12 @@ export default function Footer() {
       {/* Company number and VAT number omitted — the prototype's were invented
           placeholders. Add the real registration details before launch. */}
       <div className="legal">
-        <div className="mono">© 2026 Acumei Ltd · Registered in England &amp; Wales · London</div>
+        <div className="mono">© 2026 Acumei Ltd · Registered in England &amp; Wales</div>
+        <div className="set mono">
+          <Link to="/privacy">Privacy</Link>
+          <Link to="/cookies">Cookies</Link>
+          <Link to="/terms">Terms</Link>
+        </div>
       </div>
     </footer>
   );

@@ -1,0 +1,233 @@
+/* Standalone pages — Pricing, About, Careers, Contact, FAQ and the four legal
+   documents. Same system as the home page: hairlines, mono labels, no cards,
+   amber sparingly. */
+
+.page { padding-top: clamp(130px, 18vh, 210px); }
+
+.page-head h1 {
+  font-size: clamp(38px, 5.2vw, 76px);
+  max-width: 18ch;
+}
+
+.page-head .lede { max-width: 62ch; }
+
+.page-meta {
+  margin: clamp(20px, 3vh, 30px) 0 0;
+  text-transform: none;
+  letter-spacing: 0.1em;
+  font-size: 10.5px;
+}
+
+/* ------------------------------------------------------------------ prose */
+.prose {
+  margin-top: clamp(48px, 8vh, 96px);
+  max-width: 72ch;
+}
+
+.prose > section + section { margin-top: clamp(40px, 6vh, 68px); }
+
+.prose h2 {
+  font-size: clamp(22px, 2.3vw, 30px);
+  max-width: 30ch;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.prose h3 {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 28px 0 8px;
+}
+
+.prose p {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--soft);
+  margin: 16px 0 0;
+  max-width: 66ch;
+}
+
+.prose p strong { color: var(--ink); font-weight: 500; }
+
+.prose a {
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.prose a:hover { color: var(--amber); border-bottom-color: var(--amber); }
+
+.prose ul, .prose ol {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 66ch;
+}
+
+.prose li {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--soft);
+  padding: 11px 0 11px 26px;
+  border-top: 1px solid var(--line);
+  position: relative;
+}
+
+.prose li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.05em;
+  width: 8px;
+  height: 1px;
+  background: var(--dim);
+}
+
+.prose ol { counter-reset: step; }
+
+.prose ol li::before {
+  counter-increment: step;
+  content: counter(step, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  background: none;
+  width: auto;
+  height: auto;
+  top: 0.95em;
+}
+
+.prose .lead {
+  font-size: clamp(17px, 1.6vw, 21px);
+  line-height: 1.5;
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: var(--dw);
+  letter-spacing: var(--dls);
+  max-width: 30ch;
+}
+
+/* ---------------------------------------------------------------- pricing */
+.tiers {
+  margin-top: clamp(40px, 6vh, 72px);
+  border-top: 1px solid var(--line);
+}
+
+.tier {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.5fr) 1.4fr minmax(150px, auto);
+  gap: clamp(20px, 3vw, 48px);
+  padding: clamp(26px, 4vh, 40px) 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+
+.tier .name {
+  font-family: var(--display);
+  font-weight: var(--dw);
+  letter-spacing: var(--dls);
+  font-size: clamp(20px, 2vw, 27px);
+  line-height: 1.15;
+}
+
+.tier .when {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  display: block;
+  margin-top: 10px;
+}
+
+.tier p { margin-top: 0; }
+
+.tier ul { margin-top: 14px; }
+.tier li { font-size: 14.5px; padding: 8px 0 8px 24px; }
+
+.tier .price {
+  text-align: right;
+  font-family: var(--display);
+  font-weight: var(--dw);
+  letter-spacing: var(--dls);
+  font-size: clamp(22px, 2.2vw, 30px);
+  color: var(--amber);
+  line-height: 1;
+}
+
+.tier .price span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 9px;
+}
+
+/* -------------------------------------------------------------------- faq */
+.qa { margin-top: clamp(36px, 5vh, 64px); border-top: 1px solid var(--line); }
+
+.qa > div {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: clamp(16px, 2.5vw, 34px);
+  padding: clamp(22px, 3vh, 32px) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.qa .n {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  padding-top: 5px;
+}
+
+.qa h3 {
+  margin: 0 0 10px;
+  font-size: clamp(16px, 1.5vw, 19px);
+  max-width: 40ch;
+}
+
+.qa p { margin: 0; max-width: 62ch; }
+
+/* ---------------------------------------------------- contact / two-up rows */
+.routes { margin-top: clamp(36px, 5vh, 64px); border-top: 1px solid var(--line); }
+
+.route {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.55fr) 1.45fr;
+  gap: clamp(18px, 3vw, 44px);
+  padding: clamp(22px, 3vh, 32px) 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+
+.route .k {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.route p { margin: 0; }
+.route p + p { margin-top: 10px; }
+
+.page .more { margin-top: clamp(40px, 6vh, 64px); }
+
+@media (max-width: 900px) {
+  .tier { grid-template-columns: 1fr 1fr; }
+  .tier .body { grid-column: 1 / -1; order: 3; }
+  .tier .price { text-align: left; }
+  .route { grid-template-columns: 1fr; gap: 10px; }
+}
+
+@media (max-width: 640px) {
+  .tier { grid-template-columns: 1fr; }
+  .qa > div { grid-template-columns: 1fr; gap: 10px; }
+  .qa .n { padding-top: 0; }
+}

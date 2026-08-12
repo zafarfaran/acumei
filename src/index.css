@@ -2,5 +2,6 @@
 @import './styles/theme.css';
 @import './styles/global.css';
 @import './styles/sections.css';
+@import './styles/pages.css';
 @import './styles/animations.css';
 @import './styles/responsive.css';

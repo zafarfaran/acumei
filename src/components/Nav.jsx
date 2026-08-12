@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import useDither from '../hooks/useDither';
 import { subscribeScroll } from '../lib/scrollLoop';
+import { EMAIL } from '../lib/site';
 
+// Absolute so they work from a standalone page as well as from the home page.
 const LINKS = [
-  { href: '#industries', label: 'The AI Brain' },
-  { href: '#how', label: 'How it works' },
-  { href: '#calc', label: 'Calculator' },
-  { href: '#work', label: 'Work' },
-  { href: '#notes', label: 'Notes' },
+  { href: '/#industries', label: 'The AI Brain' },
+  { href: '/#how', label: 'How it works' },
+  { href: '/#calc', label: 'Calculator' },
+  { href: '/#work', label: 'Work' },
+  { href: '/#notes', label: 'Notes' },
 ];
 
 export default function Nav() {
@@ -43,16 +46,16 @@ export default function Nav() {
       <div className="prog" ref={progRef} />
 
       <nav className="nav" ref={navRef}>
-        <a href="#top" className="wordmark">
+        <Link to="/" className="wordmark">
           <canvas ref={markRef} aria-hidden="true" />
           Acumei
-        </a>
+        </Link>
 
         <div className="navlinks">
-          {LINKS.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
+          {LINKS.map((l) => <Link key={l.href} to={l.href}>{l.label}</Link>)}
         </div>
 
-        <a href="#book" className="navcta">Book a call</a>
+        <Link to="/#book" className="navcta">Book a call</Link>
 
         <button
           className="burger"
@@ -67,21 +70,21 @@ export default function Nav() {
 
       <div className="menu" id="menu" aria-hidden={!open}>
         {LINKS.map((l, i) => (
-          <a
+          <Link
             key={l.href}
-            href={l.href}
+            to={l.href}
             style={{ '--d': `${60 + i * 60}ms` }}
             onClick={() => setOpen(false)}
             tabIndex={open ? 0 : -1}
           >
             {l.label}
-          </a>
+          </Link>
         ))}
         <div className="foot" style={{ '--d': '360ms' }}>
-          <a href="#book" onClick={() => setOpen(false)} tabIndex={open ? 0 : -1}>
+          <Link to="/#book" onClick={() => setOpen(false)} tabIndex={open ? 0 : -1}>
             Book a 30-minute discovery call →
-          </a>
-          <span className="mono" style={{ marginTop: 10 }}>hello@acumei.co.uk</span>
+          </Link>
+          <span className="mono" style={{ marginTop: 10 }}>{EMAIL}</span>
         </div>
       </div>
     </>

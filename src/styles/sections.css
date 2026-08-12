@@ -760,8 +760,7 @@ input[type=range]:focus-visible { outline: 1px solid var(--amber); outline-offse
 
 .fgrid {
   display: grid;
-  /* prototype was 1.4fr repeat(3,…) 1.1fr — the Legal column is not built yet */
-  grid-template-columns: 1.4fr repeat(2, minmax(120px, 0.7fr)) 1.1fr;
+  grid-template-columns: 1.4fr repeat(3, minmax(120px, 0.7fr)) 1.1fr;
   gap: clamp(26px, 4vw, 56px);
   position: relative;
   z-index: 2;
