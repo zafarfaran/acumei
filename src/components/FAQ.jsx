@@ -4,12 +4,12 @@ import SectionLabel from './SectionLabel';
 
 const ITEMS = [
   {
-    q: 'What is the AI Brain, exactly?',
-    a: 'An assistant that sits across your existing tools and handles the boring stuff \u2014 missed calls, follow-ups, scheduling, stock. You stay in charge.',
+    q: 'What is an AI agent, exactly?',
+    a: 'An agent holds a role rather than running a task. It sits across your existing tools, works a shift and knows when to wake you \u2014 missed calls, follow-ups, scheduling, stock. You stay in charge.',
   },
   {
     q: 'How quickly can something go live?',
-    a: 'Single workflow: 3\u201314 days. Multi-system brain: 4\u20138 weeks.',
+    a: 'Single workflow: 3\u201314 days. Connected agents across several systems: 4\u20138 weeks.',
   },
   {
     q: 'Will this work with our existing tools?',

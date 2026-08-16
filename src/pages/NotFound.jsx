@@ -13,7 +13,7 @@ export default function NotFound() {
     >
       <section>
         <ul>
-          <li><Link to="/">The home page</Link> — the AI Brain, how we work, the calculator and the case studies</li>
+          <li><Link to="/">The home page</Link> — the AI agents, how we work, the calculator and the case studies</li>
           <li><Link to="/pricing">Pricing</Link> — how a quote gets put together</li>
           <li><Link to="/faq">FAQ</Link> — the questions we get asked on every call</li>
           <li><Link to="/contact">Contact</Link> — one address, a reply within a working day</li>

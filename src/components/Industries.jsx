@@ -20,6 +20,20 @@ const INDUSTRIES = [
     outcome: 'Fixed before you woke up. You never had to pick up the phone.',
   },
   {
+    id: 'software',
+    name: 'Software & SaaS',
+    stat: '11 min',
+    statLabel: 'first response, overnight',
+    mode: 'orb',
+    trigger: 'An alert fires at 03:14 and forty support tickets land behind it.',
+    steps: [
+      'Reads the alert and groups the tickets that are all the same outage.',
+      'Pages the on-call engineer with what broke and which accounts it’s hitting.',
+      'Replies to every affected customer with a real status link, not a canned apology.',
+    ],
+    outcome: 'One page instead of forty. Customers knew before they had to ask.',
+  },
+  {
     id: 'trades',
     name: 'Trades',
     stat: '£24K',
@@ -126,7 +140,7 @@ const INDUSTRIES = [
     trigger: 'You have an idea for a tool, app, or system — but no tech team to build it.',
     steps: [
       'We sit down with you and figure out exactly what you need — no jargon, just outcomes.',
-      'Design and build a custom solution from scratch — AI-powered apps, dashboards, integrations, automations, whatever it takes.',
+      'Design and build it from scratch — AI-powered apps, dashboards, connections between the systems you already use, whatever it takes.',
       'Hand it over fully working, fully yours. We can stay on to maintain it or you take it from here.',
     ],
     outcome: 'Your idea, built and running. Not a template — something made for you.',
@@ -175,11 +189,11 @@ export default function Industries() {
     <section id="industries">
       <div className="shead" data-reveal>
         <span className="mono">01</span>
-        <span className="mono">The AI Brain</span>
+        <span className="mono">AI agents</span>
       </div>
 
       <h2 className="swipe" data-reveal>
-        One brain. <span className="amb">Every industry.</span>
+        Agents for <span className="amb">every industry.</span>
       </h2>
 
       <p className="sub" data-reveal style={{ '--d': '120ms' }}>
@@ -187,7 +201,7 @@ export default function Industries() {
       </p>
 
       <div className="ind">
-        <div className="indlist" ref={listRef} data-reveal style={{ '--d': '180ms' }} role="tablist" aria-label="Industries">
+        <div className="indlist" ref={listRef} data-reveal data-fly="left" style={{ '--d': '180ms' }} role="tablist" aria-label="Industries">
           <div className="marker" ref={markerRef} />
           {INDUSTRIES.map((ind, i) => (
             <button
@@ -205,7 +219,7 @@ export default function Industries() {
           ))}
         </div>
 
-        <div className="story" data-reveal style={{ '--d': '240ms' }}>
+        <div className="story" data-reveal data-fly="right" style={{ '--d': '240ms' }}>
           <canvas
             className="tile"
             ref={(el) => { tileRef.current = el; parRef.current = el; }}

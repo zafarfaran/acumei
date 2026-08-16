@@ -29,7 +29,7 @@ export default function DemoSection() {
             letterSpacing: '-0.025em',
             lineHeight: 1.05,
           }}>
-            What an <span className="display-ital" style={{ color: 'var(--accent)' }}>AI Brain</span> handles before you finish your coffee.
+            What your <span className="display-ital" style={{ color: 'var(--accent)' }}>AI agents</span> handle before you finish your coffee.
           </h2>
           <p style={{
             fontSize: 17,
@@ -44,7 +44,7 @@ export default function DemoSection() {
             {[
               'You stay in charge — nothing risky goes out without your nod',
               'Tricky calls always come to a human, never to a dead end',
-              'You can see and undo anything the Brain did, any time',
+              'You can see and undo anything an agent did, any time',
             ].map((x) => (
               <li key={x} style={{
                 display: 'flex',

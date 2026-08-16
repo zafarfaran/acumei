@@ -16,7 +16,7 @@ export default function PageShell({ n, label, title, lede, meta, field, children
 
   useEffect(() => {
     document.title = `${typeof title === 'string' ? title : label} — Acumei`;
-    return () => { document.title = 'Acumei — The AI Brain'; };
+    return () => { document.title = 'Acumei — AI agents for British companies'; };
   }, [title, label]);
 
   return (

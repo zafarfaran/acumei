@@ -23,7 +23,7 @@ const TIERS = [
   },
   {
     id: 'brain',
-    name: 'AI Brain',
+    name: 'Connected Agents',
     sub: 'Mid-market · 4–8 wks',
     headline: 'Wire the whole operation.',
     detail: 'For 50–500 person firms with multiple processes that need to talk to each other. Diagnostic, architecture, and a connected set of agents that compound.',

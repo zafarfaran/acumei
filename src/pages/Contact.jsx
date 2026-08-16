@@ -14,7 +14,7 @@ const ROUTES = [
         </p>
         <p>
           Useful to mention up front: what the workflow is, roughly how many hours a week
-          it takes, and which systems it touches.
+          it takes, and which systems it involves.
         </p>
       </>
     ),
@@ -56,7 +56,7 @@ export default function Contact() {
       n="04"
       label="Contact"
       title={<>One address. <span className="amb">A reply within a working day.</span></>}
-      lede="There is no contact form, no ticket queue and no chatbot in the corner. Email reaches a person who can actually answer the question."
+      lede="There is no contact form, no support queue and no chatbot in the corner. Email reaches a person who can actually answer the question."
       field={{ mode: 'orb' }}
     >
       <section>

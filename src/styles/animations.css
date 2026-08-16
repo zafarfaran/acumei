@@ -13,6 +13,16 @@
   transform: none;
 }
 
+/* Directional reveals. data-fly rides on data-reveal rather than being its own
+   attribute, so useReveal's existing observer drives it and nothing new needs
+   observing. Distances are larger than the default 26px lift — these are meant
+   to read as arriving, not settling. */
+[data-reveal][data-fly="left"] { transform: translate3d(-64px, 0, 0); }
+[data-reveal][data-fly="right"] { transform: translate3d(64px, 0, 0); }
+[data-reveal][data-fly="up"] { transform: translate3d(0, 68px, 0); }
+[data-reveal][data-fly="in"] { transform: scale(0.94); }
+[data-reveal].in[data-fly] { transform: none; }
+
 /* h2 sweep — a diagonal gradient mask wipes the headline in */
 .swipe {
   -webkit-mask-image: linear-gradient(100deg, #000 0 30%, rgba(0, 0, 0, 0.2) 52%, rgba(0, 0, 0, 0) 64%);
@@ -58,6 +68,38 @@ h1 .ln > span {
 
 .loaded h1 .ln > span { transform: none; }
 
+/* The rotating clause rolls out of the top of the clip box while the next one
+   rolls in from the bottom. Animation rather than transition, because each
+   clause is a freshly mounted node and a transition has no starting frame. */
+h1 .ln.rot { position: relative; }
+
+h1 .ln.rot > span {
+  transform: none;   /* these are driven by the keyframes below, not by .loaded */
+}
+
+h1 .ln.rot .roll-out {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  animation: clauseOut 0.7s var(--ease) both;
+}
+
+h1 .ln.rot .roll-in {
+  animation: clauseIn 0.7s var(--ease) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes clauseOut {
+  from { transform: none; opacity: 1; }
+  to { transform: translateY(-105%); opacity: 0; }
+}
+
+@keyframes clauseIn {
+  from { transform: translateY(105%); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
@@ -72,12 +114,15 @@ h1 .ln > span {
 
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],
+  [data-reveal][data-fly],
   h1 .ln > span {
     opacity: 1;
     transform: none;
     transition: none;
   }
   [data-line]::before { transform: scaleX(1); transition: none; }
+  h1 .ln.rot .roll-in { animation: none; opacity: 1; transform: none; }
+  h1 .ln.rot .roll-out { display: none; }
   .swipe {
     -webkit-mask-image: none;
     mask-image: none;

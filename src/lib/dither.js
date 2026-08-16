@@ -99,6 +99,16 @@ const FIELDS = {
 
 export const modes = Object.keys(FIELDS);
 
+// Every field on the page stops together while something covers them — the
+// menu overlay is 97% opaque, so a running field behind it is pure waste.
+// Module-level rather than per-instance: callers should not have to hold a
+// reference to every canvas on the page.
+let paused = false;
+
+export function pauseFields(p) {
+  paused = !!p;
+}
+
 export function dither(canvas, opts) {
   opts = opts || {};
   const ctx = canvas.getContext('2d', { alpha: true });
@@ -167,7 +177,7 @@ export function dither(canvas, opts) {
 
   function frame(now) {
     raf = requestAnimationFrame(frame);
-    if (!running) return;
+    if (!running || paused) return;
     if (now - last < 33) return;          // capped at 30fps
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now; t += dt;

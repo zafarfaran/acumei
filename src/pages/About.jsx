@@ -7,7 +7,7 @@ export default function About() {
     <PageShell
       n="02"
       label="About"
-      title={<>AI built by people who have <span className="amb">shipped it before.</span></>}
+      title={<>AI built by people who have <span className="amb">built it before.</span></>}
       lede="We built AI systems at some of the largest technology companies in the world. Acumei exists to bring that capability to British businesses without the jargon or the six-figure price tag that usually comes with it."
       field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
@@ -24,8 +24,8 @@ export default function About() {
           for the people they happen to.
         </p>
         <p>
-          Our background is in building AI platforms at scale — research through to
-          production, systems used by millions of people. The engineering discipline that
+          Our background is in building AI at scale — from the research through to systems
+          used by millions of people. The engineering discipline that
           takes is the same discipline that makes a small automation trustworthy enough to
           leave running unattended overnight. That is the part most people skip.
         </p>
@@ -45,9 +45,9 @@ export default function About() {
 
         <h3>You own it, completely</h3>
         <p>
-          Code, prompts, credentials, the lot. Everything runs on your accounts and your
-          infrastructure. If you never speak to us again the systems keep working, and
-          any competent developer can pick them up. There is no platform, no seat licence
+          Everything we write, and the logins it runs on. It all sits on your accounts,
+          not ours. If you never speak to us again the systems keep working, and
+          any competent developer can pick them up. There is no platform, no fee per person
           and nothing to be locked into. This is the single most common thing clients tell
           us they were not offered elsewhere.
         </p>
@@ -63,7 +63,7 @@ export default function About() {
         <h3>Automate the work nobody wants</h3>
         <p>
           We are not in the business of replacing your staff, and we will say so plainly
-          on the call. The work worth automating is the late-night triage, the data entry
+          on the call. The work worth automating is the midnight call-out, the data entry
           and the chasing — the tasks people do because someone has to, not because they
           were hired for them.
         </p>
@@ -74,8 +74,8 @@ export default function About() {
         <ol>
           <li><strong>Talk.</strong> A 30-minute discovery call. Show us the workflow that hurts. We tell you whether AI can fix it — honestly.</li>
           <li><strong>Map.</strong> Within 48 hours, a written brief: the top three opportunities, rough scope, and what we would build first.</li>
-          <li><strong>Build.</strong> We write the code, with real integrations into the tools you already run. You review as it comes together.</li>
-          <li><strong>Hand over.</strong> A live system, your accounts, your code, plus the documentation to change it. A retainer only if you want one.</li>
+          <li><strong>Build.</strong> We build it, connected to the tools you already use. You see it come together as we go.</li>
+          <li><strong>Hand over.</strong> A working system on your own accounts, everything we wrote, and written instructions for changing it. Monthly support only if you want it.</li>
         </ol>
       </section>
 

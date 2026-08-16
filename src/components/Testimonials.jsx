@@ -4,7 +4,7 @@ import SectionLabel from './SectionLabel';
 const TESTIMONIALS = [
   {
     quote:
-      'I\u2019ll be honest, I thought AI was a load of hype for businesses like mine. Then they showed me the missed-call numbers from my own phone system. We were leaving four jobs a week on the table. Four. The assistant they built picks every one of them up now.',
+      'I\u2019ll be honest, I thought AI was a load of hype for businesses like mine. Then they showed me the missed-call numbers from my own phone system. We were leaving four jobs a week on the table. Four. The agent they built picks every one of them up now.',
     name: 'Gary Whitfield',
     role: 'Director, Whitfield Electrical',
     place: 'Nottingham',

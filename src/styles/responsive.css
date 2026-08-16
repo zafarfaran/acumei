@@ -34,6 +34,10 @@
 
   .steps4 { grid-template-columns: 1fr 1fr; }
 
+  .floor { grid-template-columns: 1fr 1fr; row-gap: 30px; }
+  .clock { grid-template-columns: 1fr; gap: 28px; }
+  .onnow { min-height: 0; }
+
   .bgrid { grid-template-columns: 1fr; }
 
   .fgrid { grid-template-columns: 1fr 1fr; gap: 34px; }
@@ -70,6 +74,43 @@
      rows are two lines tall here and the measurement follows */
 
   .steps4 { grid-template-columns: 1fr; gap: 26px; }
+
+  /* Four columns of prose cannot fit a phone, so the chart compresses to a
+     two-column board of agents — name and the human it answers to. The pod
+     headings, the spine and the per-row status all go; the live line in the
+     clock strip carries what is actually happening. */
+  .spine { display: none; }
+  #team { padding-top: 34px; padding-bottom: 26px; }
+  #team .sub { font-size: 14px; }
+
+  .floor { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
+  .pod, .agents { display: contents; }
+  .pod > .mono, .pod .who, .pod .hrs { display: none; }
+
+  .agent {
+    grid-template-columns: 13px 1fr;
+    gap: 3px 9px;
+    padding: 11px 0;
+  }
+
+  .agent .ow { display: block; grid-column: 2; font-size: 10px; }
+  .agent .ow.off { opacity: 0.55; }
+  .agent .st { display: none; }
+
+  /* the counts and the live line are enough here */
+  .onnow .assume { display: none; }
+
+  .clock { margin-top: 26px; padding-top: 22px; }
+
+  /* text runs the full width here, so the damped band covers more of the run */
+  .team-field {
+    -webkit-mask-image: linear-gradient(180deg, #000 0 13%, rgba(0, 0, 0, 0.13) 27%, rgba(0, 0, 0, 0.13) 74%, #000 92%);
+    mask-image: linear-gradient(180deg, #000 0 13%, rgba(0, 0, 0, 0.13) 27%, rgba(0, 0, 0, 0.13) 74%, #000 92%);
+  }
+
+  .team-field canvas { opacity: calc(0.24 + var(--load, 0) * 0.28); }
+
+  .acard { grid-template-columns: 1fr; gap: 22px; }
 
   .pair { grid-template-columns: 1fr; gap: 20px; }
 

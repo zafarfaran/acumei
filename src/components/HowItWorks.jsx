@@ -15,13 +15,13 @@ const STEPS = [
     day: 'Days 3–10',
     n: '03',
     title: 'Build',
-    copy: 'We write the code. Real integrations with your actual tools. You review as it comes together.',
+    copy: 'We build it, connected to the tools you already use — your diary, your inbox, your accounts software. You see it come together as we go.',
   },
   {
     day: 'Day 14',
     n: '04',
     title: 'Hand over',
-    copy: 'Live system. Your code, your prompts, your accounts. Optional retainer if you want us on call.',
+    copy: 'It goes live on your own accounts, and everything we wrote belongs to you. Optional monthly support if you want us on call.',
   },
 ];
 
@@ -29,7 +29,7 @@ export default function HowItWorks() {
   return (
     <section id="how">
       <div className="shead" data-reveal>
-        <span className="mono">02</span>
+        <span className="mono">03</span>
         <span className="mono">How we work</span>
       </div>
 
@@ -39,7 +39,7 @@ export default function HowItWorks() {
 
       <div className="steps4">
         {STEPS.map((s, i) => (
-          <div key={s.n} data-reveal data-line style={{ '--d': `${i * 110}ms` }}>
+          <div key={s.n} data-reveal data-line data-fly="up" style={{ '--d': `${i * 110}ms` }}>
             <span className="mono">{s.day}</span>
             <div className="big">{s.n}</div>
             <h3>{s.title}</h3>

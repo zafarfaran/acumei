@@ -2,9 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 // [time, label, status, notable]
 const EVENTS = [
-  ['04:47', 'Emergency triage · Bristol', 'dispatched', 1],
+  ['03:14', 'Outage sorted · Shoreditch', 'engineer woken', 1],
+  ['04:47', 'Emergency call · Bristol', 'engineer sent', 1],
   ['06:00', 'Salon rebookings · Soho', '23 sent · 7 booked', 0],
   ['09:12', 'Stock reconciled · Leeds', 'reconciled', 0],
+  ['11:38', 'Trial follow-up · day 3', '4 replies', 0],
   ['14:30', 'Quote drafted · Manchester', '£8,420 · sent', 1],
   ['16:02', 'Waitlist filled · Glasgow', '90 sec', 0],
   ['17:41', 'Invoice chased · Cardiff', '£1,260 · paid', 1],

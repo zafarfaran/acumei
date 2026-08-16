@@ -36,6 +36,9 @@ Thumbs.db
 # Test / coverage
 coverage/
 
+# Git worktrees created by tooling
+.worktrees/
+
 # Outbound platform local data (SQLite DB)
 outbound/data/
 *.sqlite

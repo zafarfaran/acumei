@@ -25,7 +25,7 @@ const TIERS = [
     includes: [
       'Built around the tools you already run',
       'Live in days, not quarters',
-      'Code, prompts and credentials you own outright',
+      'Everything we write is yours outright, logins included',
       'Two weeks of post-launch fixes included',
       'Optional support retainer afterwards',
     ],
@@ -33,14 +33,14 @@ const TIERS = [
     priceNote: 'Quoted after the scan',
   },
   {
-    name: 'AI Brain',
+    name: 'Connected Agents',
     when: 'Mid-market · 4–8 weeks',
-    summary: 'For firms with several processes that need to talk to each other. A diagnostic, an architecture, and a connected set of agents that compound rather than sit in isolation.',
+    summary: 'For firms with several processes that need to talk to each other. We work out where the time goes, plan how it should fit together, and build a set of agents that pass work between them instead of each sitting on its own.',
     includes: [
-      'Multi-system integration',
-      'Agentic pipelines and retrieval over your own data',
-      'Stakeholder readout and written architecture',
-      'Handover with runbooks and audit logging',
+      'Connected to every system involved, not just one',
+      'Agents that hand work to each other, and that can search your own documents and records',
+      'A walkthrough for everyone involved, plus a written plan of how it all fits together',
+      'Handover with written instructions, and a log of every action taken',
       'Ongoing strategic support if you want it',
     ],
     price: 'Fixed fee',
@@ -101,8 +101,8 @@ export default function Pricing() {
       <section>
         <h2>What moves the number</h2>
         <ul>
-          <li><strong>How many workflows.</strong> One is a build. Four that hand off to each other is a brain.</li>
-          <li><strong>What it has to talk to.</strong> A modern API is a morning. A legacy system with a CSV export is a week.</li>
+          <li><strong>How many workflows.</strong> One is a build. Four that hand off to each other is a connected set of agents.</li>
+          <li><strong>What it has to talk to.</strong> A modern system that is built to be connected to takes a morning. Something older, where the only way out is a spreadsheet export, takes a week.</li>
           <li><strong>How clean the data is.</strong> If your customer records live in three places and disagree, that gets fixed first.</li>
           <li><strong>How much judgement is involved.</strong> Work with a right answer automates cheaply. Work that needs a human to sign off needs a review path built around it.</li>
           <li><strong>Whether you want us afterwards.</strong> The retainer is optional and priced separately.</li>
@@ -112,9 +112,9 @@ export default function Pricing() {
       <section>
         <h2>What is always included</h2>
         <ul>
-          <li>Full ownership of the code, the prompts and the credentials. Nothing runs on our accounts.</li>
-          <li>Everything built on your own infrastructure and your own vendor accounts, so there is nothing to migrate if we part ways.</li>
-          <li>Audit logging on every automated action, with a human escalation path.</li>
+          <li>Everything we write belongs to you, along with the logins it runs on. Nothing runs on our accounts.</li>
+          <li>Built on your own accounts with the suppliers involved, so there is nothing to move across if we part ways.</li>
+          <li>A record of every action taken automatically, and a clear point where a person takes over.</li>
           <li>A written handover — how it works, how to change it, how to turn it off.</li>
           <li>Two weeks of fixes after go-live at no charge.</li>
         </ul>

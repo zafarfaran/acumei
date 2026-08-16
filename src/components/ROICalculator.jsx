@@ -6,9 +6,9 @@ const gbp = (n) => '£' + Math.round(n).toLocaleString('en-GB');
 
 const FIELDS = [
   { key: 'hours', label: 'Hours/week on manual work (per person)', min: 2, max: 40, step: 1, format: (v) => `${v} hrs` },
-  { key: 'rate', label: 'Hourly value of that time', min: 10, max: 250, step: 5, format: (v) => `£${v}` },
+  { key: 'rate', label: 'What an hour of that time is worth', min: 10, max: 250, step: 5, format: (v) => `£${v}` },
   { key: 'people', label: 'People doing this work', min: 1, max: 50, step: 1, format: (v) => `${v}` },
-  { key: 'cost', label: 'One-off build investment', min: 1000, max: 100000, step: 500, format: gbp },
+  { key: 'cost', label: 'One-off cost to build it', min: 1000, max: 100000, step: 500, format: gbp },
 ];
 
 const TWEEN_MS = 520;
@@ -79,7 +79,7 @@ export default function ROICalculator() {
   return (
     <section id="calc" ref={sectionRef}>
       <div className="shead" data-reveal>
-        <span className="mono">03</span>
+        <span className="mono">04</span>
         <span className="mono">Calculator</span>
       </div>
 
@@ -88,7 +88,7 @@ export default function ROICalculator() {
       </h2>
 
       <div className="calc">
-        <div className="inputs" data-reveal style={{ '--d': '140ms' }}>
+        <div className="inputs" data-reveal data-fly="left" style={{ '--d': '140ms' }}>
           {FIELDS.map((f) => (
             <div className="field" key={f.key}>
               <div className="top">
@@ -107,11 +107,11 @@ export default function ROICalculator() {
             </div>
           ))}
           <p className="assume">
-            Drag the sliders. We assume automation captures 75% of the hours described.
+            Drag the sliders. We assume the agents take on 75% of the hours you describe.
           </p>
         </div>
 
-        <div className="readout" data-reveal style={{ '--d': '220ms' }}>
+        <div className="readout" data-reveal data-fly="right" style={{ '--d': '220ms' }}>
           <div>
             <div className="mono" style={{ marginBottom: 14 }}>Annual savings</div>
             <div className="headline-num">{gbp(out.annual)}</div>
@@ -129,7 +129,7 @@ export default function ROICalculator() {
               <div className="v">{out.hours.toFixed(1)}</div>
             </div>
             <div>
-              <div className="mono">Payback</div>
+              <div className="mono">Pays for itself in</div>
               <div className="v">
                 {out.payback < 4
                   ? `${out.payback.toFixed(1)} wks`

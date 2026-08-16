@@ -7,7 +7,7 @@ const COLUMNS = [
   {
     heading: 'Product',
     links: [
-      ['The AI Brain', '/#industries'],
+      ['AI agents', '/#industries'],
       ['How it works', '/#how'],
       ['Calculator', '/#calc'],
       ['Pricing', '/pricing'],

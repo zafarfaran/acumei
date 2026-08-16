@@ -16,7 +16,7 @@ export default function Book() {
   return (
     <section className="book" id="book">
       <div className="shead" data-reveal>
-        <span className="mono">06</span>
+        <span className="mono">07</span>
         <span className="mono">Start</span>
       </div>
 
@@ -38,7 +38,7 @@ export default function Book() {
           </div>
         </div>
 
-        <div className="contact" data-reveal style={{ '--d': '240ms' }}>
+        <div className="contact" data-reveal data-fly="right" style={{ '--d': '240ms' }}>
           <div className="mono" style={{ marginBottom: 14 }}>Or reach out directly</div>
           <div className="e">
             <a href={MAILTO}>{EMAIL}</a>

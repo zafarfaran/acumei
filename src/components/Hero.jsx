@@ -1,12 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useDither from '../hooks/useDither';
 import useFieldInteraction from '../hooks/useFieldInteraction';
 import { subscribeScroll } from '../lib/scrollLoop';
 import LiveFeed from './LiveFeed';
 
-// where the brain sits horizontally within the full-bleed field, matching the
+// where the shape sits horizontally within the full-bleed field, matching the
 // 72% centre of the mask
 const FOCUS = 0.72;
+
+// The headline is one sentence with a rotating relative clause: "The AI agents
+// your business ___". Each has to complete that grammatically and fit the 15ch
+// headline measure, or the line wraps and the hero changes height.
+const CLAUSES = ['was promised.', 'keeps missing.', 'can’t hire.'];
+const CLAUSE_MS = 3800;
+const ROLL_MS = 760;   // must outlast the clause roll in animations.css
 
 export default function Hero() {
   const small = typeof matchMedia === 'function' && matchMedia('(max-width:900px)').matches;
@@ -14,7 +21,7 @@ export default function Hero() {
   const [brainRef, brain] = useDither({
     mode: 'brain',
     ascii: true,
-    cell: small ? 7 : 8,          // cheaper grid on mobile
+    cell: small ? 9 : 8,          // coarser, and so cheaper, on mobile
     color: 'rgba(241,237,228,.62)',
     gain: 1,
     params: { boot: 0, lens: small ? 0 : 0.9, px: 9, py: 9 },
@@ -56,6 +63,26 @@ export default function Hero() {
     return () => cancelAnimationFrame(id);
   }, []);
 
+  // The outgoing clause is kept alongside the incoming one for the length of
+  // the roll, so both halves of the move are visible inside the clip box.
+  // `n` only ever increases — it keys the pair so the animation replays.
+  const [clause, setClause] = useState({ cur: 0, prev: null, n: 0 });
+
+  useEffect(() => {
+    if (reduce) return;
+    let drop = 0;
+    const id = setInterval(() => {
+      if (document.hidden) return;
+      setClause((c) => ({ cur: (c.cur + 1) % CLAUSES.length, prev: c.cur, n: c.n + 1 }));
+      // Drop the outgoing copy as soon as its roll ends. Left in place it would
+      // sit in the DOM until the next rotation, and the h1 would read as two
+      // clauses at once to a screen reader.
+      clearTimeout(drop);
+      drop = setTimeout(() => setClause((c) => ({ ...c, prev: null })), ROLL_MS);
+    }, CLAUSE_MS);
+    return () => { clearInterval(id); clearTimeout(drop); };
+  }, [reduce]);
+
   return (
     <section className="hero" id="top">
       <canvas className="hero-brain" ref={brainRef} aria-hidden="true" />
@@ -63,19 +90,32 @@ export default function Hero() {
       <div className="hero-inner">
         <div className="eyebrow" data-reveal>
           <span className="dot" />
-          <span className="mono">AI for British businesses · London</span>
+          <span className="mono">AI agents for British companies · London</span>
         </div>
 
         <h1>
-          <span className="ln"><span style={{ '--d': '120ms' }}>The <span className="amb">AI Brain</span></span></span>
+          <span className="ln"><span style={{ '--d': '120ms' }}>The <span className="amb">AI agents</span></span></span>
           <span className="ln"><span style={{ '--d': '220ms' }}>your business</span></span>
-          <span className="ln"><span style={{ '--d': '320ms' }}>was promised.</span></span>
+          <span className="ln rot">
+            {clause.prev !== null && (
+              <span key={`out${clause.n}`} className="roll-out" aria-hidden="true">
+                {CLAUSES[clause.prev]}
+              </span>
+            )}
+            <span
+              key={`in${clause.n}`}
+              className="roll-in"
+              style={{ '--d': clause.n === 0 ? '320ms' : '90ms' }}
+            >
+              {CLAUSES[clause.cur]}
+            </span>
+          </span>
         </h1>
 
         <p className="lede" data-reveal style={{ '--d': '420ms' }}>
-          A quietly brilliant <strong>AI assistant</strong> that picks up the phone at 4am, drafts
-          the awkward follow-up, sorts tomorrow&rsquo;s diary and reorders stock before you notice
-          it&rsquo;s low.
+          <strong>AI agents</strong> that do a real job in your business &mdash; picking up the 3am
+          problem and sorting it, writing the follow-up nobody wants to write, keeping
+          tomorrow&rsquo;s schedule honest and reordering stock before anyone notices it&rsquo;s low.
         </p>
 
         <div className="acts" data-reveal style={{ '--d': '500ms' }}>

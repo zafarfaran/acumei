@@ -2,6 +2,7 @@ import useReveal from '../hooks/useReveal';
 import Nav from '../components/Nav';
 import Hero from '../components/Hero';
 import Industries from '../components/Industries';
+import AITeam from '../components/AITeam';
 import HowItWorks from '../components/HowItWorks';
 import ROICalculator from '../components/ROICalculator';
 import CaseStudies from '../components/CaseStudies';
@@ -23,6 +24,8 @@ export default function Home() {
         <Hero />
         <hr className="rule" />
         <Industries />
+        <hr className="rule" />
+        <AITeam />
         <hr className="rule" />
         <HowItWorks />
         <hr className="rule" />

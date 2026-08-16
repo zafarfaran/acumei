@@ -2,11 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import useDither from '../hooks/useDither';
 import { subscribeScroll } from '../lib/scrollLoop';
+import { pauseFields } from '../lib/dither';
 import { EMAIL } from '../lib/site';
 
 // Absolute so they work from a standalone page as well as from the home page.
 const LINKS = [
-  { href: '/#industries', label: 'The AI Brain' },
+  { href: '/#industries', label: 'AI agents' },
+  { href: '/#team', label: 'The night shift' },
   { href: '/#how', label: 'How it works' },
   { href: '/#calc', label: 'Calculator' },
   { href: '/#work', label: 'Work' },
@@ -28,9 +30,14 @@ export default function Nav() {
     }
   }), []);
 
+  // the overlay hides every field, so stop drawing them for as long as it is up
   useEffect(() => {
     document.body.classList.toggle('menu-open', open);
-    return () => document.body.classList.remove('menu-open');
+    pauseFields(open);
+    return () => {
+      document.body.classList.remove('menu-open');
+      pauseFields(false);
+    };
   }, [open]);
 
   // escape closes the overlay

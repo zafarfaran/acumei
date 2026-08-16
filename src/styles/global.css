@@ -126,3 +126,10 @@ h1 .amb, h2 .amb { color: var(--amber); }
   background: var(--amber);
   animation: pulse 3.2s ease-in-out infinite;
 }
+
+/* the same dot, off duty */
+.dot.off {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--dim);
+  animation: none;
+}
