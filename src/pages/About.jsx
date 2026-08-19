@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
-import { MAILTO } from '../lib/site';
+import BookCall from '../components/BookCall';
 
 export default function About() {
   return (
@@ -101,9 +101,9 @@ export default function About() {
       </section>
 
       <div className="more">
-        <a className="act" href={`${MAILTO}?subject=Discovery%20call`}>
+        <BookCall>
           Book a 30-minute discovery call <span>→</span>
-        </a>
+        </BookCall>
       </div>
     </PageShell>
   );
