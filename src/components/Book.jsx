@@ -1,6 +1,7 @@
 import useDither from '../hooks/useDither';
 import useParallax from '../hooks/useParallax';
 import { EMAIL, MAILTO } from '../lib/site';
+import BookCall from './BookCall';
 
 export default function Book() {
   // dark-on-light: this field sits on the inverted section
@@ -32,9 +33,9 @@ export default function Book() {
           </p>
 
           <div style={{ marginTop: 38 }} data-reveal>
-            <a className="act" href={`${MAILTO}?subject=Discovery%20call`}>
+            <BookCall>
               Book a 30-minute discovery call <span>→</span>
-            </a>
+            </BookCall>
           </div>
         </div>
 

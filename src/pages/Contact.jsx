@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import { EMAIL, MAILTO } from '../lib/site';
+import BookCall from '../components/BookCall';
 
 const ROUTES = [
   {
@@ -109,9 +110,9 @@ export default function Contact() {
       </section>
 
       <div className="more">
-        <a className="act" href={`${MAILTO}?subject=Discovery%20call`}>
+        <BookCall>
           Book a 30-minute discovery call <span>→</span>
-        </a>
+        </BookCall>
       </div>
     </PageShell>
   );

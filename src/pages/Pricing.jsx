@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
-import { MAILTO } from '../lib/site';
+import BookCall from '../components/BookCall';
 
 // Tiers, scope and timelines are the ones the business already publishes in
 // its service model. The figures are not — see the note in the markup.
@@ -144,9 +144,9 @@ export default function Pricing() {
       </section>
 
       <div className="more">
-        <a className="act" href={`${MAILTO}?subject=Discovery%20call`}>
+        <BookCall>
           Book a 30-minute discovery call <span>→</span>
-        </a>
+        </BookCall>
       </div>
     </PageShell>
   );
