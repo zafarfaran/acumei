@@ -31,6 +31,7 @@ const CASES = [
     after: 'An agent listens to the voicemail, works out how urgent it is, texts the engineer on call and confirms the slot.',
     metric: '14 sec',
     metricLabel: 'avg dispatch',
+    href: '/case-studies/plumbing',
   },
   {
     tag: 'B2B SaaS · London',
@@ -38,6 +39,7 @@ const CASES = [
     after: 'An agent groups the tickets that are all the same problem, wakes the engineer on call for anything genuinely broken, and answers the rest.',
     metric: '11 min',
     metricLabel: 'first response',
+    href: '/case-studies/b2b-saas',
   },
   {
     tag: 'Restaurant · Leeds',
@@ -45,6 +47,7 @@ const CASES = [
     after: 'An agent reads the till data and drafts the weekly order. The chef approves it with a single tap.',
     metric: '−24%',
     metricLabel: 'food waste',
+    href: '/case-studies/restaurant',
   },
   {
     tag: 'Salon · Manchester',
@@ -52,6 +55,7 @@ const CASES = [
     after: 'A daily rebooking agent sends personalised messages in the owner’s voice.',
     metric: '7×',
     metricLabel: 'rebookings/wk',
+    href: '/case-studies/salon',
   },
 ];
 

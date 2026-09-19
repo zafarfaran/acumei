@@ -6,6 +6,10 @@ import About from './pages/About';
 import CaseStudyPremo from './pages/CaseStudyPremo';
 import CaseStudyDentalPractice from './pages/CaseStudyDentalPractice';
 import CaseStudyConstruction from './pages/CaseStudyConstruction';
+import CaseStudyPlumbing from './pages/CaseStudyPlumbing';
+import CaseStudySaas from './pages/CaseStudySaas';
+import CaseStudyRestaurant from './pages/CaseStudyRestaurant';
+import CaseStudySalon from './pages/CaseStudySalon';
 import Careers from './pages/Careers';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
@@ -26,6 +30,10 @@ export default function App() {
         <Route path="/case-studies/premo" element={<CaseStudyPremo />} />
         <Route path="/case-studies/dental-practice" element={<CaseStudyDentalPractice />} />
         <Route path="/case-studies/construction" element={<CaseStudyConstruction />} />
+        <Route path="/case-studies/plumbing" element={<CaseStudyPlumbing />} />
+        <Route path="/case-studies/b2b-saas" element={<CaseStudySaas />} />
+        <Route path="/case-studies/restaurant" element={<CaseStudyRestaurant />} />
+        <Route path="/case-studies/salon" element={<CaseStudySalon />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
