@@ -18,6 +18,14 @@ const CASES = [
     href: '/case-studies/dental-practice',
   },
   {
+    tag: 'Construction · Birmingham',
+    before: 'Every site foreman lost the last hour of the day writing up progress notes by hand — photos, measurements, what got done — before anyone could send the client an update.',
+    after: 'An agent turns a quick voice note and a few site photos into a structured, client-ready progress report, sent the same evening.',
+    metric: '6 hrs/wk',
+    metricLabel: 'admin time back on site',
+    href: '/case-studies/construction',
+  },
+  {
     tag: 'Plumbing & heating · Bristol',
     before: 'After-hours calls slipped to voicemail until morning. Roughly £24,000 a year in lost emergency callouts.',
     after: 'An agent listens to the voicemail, works out how urgent it is, texts the engineer on call and confirms the slot.',
