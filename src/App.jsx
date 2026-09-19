@@ -3,6 +3,7 @@ import ScrollManager from './components/ScrollManager';
 import Home from './pages/Home';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
+import CaseStudyPremo from './pages/CaseStudyPremo';
 import Careers from './pages/Careers';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
+        <Route path="/case-studies/premo" element={<CaseStudyPremo />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />

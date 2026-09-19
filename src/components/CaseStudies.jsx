@@ -2,6 +2,14 @@
 // and the quote/author no longer have a slot in the record row.
 const CASES = [
   {
+    tag: 'Feedback platform · Premo AI Ltd',
+    before: "A new feedback platform for UK trades businesses needed genuinely secure, multi-tenant infrastructure from day one — before a single customer's data could be trusted alongside another's.",
+    after: 'Tenant isolation enforced at the database level, tamper-evident audit logging, and payment/webhook security — 1,982 automated tests proving it, not just code that looks right.',
+    metric: '1 month',
+    metricLabel: 'idea to tested infrastructure',
+    href: '/case-studies/premo',
+  },
+  {
     tag: 'Plumbing & heating · Bristol',
     before: 'After-hours calls slipped to voicemail until morning. Roughly £24,000 a year in lost emergency callouts.',
     after: 'An agent listens to the voicemail, works out how urgent it is, texts the engineer on call and confirms the slot.',
@@ -45,7 +53,7 @@ export default function CaseStudies() {
 
       <div className="cases">
         {CASES.map((c, i) => (
-          <a className="case" href="#book" key={c.tag} data-reveal data-fly="left" style={{ '--d': `${i * 90}ms` }}>
+          <a className="case" href={c.href || '#book'} key={c.tag} data-reveal data-fly="left" style={{ '--d': `${i * 90}ms` }}>
             <div className="tag">{c.tag}</div>
             <div className="ba before"><span className="k">Before</span>{c.before}</div>
             <div className="ba after"><span className="k">After</span>{c.after}</div>
