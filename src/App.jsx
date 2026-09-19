@@ -10,6 +10,13 @@ import CaseStudyPlumbing from './pages/CaseStudyPlumbing';
 import CaseStudySaas from './pages/CaseStudySaas';
 import CaseStudyRestaurant from './pages/CaseStudyRestaurant';
 import CaseStudySalon from './pages/CaseStudySalon';
+import NotesIndex from './pages/notes/NotesIndex';
+import NoteVoicemailDispatchCost from './pages/notes/NoteVoicemailDispatchCost';
+import NoteWhenAgentShouldWakeHuman from './pages/notes/NoteWhenAgentShouldWakeHuman';
+import NoteBuildOnYourAccounts from './pages/notes/NoteBuildOnYourAccounts';
+import NoteOrderingAgentsStockDecisions from './pages/notes/NoteOrderingAgentsStockDecisions';
+import NoteFortnightRightUnit from './pages/notes/NoteFortnightRightUnit';
+import NoteWhatClientsOwn from './pages/notes/NoteWhatClientsOwn';
 import Careers from './pages/Careers';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
@@ -34,6 +41,13 @@ export default function App() {
         <Route path="/case-studies/b2b-saas" element={<CaseStudySaas />} />
         <Route path="/case-studies/restaurant" element={<CaseStudyRestaurant />} />
         <Route path="/case-studies/salon" element={<CaseStudySalon />} />
+        <Route path="/notes" element={<NotesIndex />} />
+        <Route path="/notes/voicemail-dispatch-cost" element={<NoteVoicemailDispatchCost />} />
+        <Route path="/notes/when-to-wake-a-human" element={<NoteWhenAgentShouldWakeHuman />} />
+        <Route path="/notes/build-on-your-accounts" element={<NoteBuildOnYourAccounts />} />
+        <Route path="/notes/ordering-agents-stock-decisions" element={<NoteOrderingAgentsStockDecisions />} />
+        <Route path="/notes/fortnight-right-unit-of-delivery" element={<NoteFortnightRightUnit />} />
+        <Route path="/notes/what-clients-actually-own" element={<NoteWhatClientsOwn />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
