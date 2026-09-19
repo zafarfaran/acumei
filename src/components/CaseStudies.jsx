@@ -10,6 +10,14 @@ const CASES = [
     href: '/case-studies/premo',
   },
   {
+    tag: 'Dental practice · Leeds',
+    before: 'No-shows went unnoticed until check-in. Empty chair time added up fast, and cancelled slots rarely got refilled in time.',
+    after: 'An agent sends smart reminders, catches cancellations early and automatically offers the freed slot to the next patient on the waitlist.',
+    metric: '£1,850/mo',
+    metricLabel: 'recovered chair time',
+    href: '/case-studies/dental-practice',
+  },
+  {
     tag: 'Plumbing & heating · Bristol',
     before: 'After-hours calls slipped to voicemail until morning. Roughly £24,000 a year in lost emergency callouts.',
     after: 'An agent listens to the voicemail, works out how urgent it is, texts the engineer on call and confirms the slot.',

@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
 import CaseStudyPremo from './pages/CaseStudyPremo';
+import CaseStudyDentalPractice from './pages/CaseStudyDentalPractice';
 import Careers from './pages/Careers';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/case-studies/premo" element={<CaseStudyPremo />} />
+        <Route path="/case-studies/dental-practice" element={<CaseStudyDentalPractice />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
