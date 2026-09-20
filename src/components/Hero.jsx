@@ -8,10 +8,10 @@ import LiveFeed from './LiveFeed';
 // 72% centre of the mask
 const FOCUS = 0.72;
 
-// The headline is one sentence with a rotating relative clause: "The AI agents
+// The headline is one sentence with a rotating relative clause: "The AI systems
 // your business ___". Each has to complete that grammatically and fit the 15ch
 // headline measure, or the line wraps and the hero changes height.
-const CLAUSES = ['was promised.', 'keeps missing.', 'can’t hire.'];
+const CLAUSES = ['was promised.', 'actually needs.', 'can build on.'];
 const CLAUSE_MS = 3800;
 const ROLL_MS = 760;   // must outlast the clause roll in animations.css
 
@@ -90,11 +90,11 @@ export default function Hero() {
       <div className="hero-inner">
         <div className="eyebrow" data-reveal>
           <span className="dot" />
-          <span className="mono">AI agents for British companies · London</span>
+          <span className="mono">AI agents &amp; platforms for British companies · London</span>
         </div>
 
         <h1>
-          <span className="ln"><span style={{ '--d': '120ms' }}>The <span className="amb">AI agents</span></span></span>
+          <span className="ln"><span style={{ '--d': '120ms' }}>The <span className="amb">AI systems</span></span></span>
           <span className="ln"><span style={{ '--d': '220ms' }}>your business</span></span>
           <span className="ln rot">
             {clause.prev !== null && (
@@ -113,9 +113,11 @@ export default function Hero() {
         </h1>
 
         <p className="lede" data-reveal style={{ '--d': '420ms' }}>
-          <strong>AI agents</strong> that do a real job in your business &mdash; picking up the 3am
-          problem and sorting it, writing the follow-up nobody wants to write, keeping
-          tomorrow&rsquo;s schedule honest and reordering stock before anyone notices it&rsquo;s low.
+          We build <strong>AI-native platforms and dashboards</strong> that give your team one
+          place to see what&rsquo;s happening, make decisions and run connected workflows.
+          And <strong>focused AI agents</strong> that dispatch the 3am callout, follow up
+          unanswered quotes or keep tomorrow&rsquo;s schedule honest. Built around your
+          business, on accounts you own.
         </p>
 
         <div className="acts" data-reveal style={{ '--d': '500ms' }}>

@@ -5,12 +5,26 @@
 /* A compact floating bar rather than a full-width one: the section links live
    behind the toggle instead of sitting across the top of every screen.
    The corner radius is the one deliberate exception to the no-radius rule. */
-.nav {
+/* Keep scrolled content out of the navigation's reading area. */
+.nav-shell {
   position: fixed;
-  top: 16px;
-  left: 50%;
-  transform: translateX(-50%);
+  inset: 0 0 auto;
   z-index: 60;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+  pointer-events: none;
+}
+
+/* Once scrolled, the shell fades to the page colour beneath the pill so card
+   text never bleeds through the translucent bar — yet there is no hard bar
+   edge, and the pill still reads as floating. */
+.nav-shell:has(.nav.stuck) {
+  background: linear-gradient(to bottom, var(--bg) 55%, transparent);
+}
+
+.nav {
+  pointer-events: auto;
   display: flex;
   align-items: center;
   gap: clamp(28px, 6vw, 64px);
@@ -797,14 +811,20 @@ input[type=range]:focus-visible { outline: 1px solid var(--amber); outline-offse
 
 /* ---------------------------------------------------------------- work */
 .cases {
+  /* Shared tracks keep every card aligned regardless of its metric width. */
+  display: grid;
+  grid-template-columns: minmax(150px, 0.6fr) minmax(0, 1.15fr) minmax(0, 1.15fr) minmax(120px, max-content);
+  column-gap: clamp(20px, 3vw, 48px);
   margin-top: clamp(44px, 7vh, 86px);
   border-top: 1px solid var(--line);
 }
 
 .case {
   display: grid;
-  grid-template-columns: minmax(150px, 0.6fr) 1.15fr 1.15fr minmax(120px, auto);
-  gap: clamp(20px, 3vw, 48px);
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  grid-template-rows: auto 1fr;
+  row-gap: 8px;
   align-items: start;
   padding: clamp(26px, 4vh, 42px) 0;
   border-bottom: 1px solid var(--line);
@@ -840,7 +860,20 @@ input[type=range]:focus-visible { outline: 1px solid var(--amber); outline-offse
 
 .case:hover .tag { color: var(--amber); }
 
-.case .ba { font-size: 14.5px; line-height: 1.55; }
+/* Labels and paragraphs share two rows, even if either label wraps. */
+.case .tag { grid-column: 1; grid-row: 1 / span 2; }
+.case .m { grid-column: 4; grid-row: 1 / span 2; }
+.case .ba {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  min-width: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.case .before { grid-column: 2; }
+.case .after { grid-column: 3; }
 
 .case .ba .k {
   font-family: var(--mono);
@@ -848,7 +881,6 @@ input[type=range]:focus-visible { outline: 1px solid var(--amber); outline-offse
   letter-spacing: 0.18em;
   color: var(--dim);
   display: block;
-  margin-bottom: 8px;
 }
 
 .case .before { color: var(--dim); }

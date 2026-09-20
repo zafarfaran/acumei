@@ -52,22 +52,24 @@ export default function Nav() {
     <>
       <div className="prog" ref={progRef} />
 
-      <nav className="nav" ref={navRef}>
-        <Link to="/" className="wordmark">
-          <canvas ref={markRef} aria-hidden="true" />
-          Acumei
-        </Link>
+      <div className="nav-shell">
+        <nav className="nav" ref={navRef}>
+          <Link to="/" className="wordmark">
+            <canvas ref={markRef} aria-hidden="true" />
+            Acumei
+          </Link>
 
-        <button
-          className="burger"
-          aria-label={open ? 'Close menu' : 'Menu'}
-          aria-expanded={open}
-          aria-controls="menu"
-          onClick={() => setOpen((o) => !o)}
-        >
-          <i /><i />
-        </button>
-      </nav>
+          <button
+            className="burger"
+            aria-label={open ? 'Close menu' : 'Menu'}
+            aria-expanded={open}
+            aria-controls="menu"
+            onClick={() => setOpen((o) => !o)}
+          >
+            <i /><i />
+          </button>
+        </nav>
+      </div>
 
       <div className="menu" id="menu" aria-hidden={!open}>
         {LINKS.map((l, i) => (
