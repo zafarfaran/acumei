@@ -8,7 +8,7 @@ export default function CaseStudyPremo() {
       n="05"
       label="Case study · Premo AI Ltd"
       title={<>Building the security foundation for <span className="amb">a real feedback platform.</span></>}
-      lede="Premo helps UK trades businesses collect feedback through a card tap or QR code. We’re working with Premo AI Ltd on the platform behind that simple interaction — keeping each business’s data separate, access controlled and sensitive actions accountable."
+      lede="Premo is a full multi-tenant SaaS platform for UK trades businesses: a card tap or QR scan is the visible surface over real-time dashboards, a team and location hierarchy, an entitlements engine and a real integration ecosystem. We’re building it with Premo AI Ltd on infrastructure that keeps each business’s data separate, access controlled and sensitive actions accountable."
       meta="Ongoing engagement · Two months in · Work continues"
       field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
