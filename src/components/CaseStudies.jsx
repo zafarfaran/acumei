@@ -4,9 +4,9 @@ const CASES = [
   {
     tag: 'Feedback platform · Premo AI Ltd',
     before: "A new feedback platform for UK trades businesses needed genuinely secure, multi-tenant infrastructure from day one — before a single customer's data could be trusted alongside another's.",
-    after: 'Tenant isolation enforced at the database level, tamper-evident audit logging, and payment/webhook security — 1,982 automated tests proving it, not just code that looks right.',
-    metric: '1 month',
-    metricLabel: 'idea to tested infrastructure',
+    after: 'Tenant isolation enforced at the database level, tamper-evident audit logging, and payment/webhook security — 1,982 automated tests so far, with development and testing continuing.',
+    metric: 'Ongoing',
+    metricLabel: 'two months in',
     href: '/case-studies/premo',
   },
   {

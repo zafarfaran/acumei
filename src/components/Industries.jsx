@@ -136,7 +136,7 @@ const INDUSTRIES = [
     id: 'custom',
     name: 'Custom Tech Solutions',
     stat: '1,982',
-    statLabel: 'automated tests proving it works',
+    statLabel: 'automated tests so far',
     mode: 'orb',
     trigger: "Your business runs on spreadsheets, sticky notes, and three tools that don't talk to each other.",
     steps: [
@@ -144,8 +144,8 @@ const INDUSTRIES = [
       'Design and build an AI-native dashboard from scratch — one place, connected to everything, doing the thinking instead of just displaying data.',
       'Hand it over fully working, fully yours. We can stay on to maintain it, or you take it from here.',
     ],
-    outcome: 'One dashboard instead of five disconnected tools. Built in a month, idea to tested infrastructure.',
-    link: { href: '/case-studies/premo', label: 'See how we built this for Premo' },
+    outcome: 'One dashboard instead of five disconnected tools. Ongoing development, with testing alongside every feature.',
+    link: { href: '/case-studies/premo', label: 'See what we’re building for Premo' },
   },
 ];
 
