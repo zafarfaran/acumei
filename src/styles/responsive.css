@@ -62,6 +62,10 @@
 }
 
 @media (max-width: 640px) {
+  /* three figures will not sit side by side at this width */
+  .premo-progress { grid-template-columns: minmax(0, 1fr); }
+  .premo-progress dd { font-size: clamp(38px, 11vw, 52px); }
+
   .nav-shell { padding: 12px 0; }
   .nav { padding: 9px 10px 9px 15px; }
   .wordmark { font-size: 17px; }

@@ -40,12 +40,17 @@ export default function CaseStudyPremo() {
             <dt>Cross-tenant data leaks, tested</dt>
             <dd>0</dd>
           </div>
+          <div>
+            <dt>Tenant-isolated tables</dt>
+            <dd>47</dd>
+          </div>
         </dl>
         <p className="premo-progress-note">
           Current figures reported by the project team. The zero refers to the tested
           tenant-isolation scenarios, not a guarantee against every possible failure.
           The test count describes the suite so far, not a claim that every test passes
-          in every environment.
+          in every environment. The table count is the number of tenant-scoped tables
+          currently carrying Row-Level Security policies.
         </p>
       </section>
 
@@ -55,16 +60,47 @@ export default function CaseStudyPremo() {
           This is active work for Premo AI Ltd, two months into an ongoing engagement.
           The product serves plumbers, electricians and other trades businesses:
           customers leave feedback after a job and can continue to a Google review.
-          Behind that interaction, we&rsquo;re developing the infrastructure that lets
-          multiple businesses use the same platform without sharing access to each
-          other&rsquo;s customer data.
+          That interaction is the surface. Underneath it sits a full multi-tenant SaaS
+          platform — a real-time dashboard, a subscription and entitlements engine,
+          an integration layer and the isolation guarantees that let unrelated
+          businesses share one system safely.
+        </p>
+
+        <h3>A dashboard that updates itself</h3>
+        <p>
+          Postgres LISTEN/NOTIFY carries database changes straight to the application,
+          which pipes them to the browser over Server-Sent Events. Feedback appears on
+          the dashboard as it arrives: no polling loop, no refresh button, and no
+          interval quietly re-querying the database for every tab a business leaves
+          open all day.
+        </p>
+
+        <h3>A data hierarchy that keeps its history</h3>
+        <p>
+          The model runs Organisation → Location → Team → Team member, and
+          historical records hold immutable snapshots of the structure they were
+          written under. Renaming a location or an employee leaving does not silently
+          rewrite last quarter&rsquo;s reports — what happened stays what happened,
+          even once the organisation around it has changed.
+        </p>
+
+        <h3>Entitlements and subscription state</h3>
+        <p>
+          Plan limits resolve through a single pure function that every gated action
+          calls, so there is one place to read and one place to change what a plan
+          allows. Subscriptions move through an explicit state machine — active,
+          grace, read-only, suspended — rather than a scatter of boolean flags.
+          Stripe webhooks are signature-verified and processed idempotently, so a
+          redelivered event cannot be applied twice. We test forged signatures and
+          replays alongside the ordinary payment paths.
         </p>
 
         <h3>Tenant isolation at the database level</h3>
         <p>
-          PostgreSQL Row-Level Security enforces the boundaries between businesses.
-          We build and test those boundaries alongside the features that depend on
-          them, including adversarial attempts to read or change another tenant&rsquo;s
+          PostgreSQL Row-Level Security is enforced on every one of the 47
+          tenant-scoped tables, not only the ones the application happens to query
+          today. Those boundaries are tested independently of the application code,
+          including adversarial attempts to read or change another tenant&rsquo;s
           records. Isolation belongs in the database as well as the application.
         </p>
 
@@ -76,28 +112,42 @@ export default function CaseStudyPremo() {
           Audit coverage develops with the platform.
         </p>
 
-        <h3>Stripe webhook security</h3>
+        <h3>Integrations that carry real traffic</h3>
         <p>
-          Payment infrastructure verifies incoming Stripe webhook signatures before
-          trusting events. We test forged signatures and replay scenarios alongside
-          normal payment flows, so the handling of untrusted or repeated events is
-          part of the implementation from the start.
+          Clerk handles identity, Stripe payments, Resend transactional email, and
+          Google the routing of review requests. WhatsApp, through the Meta API, gives
+          owners alerts and conversational access to their own aggregate figures —
+          scoped to that business and designed around summaries, with individual
+          customer data excluded from responses. A live monday.com integration closes
+          the loop from the other direction: when a client marks a job complete on
+          their own board, that push triggers the review request automatically.
         </p>
 
-        <h3>WhatsApp with aggregate-only guardrails</h3>
+        <h3>UK and EU data residency, designed in</h3>
         <p>
-          The WhatsApp integration gives business owners alerts and conversational
-          access to their own aggregate performance statistics. Access checks and
-          response guardrails keep the channel scoped to that business and designed
-          around summaries, with individual customer data excluded from responses.
+          Postgres is hosted in London, and error tracking is scrubbed of personal data
+          before anything leaves the application. Trades businesses hold customer
+          names, addresses and job details, so residency is a constraint to build
+          around from the first migration rather than a retrofit once a customer asks
+          the question.
         </p>
+      </section>
 
-        <h3>Authentication and team management</h3>
+      <section>
+        <h2>Real infrastructure, not a prototype</h2>
         <p>
-          Authentication and team-management work supports solo tradespeople through
-          to businesses with several locations. Permissions determine who can access
-          each part of the platform, with team membership and business boundaries
-          checked as the product grows.
+          The database runs on Neon — serverless Postgres with connection pooling
+          that holds up when requests arrive from more than one place at once — and
+          the application on Railway. Development, staging and production are separate
+          environments, each fully isolated, with their own databases and their own
+          credentials.
+        </p>
+        <p>
+          None of that is unusual for production software, which is the point of saying
+          it. It is the difference between something that works on one machine and
+          something that can be deployed, tested against and rolled back — and it is
+          how the project is set up while it is still being built, rather than work
+          deferred until a launch week.
         </p>
       </section>
 

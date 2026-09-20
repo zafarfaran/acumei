@@ -25,7 +25,7 @@
 
 .premo-progress {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(20px, 3vw, 40px);
   margin: 0;
   padding: clamp(24px, 4vh, 40px) 0;
@@ -52,7 +52,7 @@
   order: -1;
   margin: 0;
   font-family: var(--display);
-  font-size: clamp(38px, 5.2vw, 64px);
+  font-size: clamp(32px, 4.2vw, 50px);
   font-weight: var(--dw);
   letter-spacing: var(--dls);
   line-height: var(--dlh);
