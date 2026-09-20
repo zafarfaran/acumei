@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import useDither from '../hooks/useDither';
 import useParallax from '../hooks/useParallax';
 
@@ -134,16 +135,17 @@ const INDUSTRIES = [
   {
     id: 'custom',
     name: 'Custom Tech Solutions',
-    stat: '∞',
-    statLabel: 'if you can describe it, we can build it',
+    stat: '1,982',
+    statLabel: 'automated tests proving it works',
     mode: 'orb',
-    trigger: 'You have an idea for a tool, app, or system — but no tech team to build it.',
+    trigger: "Your business runs on spreadsheets, sticky notes, and three tools that don't talk to each other.",
     steps: [
-      'We sit down with you and figure out exactly what you need — no jargon, just outcomes.',
-      'Design and build it from scratch — AI-powered apps, dashboards, connections between the systems you already use, whatever it takes.',
-      'Hand it over fully working, fully yours. We can stay on to maintain it or you take it from here.',
+      'We map out how the business actually runs — not the process on paper, the one people actually follow.',
+      'Design and build an AI-native dashboard from scratch — one place, connected to everything, doing the thinking instead of just displaying data.',
+      'Hand it over fully working, fully yours. We can stay on to maintain it, or you take it from here.',
     ],
-    outcome: 'Your idea, built and running. Not a template — something made for you.',
+    outcome: 'One dashboard instead of five disconnected tools. Built in a month, idea to tested infrastructure.',
+    link: { href: '/case-studies/premo', label: 'See how we built this for Premo' },
   },
 ];
 
@@ -242,6 +244,11 @@ export default function Industries() {
                 <b>{selected.stat}</b>
                 <span>{selected.statLabel}</span>
               </div>
+              {selected.link && (
+                <Link className="act" to={selected.link.href}>
+                  {selected.link.label} <span>→</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>
