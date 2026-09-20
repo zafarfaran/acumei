@@ -47,8 +47,13 @@
 
   .flow { opacity: 0.45; }
 
-  .case { grid-template-columns: 1fr 1fr; gap: 20px 30px; }
-  .case .tag, .case .m { grid-column: 1 / -1; }
+  .cases { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 30px; }
+  .case { grid-template-rows: auto auto 1fr auto; row-gap: 16px; }
+  .case .tag { grid-column: 1 / -1; grid-row: 1; }
+  .case .ba { grid-row: 2 / span 2; row-gap: 8px; }
+  .case .before { grid-column: 1; }
+  .case .after { grid-column: 2; }
+  .case .m { grid-column: 1 / -1; grid-row: 4; }
   .case .m { text-align: left; display: flex; align-items: baseline; gap: 14px; }
   .case .m span { margin-top: 0; }
 
@@ -57,12 +62,16 @@
 }
 
 @media (max-width: 640px) {
-  .nav { top: 12px; padding: 9px 10px 9px 15px; }
+  .nav-shell { padding: 12px 0; }
+  .nav { padding: 9px 10px 9px 15px; }
   .wordmark { font-size: 17px; }
 
   .hero { padding-top: 96px; padding-bottom: 44px; }
 
-  .case { grid-template-columns: 1fr; gap: 16px; }
+  .cases { grid-template-columns: minmax(0, 1fr); }
+  .case { grid-template-rows: auto; row-gap: 16px; }
+  .case .tag, .case .ba, .case .m { grid-column: 1; grid-row: auto; }
+  .case .ba { grid-template-rows: auto auto; row-gap: 8px; }
   .case .m { text-align: left; display: flex; align-items: baseline; gap: 14px; }
   .case .m span { margin-top: 0; }
 

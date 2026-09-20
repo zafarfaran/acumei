@@ -75,8 +75,8 @@ export default function CaseStudies() {
         {CASES.map((c, i) => (
           <a className="case" href={c.href || '#book'} key={c.tag} data-reveal data-fly="left" style={{ '--d': `${i * 90}ms` }}>
             <div className="tag">{c.tag}</div>
-            <div className="ba before"><span className="k">Before</span>{c.before}</div>
-            <div className="ba after"><span className="k">After</span>{c.after}</div>
+            <div className="ba before"><span className="k">Before</span><span>{c.before}</span></div>
+            <div className="ba after"><span className="k">After</span><span>{c.after}</span></div>
             <div className="m">
               <b>{c.metric}</b>
               <span>{c.metricLabel}</span>
