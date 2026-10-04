@@ -234,6 +234,8 @@ body.menu-open .menu > a, body.menu-open .menu .foot { opacity: 1; transform: no
   .sheets .fr { min-height: 0; }
   .sheet-lg .fr { flex-direction: column; }
   .sheet-img { border-right: 0; border-bottom: 1px solid var(--line); aspect-ratio: 16 / 10; }
+  /* an explicit size: with aspect-ratio plus a min-height, Safari widens the plate past the card */
+  .premo-plate { flex: none; width: 100%; min-width: 0; aspect-ratio: auto; min-height: 0; height: clamp(260px, 80vw, 400px); }
   #book { height: 170vh; }
   .close-h { font-size: 48px; }
   .cta { gap: 18px; margin-top: 26px; }
