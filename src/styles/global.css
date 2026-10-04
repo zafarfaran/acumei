@@ -6,6 +6,11 @@
 html {
   background: var(--bg);
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* iOS Safari still pans sideways with only body clipped; clip (not hidden) so
+     neither element becomes a scroll container and sticky scenes keep working */
+  overflow-x: clip;
 }
 
 body {
@@ -17,6 +22,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-wrap: pretty;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 h1, h2, h3 {

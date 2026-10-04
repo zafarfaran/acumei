@@ -197,8 +197,16 @@ body.menu-open .menu > a, body.menu-open .menu .foot { opacity: 1; transform: no
   .nav { display: none; }
   .burger { display: block; }
   .hdr { padding: 0 16px; }
-  #stage { width: 100vw; height: var(--band); z-index: 6; background: var(--bg); border-bottom: 1px solid var(--line); }
-  #leaders { z-index: 7; }
+  /* the band is part of the page, not a box on top of it: no frame, text dissolves
+     into its lower edge, and Stage fades it out with the machine and scrolls it off
+     with the footer */
+  #stage {
+    width: 100vw; height: var(--band); z-index: 6; background: var(--bg);
+    -webkit-mask-image: linear-gradient(#000 calc(100% - 48px), transparent);
+    mask-image: linear-gradient(#000 calc(100% - 48px), transparent);
+    will-change: transform, opacity;
+  }
+  #leaders { z-index: 7; overflow: hidden; }
   .asm-home main { padding-top: var(--band); }
   .asm .col { width: 100%; padding: 0 22px; }
   .asm-home h1 { font-size: 40px; }

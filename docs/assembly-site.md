@@ -32,7 +32,7 @@ Old files kept: `lib/dither.js` + `hooks/useDither.js` (used for the Notes thumb
 
 ## How the machine and scroll loop work
 
-* `Stage` (home only) mounts a fixed canvas (right 55% of the viewport, a 40vh band on phones), an SVG overlay
+* `Stage` (home only) mounts a fixed canvas (right 55% of the viewport; on phones a 40vh band with no frame that fades out over Work/Notes and is pushed off by the footer), an SVG overlay
   for leader lines and the drawing title block. It subscribes one callback to `motion.onFrame`.
 * Each frame: eased scroll (`shown += (scrollY - shown) * 0.18`) -> `homeState()` -> `renderer.draw()`.
   `homeState` turns document positions of the `[data-scene]` elements (cached by `readLayout()` on resize)

@@ -23,7 +23,9 @@ export default function Stage() {
     const q = (s, r = document) => r.querySelector(s);
     const qa = (s, r = document) => [...r.querySelectorAll(s)];
 
-    let W = 0, H = 0, mobile = false, bandH = 0, cw = 0, ch = 0, cvLeft = 0, cvTop = 0;
+    let W = 0, H = 0, mobile = false, bandH = 0, cw = 0, ch = 0, cvLeft = 0, cvTop = 0, footTop = Infinity;
+    // phones: the band's own fade and scroll-off (see bandFx)
+    let bandA = 1, bandY = 0, bandCss = '';
     let L = null;
     let shown = 0, introT = STATIC ? 1 : 0, lastShown = -1, dirty = true, frameN = 0, lastT = 0, snapNext = false;
     const hl = [0, 0, 0, 0];
@@ -35,6 +37,7 @@ export default function Stage() {
     const rows = qa('[data-row]');
     const words = qa('[data-cw]');
     const cc = q('[data-cc]');
+    const foot = q('.foot-sheet');
 
     const callouts = qa('[data-anchor]').map((el) => {
       const g = document.createElementNS(NS, 'g'), h = document.createElementNS(NS, 'path'), p = document.createElementNS(NS, 'path'), c = document.createElementNS(NS, 'circle');
@@ -49,6 +52,7 @@ export default function Stage() {
       W = window.innerWidth; H = window.innerHeight;
       mobile = W < 820; bandH = mobile ? Math.round(H * 0.4) : 0;
       document.documentElement.style.setProperty('--band', bandH ? bandH + 'px' : '40vh');
+      canvas.style.opacity = ''; canvas.style.transform = ''; bandCss = '';
       const r = canvas.getBoundingClientRect();
       cw = Math.round(r.width); ch = Math.round(r.height); cvLeft = r.left; cvTop = r.top;
       R.resize(cw, ch, window.devicePixelRatio || 1);
@@ -58,6 +62,7 @@ export default function Stage() {
       L = readLayout();
       const top = (el) => el.getBoundingClientRect().top + window.scrollY;
       lands.forEach((o) => { o.top = top(o.el); });
+      footTop = foot ? top(foot) : Infinity;
       callouts.forEach((c) => {
         const rc = c.el.getBoundingClientRect();
         c.docTop = rc.top + window.scrollY; c.right = rc.right; c.h = rc.height; c.sticky = !!c.el.closest('[data-sticky]');
@@ -117,12 +122,13 @@ export default function Stage() {
         else target = sm(clamp((1 - Math.abs(cy - (top + Vh * 0.5)) / (Vh * 0.42)) * 2.2));
         // no leaders while the machine is hidden (Work, Notes), or from text that has left the screen
         target *= 1 - (s.hide || 0);
+        if (mobile && bandA < 0.5) target = 0;
         if (cy < 72 || cy > Vh - 8) target = 0;
         c.a += (target - c.a) * 0.18; if (Math.abs(target - c.a) < 0.003) c.a = target;
         const a = c.a;
         if (a < 0.01) { c.p.style.visibility = 'hidden'; c.hl.style.visibility = 'hidden'; c.c.style.opacity = 0; continue; }
         const an = R.anchors[c.anchor]; if (!an) continue;
-        const px = cvLeft + an[0], py = cvTop + an[1];
+        const px = cvLeft + an[0], py = cvTop + an[1] + bandY;
         if (mobile) {
           dash(c, cy < bandH + 14 ? 0 : a, `M11 ${cy - 15} V${cy + 15}`);
           c.c.setAttribute('cx', px); c.c.setAttribute('cy', py); c.c.setAttribute('r', 9 + (1 - a) * 8); c.c.style.opacity = a; c.c.style.fill = 'none';
@@ -135,6 +141,21 @@ export default function Stage() {
         dash(c, a, `M${x0} ${cy} H${jx} L${px} ${py}`);
         c.c.setAttribute('cx', px); c.c.setAttribute('cy', py); c.c.style.opacity = clamp((a - 0.85) * 7);
       }
+    }
+
+    // Phones: the band fades with the machine (gone over Work and Notes, so those get
+    // the whole screen) and is pushed up by the footer, so it leaves with the page
+    // instead of sitting on top of it.
+    function bandFx(s, y) {
+      if (!mobile || STATIC) { bandA = 1; bandY = 0; return; }
+      bandA = clamp(1 - (s.hide || 0) * 1.15);
+      bandY = Math.min(0, Math.round(footTop - y - bandH));
+      const css = `${bandA.toFixed(3)}|${bandY}`;
+      if (css === bandCss) return;
+      bandCss = css;
+      canvas.style.opacity = bandA.toFixed(3);
+      canvas.style.transform = bandY ? `translate3d(0, ${bandY}px, 0)` : '';
+      canvas.style.visibility = bandA < 0.005 || bandY <= -bandH ? 'hidden' : '';
     }
 
     function frame(t) {
@@ -153,6 +174,7 @@ export default function Stage() {
         R.draw(s, homeView(s, cw, ch, R.dpr, mobile, t), t);
         lastShown = shown; dirty = false;
       }
+      bandFx(s, y);
       updateDOM(s, shown);
       leaders(s);
     }
