@@ -52,7 +52,8 @@ export function homeState(y, L, env) {
   s.mAlpha = 1 - s.hide;
   s.Rk = sm(lin(P, 0.7, 0.8)) * (1 - sm(s.labA * 1.3));
   s.mx = 6.5 * sm(lin(P, 0.7, 0.78)) * (1 - backOut(lin(P, 0.8, 1)));
-  const st = L.close - Vh * 0.6, en = L.close + L.closeH - Vh;
+  // the closing scene unpins when its bottom meets the bottom of the screen (env.H, not Vh on phones)
+  const st = L.close - Vh * 0.6, en = L.close + L.closeH - env.H;
   s.cl = clamp((y - st) / Math.max(1, en - st));
   s.mk = sm(lin(s.cl, 0.58, 0.9)); s.pulse = lin(s.cl, 0.4, 0.62);
   s.yawX = -0.62 * s.labA * (1 - sm(lin(s.cl, 0.02, 0.5)));
@@ -65,7 +66,8 @@ export function homeState(y, L, env) {
 
 /** Camera for the home stage, in device pixels. cw/ch are css px. */
 export function homeView(s, cw, ch, dpr, mobile, t) {
-  const Sbase = Math.min(cw / 21, (mobile ? ch - 54 : ch) / (mobile ? 23 : 24)) * dpr;
+  // phones: the canvas starts under the header; keep headroom for the rack label
+  const Sbase = Math.min(cw / 21, ch / (mobile ? 25 : 24)) * dpr;
   const [q0, q1, q2, q3] = s.q;
   const aM = (q0 + q1 + q2 + q3) / 4;
   const uu = 0.25 * q0 + 0.15 * q1 + 0.2 * q2 + 0.4 * q3;
@@ -73,7 +75,7 @@ export function homeView(s, cw, ch, dpr, mobile, t) {
   const idle = s.static ? 0 : Math.sin(t * 0.28) * 0.07;
   return {
     cx: cw * dpr * 0.5,
-    cy: (mobile ? 54 + (ch - 54) * 0.5 : ch * 0.52) * dpr,
+    cy: ch * (mobile ? 0.56 : 0.52) * dpr,
     S: Sbase * scaleK,
     zc: lerp(lerp(2.8, 3.1, 1 - aM), 5.4, s.mk),
     yaw: idle + s.yawX,

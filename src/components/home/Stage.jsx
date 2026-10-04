@@ -144,12 +144,12 @@ export default function Stage() {
     }
 
     // Phones: the band fades with the machine (gone over Work and Notes, so those get
-    // the whole screen) and is pushed up by the footer, so it leaves with the page
-    // instead of sitting on top of it.
+    // the whole screen) and, once the closing scene unpins, scrolls up with it, so it
+    // leaves with the page instead of covering the closing call to action.
     function bandFx(s, y) {
       if (!mobile || STATIC) { bandA = 1; bandY = 0; return; }
       bandA = clamp(1 - (s.hide || 0) * 1.15);
-      bandY = Math.min(0, Math.round(footTop - y - bandH));
+      bandY = Math.min(0, Math.round(footTop - y - H));
       const css = `${bandA.toFixed(3)}|${bandY}`;
       if (css === bandCss) return;
       bandCss = css;
