@@ -6,7 +6,7 @@ import { CALENDLY_URL } from '../lib/site';
 // It keeps the same `.act` markup it had as a mailto link — the href is still a
 // real destination so the link works without JS — but a click opens Calendly in
 // a modal instead of the mail client.
-export default function BookCall({ children }) {
+export default function BookCall({ children, className = 'act' }) {
   const [open, setOpen] = useState(false);
   const [root, setRoot] = useState(null);
 
@@ -16,7 +16,7 @@ export default function BookCall({ children }) {
   return (
     <>
       <a
-        className="act"
+        className={className}
         href={CALENDLY_URL}
         onClick={(e) => { e.preventDefault(); setOpen(true); }}
       >

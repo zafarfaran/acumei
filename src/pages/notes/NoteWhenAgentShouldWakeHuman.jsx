@@ -1,18 +1,11 @@
-import PageShell from '../../components/PageShell';
-import BookCall from '../../components/BookCall';
-import { NOTES } from '../../lib/notes';
+import NoteLayout from './NoteLayout';
 
-const note = NOTES.find((entry) => entry.slug === 'when-to-wake-a-human');
 
 export default function NoteWhenAgentShouldWakeHuman() {
   return (
-    <PageShell
-      n="06"
-      label={`Notes · ${note.category}`}
+    <NoteLayout slug="when-to-wake-a-human" part="agents"
       title={<>When an agent should wake a human, <span className="amb">and when it should not</span></>}
       lede="An escalation policy spends somebody’s attention. It needs an owner, a reason and a clear next action—not just a model that can label a message “urgent”."
-      meta={`${note.category} · ${note.date} · ${note.mins} min read`}
-      field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
       <section>
         <h2>Being cautious can still cause harm</h2>
@@ -159,12 +152,6 @@ export default function NoteWhenAgentShouldWakeHuman() {
           that nobody will ever need to make a judgement call again.
         </p>
       </section>
-
-      <div className="more">
-        <BookCall>
-          Want to talk about this? <span>→</span>
-        </BookCall>
-      </div>
-    </PageShell>
+    </NoteLayout>
   );
 }

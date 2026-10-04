@@ -3,7 +3,42 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm ci",
+  "redirects": [
+    {
+      "source": "/case-studies/dental-practice",
+      "destination": "/#work",
+      "permanent": false
+    },
+    {
+      "source": "/case-studies/construction",
+      "destination": "/#work",
+      "permanent": false
+    },
+    {
+      "source": "/case-studies/plumbing",
+      "destination": "/#work",
+      "permanent": false
+    },
+    {
+      "source": "/case-studies/b2b-saas",
+      "destination": "/#work",
+      "permanent": false
+    },
+    {
+      "source": "/case-studies/restaurant",
+      "destination": "/#work",
+      "permanent": false
+    },
+    {
+      "source": "/case-studies/salon",
+      "destination": "/#work",
+      "permanent": false
+    }
+  ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }

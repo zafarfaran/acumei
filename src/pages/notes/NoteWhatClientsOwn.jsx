@@ -1,18 +1,11 @@
-import PageShell from '../../components/PageShell';
-import BookCall from '../../components/BookCall';
-import { NOTES } from '../../lib/notes';
+import NoteLayout from './NoteLayout';
 
-const note = NOTES.find((entry) => entry.slug === 'what-clients-actually-own');
 
 export default function NoteWhatClientsOwn() {
   return (
-    <PageShell
-      n="06"
-      label={`Notes · ${note.category}`}
+    <NoteLayout slug="what-clients-actually-own" part="data"
       title={<>What clients actually own <span className="amb">when we hand a system over</span></>}
       lede="A repository is part of a handover. The harder question is whether someone else can run, understand and change the system without needing its original author on the phone."
-      meta={`${note.category} · ${note.date} · ${note.mins} min read`}
-      field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
       <section>
         <h2>A zip file is a weak finish</h2>
@@ -160,12 +153,6 @@ export default function NoteWhatClientsOwn() {
           source code worth handing over in the first place.
         </p>
       </section>
-
-      <div className="more">
-        <BookCall>
-          Want to talk about this? <span>→</span>
-        </BookCall>
-      </div>
-    </PageShell>
+    </NoteLayout>
   );
 }

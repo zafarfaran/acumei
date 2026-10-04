@@ -1,42 +1,37 @@
-import useReveal from '../hooks/useReveal';
+import { useEffect } from 'react';
 import Nav from '../components/Nav';
-import Hero from '../components/Hero';
-import Industries from '../components/Industries';
-import AITeam from '../components/AITeam';
-import HowItWorks from '../components/HowItWorks';
-import ROICalculator from '../components/ROICalculator';
-import CaseStudies from '../components/CaseStudies';
-import Notes from '../components/Notes';
-import Book from '../components/Book';
 import Footer from '../components/Footer';
-
-// About, DemoSection, Stats, Services, FAQ, Testimonials and Marquee are not
-// rendered: the redesign has no prototype for them. Their files are still in
-// src/components — re-add each one here once it has been redesigned to match.
+import Stage from '../components/home/Stage';
+import Hero from '../components/home/Hero';
+import Problem from '../components/home/Problem';
+import Services from '../components/home/Services';
+import Process from '../components/home/Process';
+import Principles from '../components/home/Principles';
+import Work from '../components/home/Work';
+import Lab from '../components/home/Lab';
+import Closing from '../components/home/Closing';
+import { STATIC } from '../lib/motion';
 
 export default function Home() {
-  useReveal();
+  useEffect(() => {
+    document.title = 'Acumei — AI engineering lab';
+  }, []);
 
   return (
-    <>
+    <div className={`asm asm-home${STATIC ? ' asm-static' : ''}`}>
       <Nav />
+      <Stage />
       <main>
         <Hero />
-        <hr className="rule" />
-        <Industries />
-        <hr className="rule" />
-        <AITeam />
-        <hr className="rule" />
-        <HowItWorks />
-        <hr className="rule" />
-        <ROICalculator />
-        <hr className="rule" />
-        <CaseStudies />
-        <hr className="rule" />
-        <Notes />
-        <Book />
+        <Problem />
+        <Services />
+        <Process />
+        <Principles />
+        <Work />
+        <Lab />
+        <Closing />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -1,24 +1,16 @@
-import { Link } from 'react-router-dom';
-import PageShell from '../../components/PageShell';
-import BookCall from '../../components/BookCall';
-import { NOTES } from '../../lib/notes';
+import NoteLayout from './NoteLayout';
 
-const note = NOTES.find((entry) => entry.slug === 'ordering-agents-stock-decisions');
 
 export default function NoteOrderingAgentsStockDecisions() {
   return (
-    <PageShell
-      n="06"
-      label={`Notes · ${note.category}`}
+    <NoteLayout slug="ordering-agents-stock-decisions" part="models"
       title={<>Ordering agents and the stock decisions <span className="amb">nobody writes down</span></>}
       lede="A till can tell you what sold. It cannot tell you everything the chef knew when they placed the order. Capturing that difference is most of the work."
-      meta={`${note.category} · ${note.date} · ${note.mins} min read`}
-      field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
       <section>
         <h2>The order contains more knowledge than the spreadsheet</h2>
         <p>
-          Consider the <Link to="/case-studies/restaurant">restaurant ordering example</Link>: a Leeds kitchen prepares its weekly order on Sunday night, with perishable stock repeatedly left over. The proposed agent reads sales data and drafts the next order for the chef to approve. It is an illustrative scenario, not a report from a named client. The useful design question is what the agent would need to understand before that draft deserved anyone’s trust.
+          Consider a restaurant ordering example: a Leeds kitchen prepares its weekly order on Sunday night, with perishable stock repeatedly left over. The proposed agent reads sales data and drafts the next order for the chef to approve. It is an illustrative scenario, not a report from a named client. The useful design question is what the agent would need to understand before that draft deserved anyone’s trust.
         </p>
         <p>
           The obvious inputs are straightforward. Dishes sold, recipe quantities, stock on
@@ -206,12 +198,6 @@ export default function NoteOrderingAgentsStockDecisions() {
           everything important was in the till export.
         </p>
       </section>
-
-      <div className="more">
-        <BookCall>
-          Want to talk about this? <span>→</span>
-        </BookCall>
-      </div>
-    </PageShell>
+    </NoteLayout>
   );
 }

@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import LegalDoc from './LegalDoc';
+import '../styles/pages/legal.css';
 import { EMAIL, MAILTO, LEGAL_UPDATED } from '../lib/site';
 
 export default function Terms() {
@@ -10,8 +12,9 @@ export default function Terms() {
       title="Terms of service"
       lede="The terms on which you use this website, and a summary of the terms on which we take on work."
       meta={`Last updated ${LEGAL_UPDATED}`}
-      field={{ mode: 'wave' }}
+      part="operations"
     >
+      <LegalDoc doc="ACM-LEG-02 / Terms of service" updated={LEGAL_UPDATED}>
       {/* TODO before launch: not reviewed by a solicitor, and it needs to be — the
           liability and warranty sections in particular. Company number, registered
           office and the liability cap are flagged in the sections below. */}
@@ -42,15 +45,9 @@ export default function Terms() {
       <section>
         <h2>Nothing here is advice or an offer</h2>
         <p>
-          The content on this site — including case studies, the savings calculator and
+          The content on this site — including case studies and
           anything in Notes — is general information about what we do. It is not
           professional advice for your particular business, and it is not a binding offer.
-        </p>
-        <p>
-          <strong>The calculator produces an estimate, not a promise.</strong> It assumes
-          automation captures 75% of the hours you describe, applies your own figures, and
-          does nothing else. Your actual result depends on facts it does not know about.
-          Do not treat its output as a forecast.
         </p>
         <p>
           Case studies describe work we have done for real clients. Results vary, and past
@@ -175,6 +172,7 @@ export default function Terms() {
           <Link to="/data-processing">data processing terms</Link>.
         </p>
       </section>
+      </LegalDoc>
     </PageShell>
   );
 }

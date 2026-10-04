@@ -1,18 +1,11 @@
-import PageShell from '../../components/PageShell';
-import BookCall from '../../components/BookCall';
-import { NOTES } from '../../lib/notes';
+import NoteLayout from './NoteLayout';
 
-const note = NOTES.find((entry) => entry.slug === 'build-on-your-accounts');
 
 export default function NoteBuildOnYourAccounts() {
   return (
-    <PageShell
-      n="06"
-      label={`Notes · ${note.category}`}
+    <NoteLayout slug="build-on-your-accounts" part="machine"
       title={<>Why we build on your accounts, <span className="amb">not ours</span></>}
       lede="The account that pays the bill should belong to the business that depends on the system. It is a practical choice about control, costs and what happens when a working relationship ends."
-      meta={`${note.category} · ${note.date} · ${note.mins} min read`}
-      field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
       <section>
         <h2>Start with who can turn the lights on</h2>
@@ -134,12 +127,6 @@ export default function NoteBuildOnYourAccounts() {
           their name is the foundation, not the whole promise.
         </p>
       </section>
-
-      <div className="more">
-        <BookCall>
-          Want to talk about this? <span>→</span>
-        </BookCall>
-      </div>
-    </PageShell>
+    </NoteLayout>
   );
 }

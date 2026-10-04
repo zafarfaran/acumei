@@ -1,7 +1,22 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import { EMAIL, MAILTO } from '../lib/site';
 import BookCall from '../components/BookCall';
+import { STATIC } from '../lib/motion';
+import '../styles/pages/company.css';
+
+function useLit(ref) {
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || STATIC || typeof IntersectionObserver !== 'function') return undefined;
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting || e.boundingClientRect.top < 0) { e.target.classList.add('lit'); io.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -22% 0px' });
+    root.querySelectorAll('[data-lit]').forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [ref]);
+}
 
 const ROUTES = [
   {
@@ -51,68 +66,96 @@ const ROUTES = [
   },
 ];
 
+const NEXT = [
+  'You email. We reply within one working day, usually sooner.',
+  'We find 30 minutes. No preparation needed on your side.',
+  'On the call we map the workflow and tell you whether it is worth automating — including when the answer is no.',
+  'Within 48 hours you get a written brief: the top three opportunities, rough scope, and what we would build first. It is yours whether or not you go ahead.',
+];
+
 export default function Contact() {
+  const root = useRef(null);
+  useLit(root);
+
   return (
     <PageShell
       n="04"
       label="Contact"
+      part="lamp"
       title={<>One address. <span className="amb">A reply within a working day.</span></>}
       lede="There is no contact form, no support queue and no chatbot in the corner. Email reaches a person who can actually answer the question."
-      field={{ mode: 'orb' }}
     >
-      <section>
-        <p className="lead">
-          <a href={MAILTO}>{EMAIL}</a>
-        </p>
-        <p>
-          We are a small team working remotely across the UK, so email is genuinely the
-          quickest way through. Everything after that — the discovery call, reviews,
-          handover — happens over a call and a screen share.
-        </p>
-      </section>
-
-      <div className="routes">
-        {ROUTES.map((r) => (
-          <div className="route" key={r.k}>
-            <div className="k">{r.k}</div>
-            <div>{r.body}</div>
+      <div className="co" ref={root}>
+        <div className="card mailsheet">
+          <div className="fr">
+            <div className="hd"><span>PRIMARY CHANNEL</span><b>EMAIL</b></div>
+            <div className="bd">
+              <a className="big" href={MAILTO}>{EMAIL}</a>
+              <p>
+                We are a small team working remotely across the UK, so email is genuinely the
+                quickest way through. Everything after that &mdash; the discovery call, reviews,
+                handover &mdash; happens over a call and a screen share.
+              </p>
+            </div>
+            <div className="tb mono">
+              <div>REPLY<b>Within one working day</b></div>
+              <div>FORMAT<b>Email, then a call</b></div>
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
 
-      <section>
-        <h2>What happens next</h2>
-        <ol>
-          <li>You email. We reply within one working day, usually sooner.</li>
-          <li>We find 30 minutes. No preparation needed on your side.</li>
-          <li>On the call we map the workflow and tell you whether it is worth automating — including when the answer is no.</li>
-          <li>Within 48 hours you get a written brief: the top three opportunities, rough scope, and what we would build first. It is yours whether or not you go ahead.</li>
-        </ol>
-      </section>
+        <div className="co-tag mono" style={{ marginTop: 'var(--co-gap)' }}><b>01</b> Routes</div>
+        <div className="cards" style={{ marginTop: 0 }}>
+          {ROUTES.map((r, i) => (
+            <div className="card" key={r.k} data-lit>
+              <div className="fr">
+                <div className="hd"><span>ROUTE <b>{String(i + 1).padStart(2, '0')}</b></span></div>
+                <div className="bd">
+                  <h3>{r.k}</h3>
+                  {r.body}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
 
-      <section>
-        <h2>Before you write</h2>
-        <p>
-          If you want a rough number first, the{' '}
-          <Link to="/#calc">calculator on the home page</Link> estimates the annual cost of
-          the manual work you are describing, and <Link to="/pricing">pricing</Link>{' '}
-          explains how a quote gets put together. Neither requires talking to anyone.
-        </p>
-      </section>
+        <section>
+          <div className="co-tag mono"><b>02</b> Procedure</div>
+          <h2>What happens next</h2>
+          <div className="sr-list">
+            {NEXT.map((t, i) => (
+              <div className="sr" data-lit key={t}>
+                <div className="no"><u />{String(i + 1).padStart(2, '0')}</div>
+                <div><p style={{ margin: 0, color: '#d8d3c8', fontSize: 16.5 }}>{t}</p></div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <section>
-        <h2>Data protection</h2>
-        <p>
-          Anything you send us is handled under our{' '}
-          <Link to="/privacy">privacy policy</Link>. In short: we use it to answer you and
-          nothing else, we do not add you to a mailing list, and we do not pass it on.
-        </p>
-      </section>
+        <section>
+          <div className="co-tag mono"><b>03</b> Reference</div>
+          <h2>Before you write</h2>
+          <p>
+            If you want a rough number first, <Link to="/pricing">pricing</Link>{' '}
+            explains how a quote gets put together. It does not require talking to anyone.
+          </p>
+        </section>
 
-      <div className="more">
-        <BookCall>
-          Book a 30-minute discovery call <span>→</span>
-        </BookCall>
+        <section>
+          <div className="co-tag mono"><b>04</b> Data</div>
+          <h2>Data protection</h2>
+          <p>
+            Anything you send us is handled under our{' '}
+            <Link to="/privacy">privacy policy</Link>. In short: we use it to answer you and
+            nothing else, we do not add you to a mailing list, and we do not pass it on.
+          </p>
+        </section>
+
+        <div className="more">
+          <BookCall>
+            Book a 30-minute discovery call <span>&rarr;</span>
+          </BookCall>
+        </div>
       </div>
     </PageShell>
   );

@@ -1,62 +1,7 @@
-/* Two breakpoints only: 900px and 640px. */
+/* Two breakpoints only: 900px and 640px. Home and chrome breakpoints live in
+   assembly.css (820px). */
 
 @media (max-width: 900px) {
-  .hero { padding-top: 112px; min-height: 100svh; }
-
-  /* still fills the hero, but sits behind the text as atmosphere rather than
-     reading as an object */
-  .hero-brain {
-    position: absolute;
-    left: 0;
-    right: auto;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.3;
-    transform: none !important;
-    -webkit-mask-image: radial-gradient(ellipse 62% 42% at 50% 46%, #000 26%, transparent 68%);
-    mask-image: radial-gradient(ellipse 62% 42% at 50% 46%, #000 26%, transparent 68%);
-  }
-
-  .ind, .calc { grid-template-columns: 1fr; }
-
-  .story { min-height: 360px; }
-
-  .story .tile {
-    position: absolute;
-    top: auto;
-    bottom: 0;
-    right: 0;
-    width: 110px;
-    height: 110px;
-    opacity: 0.4;
-  }
-
-  .steps4 { grid-template-columns: 1fr 1fr; }
-
-  .floor { grid-template-columns: 1fr 1fr; row-gap: 30px; }
-  .clock { grid-template-columns: 1fr; gap: 28px; }
-  .onnow { min-height: 0; }
-
-  .bgrid { grid-template-columns: 1fr; }
-
-  .fgrid { grid-template-columns: 1fr 1fr; gap: 34px; }
-  .fbrand, .fcontact { grid-column: 1 / -1; }
-
-  .indlist { padding-left: 16px; }
-
-  .flow { opacity: 0.45; }
-
-  .cases { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 30px; }
-  .case { grid-template-rows: auto auto 1fr auto; row-gap: 16px; }
-  .case .tag { grid-column: 1 / -1; grid-row: 1; }
-  .case .ba { grid-row: 2 / span 2; row-gap: 8px; }
-  .case .before { grid-column: 1; }
-  .case .after { grid-column: 2; }
-  .case .m { grid-column: 1 / -1; grid-row: 4; }
-  .case .m { text-align: left; display: flex; align-items: baseline; gap: 14px; }
-  .case .m span { margin-top: 0; }
-
   .note { grid-template-columns: 96px 1fr auto; }
   .note .ar { display: none; }
 }
@@ -66,79 +11,7 @@
   .premo-progress { grid-template-columns: minmax(0, 1fr); }
   .premo-progress dd { font-size: clamp(38px, 11vw, 52px); }
 
-  .nav-shell { padding: 12px 0; }
-  .nav { padding: 9px 10px 9px 15px; }
-  .wordmark { font-size: 17px; }
-
-  .hero { padding-top: 96px; padding-bottom: 44px; }
-
-  .cases { grid-template-columns: minmax(0, 1fr); }
-  .case { grid-template-rows: auto; row-gap: 16px; }
-  .case .tag, .case .ba, .case .m { grid-column: 1; grid-row: auto; }
-  .case .ba { grid-template-rows: auto auto; row-gap: 8px; }
-  .case .m { text-align: left; display: flex; align-items: baseline; gap: 14px; }
-  .case .m span { margin-top: 0; }
-
   .note { grid-template-columns: 1fr auto; gap: 8px 16px; }
   .note .t { grid-column: 1 / -1; order: 2; }
   .note .ar { display: none; }
-
-  /* the feed's height is measured, so it needs no breakpoint of its own —
-     rows are two lines tall here and the measurement follows */
-
-  .steps4 { grid-template-columns: 1fr; gap: 26px; }
-
-  /* Four columns of prose cannot fit a phone, so the chart compresses to a
-     two-column board of agents — name and the human it answers to. The pod
-     headings, the spine and the per-row status all go; the live line in the
-     clock strip carries what is actually happening. */
-  .spine { display: none; }
-  #team { padding-top: 34px; padding-bottom: 26px; }
-  #team .sub { font-size: 14px; }
-
-  .floor { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
-  .pod, .agents { display: contents; }
-  .pod > .mono, .pod .who, .pod .hrs { display: none; }
-
-  .agent {
-    grid-template-columns: 13px 1fr;
-    gap: 3px 9px;
-    padding: 11px 0;
-  }
-
-  .agent .ow { display: block; grid-column: 2; font-size: 10px; }
-  .agent .ow.off { opacity: 0.55; }
-  .agent .st { display: none; }
-
-  /* the counts and the live line are enough here */
-  .onnow .assume { display: none; }
-
-  .clock { margin-top: 26px; padding-top: 22px; }
-
-  /* text runs the full width here, so the damped band covers more of the run */
-  .team-field {
-    -webkit-mask-image: linear-gradient(180deg, #000 0 13%, rgba(0, 0, 0, 0.13) 27%, rgba(0, 0, 0, 0.13) 74%, #000 92%);
-    mask-image: linear-gradient(180deg, #000 0 13%, rgba(0, 0, 0, 0.13) 27%, rgba(0, 0, 0, 0.13) 74%, #000 92%);
-  }
-
-  .team-field canvas { opacity: calc(0.24 + var(--load, 0) * 0.28); }
-
-  .acard { grid-template-columns: 1fr; gap: 22px; }
-
-  .pair { grid-template-columns: 1fr; gap: 20px; }
-
-  .trow { grid-template-columns: 52px 1fr; gap: 12px; }
-  .trow .st { grid-column: 2; color: var(--dim); opacity: 0.75; }
-
-  .acts { gap: 18px; flex-direction: column; align-items: flex-start; }
-
-  .outcome { flex-direction: column; align-items: flex-start; gap: 20px; }
-  .stat { text-align: left; }
-
-  .indbtn { font-size: 26px; line-height: 1.7; }
-
-  .fgrid { grid-template-columns: 1fr; }
-
-  .legal { flex-direction: column; gap: 14px; }
-  .legal .set { gap: 16px; }
 }

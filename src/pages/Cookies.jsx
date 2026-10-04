@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import LegalDoc from './LegalDoc';
+import '../styles/pages/legal.css';
 import { EMAIL, MAILTO, LEGAL_UPDATED } from '../lib/site';
 
 export default function Cookies() {
@@ -10,8 +12,9 @@ export default function Cookies() {
       title={<>This site sets <span className="amb">no cookies.</span></>}
       lede="Which is why there is no banner asking you to accept any. This page explains what that means and what would have to change for it to stop being true."
       meta={`Last updated ${LEGAL_UPDATED}`}
-      field={{ mode: 'grid' }}
+      part="lamp"
     >
+      <LegalDoc doc="ACM-LEG-03 / Cookie policy" updated={LEGAL_UPDATED}>
       <section>
         <h2>The short version</h2>
         <p>
@@ -48,16 +51,6 @@ export default function Cookies() {
       </section>
 
       <section>
-        <h2>The calculator</h2>
-        <p>
-          The savings calculator runs entirely in your browser. Nothing you type into it
-          is stored or transmitted — not to us, not to anyone else. Close the tab and it
-          is gone. It is not remembered between visits, which is a deliberate trade: a
-          slightly less convenient tool in exchange for not holding your numbers.
-        </p>
-      </section>
-
-      <section>
         <h2>Fonts and other assets</h2>
         <p>
           The two typefaces are served from this site rather than from a font CDN, so
@@ -88,6 +81,7 @@ export default function Cookies() {
           know.
         </p>
       </section>
+      </LegalDoc>
     </PageShell>
   );
 }

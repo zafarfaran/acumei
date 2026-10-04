@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import LegalDoc from './LegalDoc';
+import '../styles/pages/legal.css';
 import { EMAIL, MAILTO, LEGAL_UPDATED } from '../lib/site';
 
 export default function DataProcessing() {
@@ -10,8 +12,9 @@ export default function DataProcessing() {
       title="Data processing terms"
       lede="When we build a system that handles your customers' data, you are the controller and we are the processor. These are the terms that govern that — the summary version of the agreement we sign with every client."
       meta={`Last updated ${LEGAL_UPDATED}`}
-      field={{ mode: 'ridge' }}
+      part="data"
     >
+      <LegalDoc doc="ACM-LEG-04 / Data processing terms" updated={LEGAL_UPDATED}>
       {/* TODO before launch: this is the plain-English website summary, not the
           executable agreement. The signed DPA is the operative document and must be
           drafted or reviewed by a solicitor against UK GDPR Article 28 before any
@@ -147,6 +150,7 @@ export default function DataProcessing() {
           not a problem.
         </p>
       </section>
+      </LegalDoc>
     </PageShell>
   );
 }

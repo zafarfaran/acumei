@@ -51,82 +51,22 @@
 
 [data-line].in::before { transform: scaleX(1); }
 
-/* hero lines rise out of their clipping box */
-h1 .ln {
-  display: block;
-  overflow: hidden;
-  padding-bottom: 0.14em;   /* without this the descenders clip */
-  margin-bottom: -0.14em;
-}
-
-h1 .ln > span {
-  display: block;
-  transform: translateY(105%);
-  transition: transform 1.15s var(--ease);
-  transition-delay: var(--d, 0ms);
-}
-
-.loaded h1 .ln > span { transform: none; }
-
-/* The rotating clause rolls out of the top of the clip box while the next one
-   rolls in from the bottom. Animation rather than transition, because each
-   clause is a freshly mounted node and a transition has no starting frame. */
-h1 .ln.rot { position: relative; }
-
-h1 .ln.rot > span {
-  transform: none;   /* these are driven by the keyframes below, not by .loaded */
-}
-
-h1 .ln.rot .roll-out {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  animation: clauseOut 0.7s var(--ease) both;
-}
-
-h1 .ln.rot .roll-in {
-  animation: clauseIn 0.7s var(--ease) both;
-  animation-delay: var(--d, 0ms);
-}
-
-@keyframes clauseOut {
-  from { transform: none; opacity: 1; }
-  to { transform: translateY(-105%); opacity: 0; }
-}
-
-@keyframes clauseIn {
-  from { transform: translateY(105%); opacity: 0; }
-  to { transform: none; opacity: 1; }
-}
-
 @keyframes pulse {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
 }
 
-/* step cascade — industry story steps and the outcome */
-@keyframes up {
-  to { opacity: 1; transform: none; }
-}
-
-/* the live feed's slot motion is transform-driven from LiveFeed, not keyframed */
-
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],
-  [data-reveal][data-fly],
-  h1 .ln > span {
+  [data-reveal][data-fly] {
     opacity: 1;
     transform: none;
     transition: none;
   }
   [data-line]::before { transform: scaleX(1); transition: none; }
-  h1 .ln.rot .roll-in { animation: none; opacity: 1; transform: none; }
-  h1 .ln.rot .roll-out { display: none; }
   .swipe {
     -webkit-mask-image: none;
     mask-image: none;
   }
   .dot { animation: none; opacity: 1; }
-  .steps li, .outcome { opacity: 1; transform: none; animation: none; }
 }

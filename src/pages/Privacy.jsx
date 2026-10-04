@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import LegalDoc from './LegalDoc';
+import '../styles/pages/legal.css';
 import { EMAIL, MAILTO, LEGAL_UPDATED } from '../lib/site';
 
 export default function Privacy() {
@@ -10,8 +12,9 @@ export default function Privacy() {
       title="Privacy policy"
       lede="How Acumei handles personal data — on this website, and when you get in touch or become a client."
       meta={`Last updated ${LEGAL_UPDATED}`}
-      field={{ mode: 'ridge' }}
+      part="data"
     >
+      <LegalDoc doc="ACM-LEG-01 / Privacy policy" updated={LEGAL_UPDATED}>
       {/* TODO before launch: not reviewed by a solicitor. The facts below describe
           how the site and business actually operate, but the company number,
           registered office and ICO registration number are missing — see the
@@ -35,12 +38,6 @@ export default function Privacy() {
           <strong>Almost nothing.</strong> This site has no contact form, no account
           system, no advertising and no third-party analytics. It sets no cookies and
           writes nothing to local storage.
-        </p>
-        <p>
-          The savings calculator runs entirely in your browser. The figures you enter are
-          never transmitted anywhere and are gone as soon as you close the tab. The same
-          is true of everything else on the page — the activity feed is fixed sample
-          content, not live data about anyone.
         </p>
         <p>
           Our hosting provider keeps standard server logs, which include IP addresses,
@@ -143,6 +140,7 @@ export default function Privacy() {
           page. This version was published on {LEGAL_UPDATED}.
         </p>
       </section>
+      </LegalDoc>
     </PageShell>
   );
 }

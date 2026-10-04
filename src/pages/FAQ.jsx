@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import { MAILTO } from '../lib/site';
+import '../styles/pages/company.css';
 
 // The first seven are the questions the site already answered; the rest are the
 // ones that come up on discovery calls.
@@ -68,30 +70,61 @@ const ITEMS = [
 ];
 
 export default function FAQ() {
+  const [open, setOpen] = useState(() => new Set([0]));
+  const toggle = (i) => setOpen((prev) => {
+    const next = new Set(prev);
+    if (next.has(i)) next.delete(i); else next.add(i);
+    return next;
+  });
+  const allOpen = open.size === ITEMS.length;
+
   return (
     <PageShell
       n="05"
       label="FAQ"
+      part="operations"
       title={<>The questions we get asked <span className="amb">on every call.</span></>}
       lede="If yours is not here, email it over — we would rather answer it directly than have you guess."
-      field={{ mode: 'grid' }}
     >
-      <div className="qa">
-        {ITEMS.map((item, i) => (
-          <div key={item.q}>
-            <div className="n">{String(i + 1).padStart(2, '0')}</div>
-            <div>
-              <h3>{item.q}</h3>
-              {item.a}
-            </div>
-          </div>
-        ))}
-      </div>
+      <div className="co">
+        <div className="acc-bar mono">
+          <span>{String(ITEMS.length).padStart(2, '0')} ENTRIES</span>
+          <button type="button" onClick={() => setOpen(allOpen ? new Set() : new Set(ITEMS.map((_, i) => i)))}>
+            {allOpen ? 'Collapse all' : 'Expand all'}
+          </button>
+        </div>
+        <div className="acc">
+          {ITEMS.map((item, i) => {
+            const isOpen = open.has(i);
+            return (
+              <div className="qi" key={item.q}>
+                <h3>
+                  <button
+                    type="button"
+                    className="qb"
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-p-${i}`}
+                    id={`faq-b-${i}`}
+                    onClick={() => toggle(i)}
+                  >
+                    <span className="no">Q{String(i + 1).padStart(2, '0')}</span>
+                    <span className="q">{item.q}</span>
+                    <span className="pm" aria-hidden="true" />
+                  </button>
+                </h3>
+                <div className="qp" data-open={isOpen} id={`faq-p-${i}`} role="region" aria-labelledby={`faq-b-${i}`}>
+                  <div><div className="qin">{item.a}</div></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-      <div className="more">
-        <a className="act" href={`${MAILTO}?subject=Question`}>
-          Ask us something else <span>→</span>
-        </a>
+        <div className="more">
+          <a className="act" href={`${MAILTO}?subject=Question`}>
+            Ask us something else <span>&rarr;</span>
+          </a>
+        </div>
       </div>
     </PageShell>
   );

@@ -1,18 +1,11 @@
-import PageShell from '../../components/PageShell';
-import BookCall from '../../components/BookCall';
-import { NOTES } from '../../lib/notes';
+import NoteLayout from './NoteLayout';
 
-const note = NOTES.find((entry) => entry.slug === 'fortnight-right-unit-of-delivery');
 
 export default function NoteFortnightRightUnit() {
   return (
-    <PageShell
-      n="06"
-      label={`Notes · ${note.category}`}
+    <NoteLayout slug="fortnight-right-unit-of-delivery" part="lamp"
       title={<>A fortnight is <span className="amb">the right unit of delivery</span></>}
       lede="Two weeks is enough time to make a useful change visible. It is also short enough that a wrong assumption does not get an entire quarter to settle in."
-      meta={`${note.category} · ${note.date} · ${note.mins} min read`}
-      field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
       <section>
         <h2>Give the work a shape</h2>
@@ -107,12 +100,6 @@ export default function NoteFortnightRightUnit() {
           the change is still affordable.
         </p>
       </section>
-
-      <div className="more">
-        <BookCall>
-          Want to talk about this? <span>→</span>
-        </BookCall>
-      </div>
-    </PageShell>
+    </NoteLayout>
   );
 }

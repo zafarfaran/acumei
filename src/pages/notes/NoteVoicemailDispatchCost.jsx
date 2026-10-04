@@ -1,18 +1,11 @@
-import PageShell from '../../components/PageShell';
-import BookCall from '../../components/BookCall';
-import { NOTES } from '../../lib/notes';
+import NoteLayout from './NoteLayout';
 
-const note = NOTES.find((entry) => entry.slug === 'voicemail-dispatch-cost');
 
 export default function NoteVoicemailDispatchCost() {
   return (
-    <PageShell
-      n="06"
-      label={`Notes · ${note.category}`}
+    <NoteLayout slug="voicemail-dispatch-cost" part="operations"
       title={<>What a voicemail-to-dispatch agent <span className="amb">actually costs to run</span></>}
       lede="The model call is often the smallest line on the bill. The useful question is what it costs to keep the whole service working, including the person who notices when it stops."
-      meta={`${note.category} · ${note.date} · ${note.mins} min read`}
-      field={{ mode: 'brain', ascii: true, gain: 1.05 }}
     >
       <section>
         <h2>Start with a workload</h2>
@@ -153,12 +146,6 @@ export default function NoteVoicemailDispatchCost() {
           can see. The cheap model call helps. It is not the whole business case.
         </p>
       </section>
-
-      <div className="more">
-        <BookCall>
-          Want to talk about this? <span>→</span>
-        </BookCall>
-      </div>
-    </PageShell>
+    </NoteLayout>
   );
 }

@@ -4,12 +4,6 @@ import Home from './pages/Home';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
 import CaseStudyPremo from './pages/CaseStudyPremo';
-import CaseStudyDentalPractice from './pages/CaseStudyDentalPractice';
-import CaseStudyConstruction from './pages/CaseStudyConstruction';
-import CaseStudyPlumbing from './pages/CaseStudyPlumbing';
-import CaseStudySaas from './pages/CaseStudySaas';
-import CaseStudyRestaurant from './pages/CaseStudyRestaurant';
-import CaseStudySalon from './pages/CaseStudySalon';
 import NotesIndex from './pages/notes/NotesIndex';
 import NoteVoicemailDispatchCost from './pages/notes/NoteVoicemailDispatchCost';
 import NoteWhenAgentShouldWakeHuman from './pages/notes/NoteWhenAgentShouldWakeHuman';
@@ -35,12 +29,6 @@ export default function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/case-studies/premo" element={<CaseStudyPremo />} />
-        <Route path="/case-studies/dental-practice" element={<CaseStudyDentalPractice />} />
-        <Route path="/case-studies/construction" element={<CaseStudyConstruction />} />
-        <Route path="/case-studies/plumbing" element={<CaseStudyPlumbing />} />
-        <Route path="/case-studies/b2b-saas" element={<CaseStudySaas />} />
-        <Route path="/case-studies/restaurant" element={<CaseStudyRestaurant />} />
-        <Route path="/case-studies/salon" element={<CaseStudySalon />} />
         <Route path="/notes" element={<NotesIndex />} />
         <Route path="/notes/voicemail-dispatch-cost" element={<NoteVoicemailDispatchCost />} />
         <Route path="/notes/when-to-wake-a-human" element={<NoteWhenAgentShouldWakeHuman />} />
