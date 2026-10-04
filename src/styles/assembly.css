@@ -93,11 +93,6 @@ body.menu-open .menu > a, body.menu-open .menu .foot { opacity: 1; transform: no
 #leaders path { fill: none; stroke: rgba(241, 237, 228, 0.62); stroke-width: 1; }
 #leaders path.halo { stroke: #0a0a0b; stroke-width: 5; stroke-linecap: round; }
 #leaders circle { fill: #0a0a0b; stroke: rgba(241, 237, 228, 0.8); stroke-width: 1; }
-.fig { position: fixed; left: 47vw; bottom: 26px; z-index: 3; pointer-events: none; display: grid; grid-template-columns: auto auto; border: 1px solid var(--line); background: rgba(10, 10, 11, 0.7); }
-.fig div { padding: 7px 12px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.fig div:nth-child(2n) { border-right: 0; }
-.fig div:nth-last-child(-n+2) { border-bottom: 0; }
-.fig b { font-weight: 400; color: var(--ink); }
 
 .asm-home main { position: relative; z-index: 3; }
 .asm-home section { padding: 0; }
@@ -187,8 +182,7 @@ body.menu-open .menu > a, body.menu-open .menu .foot { opacity: 1; transform: no
 
 /* ------------------------------------------------------------- static */
 /* no scroll scenes: the finished machine sits beside the hero and scrolls away */
-.asm-static #stage, .asm-static .fig { position: absolute; }
-.asm-static .fig { top: calc(100vh - 80px); bottom: auto; }
+.asm-static #stage { position: absolute; }
 .asm-static .a-in { min-height: 100vh; }
 .asm-static #hero, .asm-static #process, .asm-static #principles, .asm-static #closing { height: auto; }
 .asm-static .stk, .asm-static .a-in { position: static; height: auto; padding-top: 14vh; padding-bottom: 10vh; }
@@ -205,7 +199,6 @@ body.menu-open .menu > a, body.menu-open .menu .foot { opacity: 1; transform: no
   .hdr { padding: 0 16px; }
   #stage { width: 100vw; height: var(--band); z-index: 6; background: var(--bg); border-bottom: 1px solid var(--line); }
   #leaders { z-index: 7; }
-  .fig { display: none; }
   .asm-home main { padding-top: var(--band); }
   .asm .col { width: 100%; padding: 0 22px; }
   .asm-home h1 { font-size: 40px; }

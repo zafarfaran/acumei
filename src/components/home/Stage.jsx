@@ -16,11 +16,9 @@ const NS = 'http://www.w3.org/2000/svg';
 export default function Stage() {
   const canvasRef = useRef(null);
   const svgRef = useRef(null);
-  const figRef = useRef(null);
-  const boxRef = useRef(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current, svg = svgRef.current, figt = figRef.current, figBox = boxRef.current;
+    const canvas = canvasRef.current, svg = svgRef.current;
     const R = createRenderer(canvas);
     const q = (s, r = document) => r.querySelector(s);
     const qa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -29,7 +27,6 @@ export default function Stage() {
     let L = null;
     let shown = 0, introT = STATIC ? 1 : 0, lastShown = -1, dirty = true, frameN = 0, lastT = 0, snapNext = false;
     const hl = [0, 0, 0, 0];
-    let lastFig = '';
 
     const lands = qa('.land').map((el) => ({ el, top: 0, hero: !!el.closest('[data-scene="hero"]') }));
     const steps = qa('[data-steps] li');
@@ -106,17 +103,6 @@ export default function Stage() {
         });
         if (cc) { const cp = sm(lin(s.cl, 0.8, 0.92)); cc.style.opacity = cp.toFixed(3); cc.style.transform = `translateY(${((1 - cp) * 16).toFixed(1)}px)`; }
       }
-      let fig;
-      if (STATIC) fig = '<b>FIG. 07</b> · ASSEMBLED';
-      else if (y < L.prob1 - Vh * 0.4) fig = '<b>FIG. 01</b> · EXPLODED VIEW';
-      else if (y < L.svc[0] - Vh * 0.5) fig = '<b>FIG. 02</b> · DEMO + MISSING PARTS';
-      else if (s.pe < 0.05 && y < L.proc.top) { const n = s.q.filter((v) => v > 0.5).length; fig = `<b>FIG. 03</b> · SUBSYSTEM ASSEMBLY ${Math.max(1, n)}/4`; }
-      else if (y < L.princ.top - Vh * 0.3) fig = `<b>FIG. 04</b> · STAGE ${Math.min(3, Math.floor(s.P * 4)) + 1}/04`;
-      else if (y < L.work - Vh * 0.3) fig = '<b>FIG. 05</b> · SPECIFICATION';
-      else if (y < L.close - Vh * 0.3) fig = '<b>FIG. 06</b> · REFERENCE';
-      else fig = '<b>FIG. 07</b> · ASSEMBLED';
-      figBox.style.opacity = (1 - (s.hide || 0)).toFixed(2);
-      if (fig !== lastFig) { figt.innerHTML = fig; lastFig = fig; }
     }
 
     function leaders(s) {
@@ -199,10 +185,6 @@ export default function Stage() {
     <>
       <canvas id="stage" ref={canvasRef} aria-hidden="true" />
       <svg id="leaders" ref={svgRef} aria-hidden="true" />
-      <div className="fig mono" aria-hidden="true" ref={boxRef}>
-        <div>DWG W4-001 · ACUMEI AI SYSTEM</div><div>SHEET <b>1 / 1</b></div>
-        <div ref={figRef}><b>FIG. 01</b> · EXPLODED VIEW</div><div>SCALE <b>1:1</b></div>
-      </div>
     </>
   );
 }
