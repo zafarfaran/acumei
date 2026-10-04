@@ -2,12 +2,15 @@
 // depth sort, Bayer 4x4 dithered faces (top light, left mid, right dark), crisp
 // 1px hairline edges, amber power. No libraries.
 import { clamp, sm, lin, lerp, backOut, hash, BAYER, BG, CREAM, GREY, AMB, mix } from './math.js';
-import { parts, demo, byLabel, CABLES, RACK } from './machine.js';
+import { machineModel } from './machine.js';
 
 const NL = 10; // dither density levels
 const NC = 28; // cylinder segments
 
-export function createRenderer(canvas) {
+// A model is { parts, cables, rack, demo, byLabel, lamp, lens, anchors? }; the home machine is the default.
+export function createRenderer(canvas, model = machineModel) {
+  const { parts, demo, byLabel, rack: RACK, lamp: LAMP, lens: LENS } = model;
+  const CABLES = model.cables;
   const ctx = canvas.getContext('2d');
   let dpr = 1, cw = 0, ch = 0;
   const PAT = { cream: [], amber: [], grey: [] };
@@ -308,16 +311,17 @@ export function createRenderer(canvas) {
     for (const it of items) { if (it.p.t === 'box') drawBox(it.p, it.pos, it.st); else drawCyl(it.p, it.pos, it.st, it.p.t === 'ring'); }
 
     // cables
-    const cq = clamp((st.q[3] - 0.3) / 0.6);
+    const cqOf = (g) => clamp((st.q[g === undefined ? 3 : g] - 0.3) / 0.6);
+    const cq = cqOf(model.glowGroup);
     const cabAlpha = masterA * (1 - 0.4 * (hlAny > 0.01 ? hlAny * (1 - st.hl[3]) : 0));
     const cableIdx = st.cables || [0, 1, 2, 3];
-    for (const i of cableIdx) drawCable(CABLES[i], sm(cq), st.W, t, cabAlpha);
+    for (const i of cableIdx) drawCable(CABLES[i], sm(cqOf(CABLES[i].g)), st.W, t, cabAlpha);
 
     // amber glows
-    const lamp = byLabel['L-01'], lens = byLabel['M-04'];
+    const lamp = LAMP, lens = LENS;
     if (st.W > 0.02 && cq > 0.9) {
-      if (filter(lamp)) glow(scr[lamp.i][0], scr[lamp.i][1], cam.S * 1.4, 0.35 * st.W * masterA * (0.8 + 0.2 * Math.sin(t * 2.4)));
-      if (filter(lens)) glow(scr[lens.i][0], scr[lens.i][1], cam.S * 2.6, 0.2 * st.W * masterA);
+      if (lamp && filter(lamp)) glow(scr[lamp.i][0], scr[lamp.i][1], cam.S * 1.4, 0.35 * st.W * masterA * (0.8 + 0.2 * Math.sin(t * 2.4)));
+      if (lens && filter(lens)) glow(scr[lens.i][0], scr[lens.i][1], cam.S * 2.6, 0.2 * st.W * masterA);
     }
     if (st.pulse > 0 && st.pulse < 1) {
       const k = st.pulse, l = scr[lens.i];
@@ -350,11 +354,14 @@ export function createRenderer(canvas) {
 
     if (st.mk > 0.01) drawMark(st.mk);
 
-    setAnch('machine', pj(0, 0, 2.8));
-    setAnch('demo', pj(...demo.pos));
-    setAnch('data', scr[byLabel['D-02'].i]); setAnch('core', scr[byLabel['M-02'].i]);
-    setAnch('agents', scr[byLabel['A-01'].i]); setAnch('ops', scr[lamp.i]);
-    setAnch('ghost', scr[byLabel['M-02'].i]);
+    if (model.anchors) model.anchors(setAnch, scr, pj);
+    else if (demo && byLabel['D-02']) {
+      setAnch('machine', pj(0, 0, 2.8));
+      setAnch('demo', pj(...demo.pos));
+      setAnch('data', scr[byLabel['D-02'].i]); setAnch('core', scr[byLabel['M-02'].i]);
+      setAnch('agents', scr[byLabel['A-01'].i]); setAnch('ops', scr[lamp.i]);
+      setAnch('ghost', scr[byLabel['M-02'].i]);
+    }
   }
 
   return { draw, resize, anchors, get dpr() { return dpr; } };

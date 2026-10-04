@@ -66,6 +66,10 @@ SETS.machine.filter = (p) => p.g < 4;
 // World extents of the rack that surrounds the machine at hand-over.
 export const RACK = { k: 4.7, z0: -0.7, z1: 7.9 };
 
+// The default model the renderer draws (see createRenderer).
+export const machineModel = { parts, cables: CABLES, rack: RACK, demo, byLabel, lamp: byLabel['L-01'], lens: byLabel['M-04'] };
+
+
 // Old PageField `mode` values map onto a default part so existing pages keep
 // working without edits.
 const MODE_TO_PART = { brain: 'machine', ridge: 'data', orb: 'models', grid: 'agents', wave: 'operations', flow: 'machine', scatter: 'lamp' };

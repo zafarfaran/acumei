@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createRenderer } from '../../lib/assembly/renderer';
-import { parts } from '../../lib/assembly/machine';
+import { premoModel, GROUP, AT } from './model';
 import { clamp, sm, lin } from '../../lib/assembly/math';
 import { onFrame, invalidate, STATIC, initialScrollY } from '../../lib/motion';
 
@@ -9,16 +9,14 @@ const NS = 'http://www.w3.org/2000/svg';
 // Six build steps, AI first. The agent descriptions come from the owner; the
 // platform facts are trimmed from the original case-study copy.
 const STEPS = [
-  { name: 'ISOLATION', t: 'Every business sealed off', p: 'Row-Level Security on all 47 tenant-scoped tables, so anything built on top only ever sees one business’s data.', at: [-3.7, 3.7, 0] },
-  { name: 'LIVE DATA', t: 'Feedback that arrives in real time', p: 'Changes stream to the dashboard over Server-Sent Events, with an Organisation → Location → Team hierarchy that keeps its history.', at: [-3, 3, 1.5] },
-  { name: 'ANALYSIS AGENT', t: 'A scoped AI agent that does the analysis', p: 'An agent works through each business’s feedback and does the analysis for the owner, scoped to that one business.', at: [-1.2, 1.2, 4.0] },
-  { name: 'GUARDRAILS', t: 'Summaries, not people', p: 'Responses are designed around aggregate figures. Individual customer data is excluded from what the agents say.', at: [-3.5, 3.7, 6.43] },
-  { name: 'WHATSAPP AGENT', t: 'A WhatsApp agent for the owner', p: 'Through the Meta API, owners get alerts and can simply ask about their own figures in a conversation.', at: [-4.1, 0, 3.5] },
-  { name: 'ACCOUNTABILITY', t: 'Every sensitive action on the record', p: 'A cryptographically chained audit log makes tampering detectable. The system powers in.', at: [3.7, 3.7, 6.875] },
+  { name: 'ISOLATION', t: 'Every business sealed off', p: 'Row-Level Security on all 47 tenant-scoped tables, so anything built on top only ever sees one business’s data.' },
+  { name: 'LIVE DATA', t: 'Feedback that arrives in real time', p: 'Changes stream to the dashboard over Server-Sent Events, with an Organisation → Location → Team hierarchy that keeps its history.' },
+  { name: 'ANALYSIS AGENT', t: 'A scoped AI agent that does the analysis', p: 'An agent works through each business’s feedback and does the analysis for the owner, scoped to that one business.' },
+  { name: 'GUARDRAILS', t: 'Summaries, not people', p: 'Responses are designed around aggregate figures. Individual customer data is excluded from what the agents say.' },
+  { name: 'WHATSAPP AGENT', t: 'A WhatsApp agent for the owner', p: 'Through the Meta API, owners get alerts and can simply ask about their own figures in a conversation.' },
+  { name: 'ACCOUNTABILITY', t: 'Every sensitive action on the record', p: 'A cryptographically chained audit log makes tampering detectable. The system powers in.' },
 ];
 
-// Renderer group used by each step (group 3 owns the cables, so the final step takes it).
-const GROUP = [0, 1, 2, 6, 5, 3];
 const N = STEPS.length;
 
 export default function BuildScene({ children }) {
@@ -35,19 +33,8 @@ export default function BuildScene({ children }) {
     const scene = sceneRef.current, canvas = canvasRef.current, svg = svgRef.current;
     const lis = [...listRef.current.children];
     const ticks = [...progRef.current.children];
-    const R = createRenderer(canvas);
+    const R = createRenderer(canvas, premoModel);
 
-    // Re-label the shared part list into this scene's six steps; restored on unmount.
-    const saved = parts.map((p) => p.g);
-    const o = parts.findIndex((p) => p.label === 'P-01');
-    parts.forEach((p, i) => {
-      let k = -1;
-      if (p.g === 0) k = 1;
-      else if (p.g === 1) k = 2;
-      else if (p.g === 2) k = 4;
-      else if (p.g === 3) { const j = i - o; k = j <= 4 ? 0 : j <= 9 ? 3 : 5; }
-      if (k >= 0) p.g = GROUP[k];
-    });
     const filter = (p) => p.g !== 4;
 
     let flow = false, cw = 0, ch = 0, top = 0, h = 1, H = 0, W = 0;
@@ -132,21 +119,21 @@ export default function BuildScene({ children }) {
         const Wp = STATIC ? 1 : sm(lin(s.B, N - 0.55, N - 0.1));
         const st = {
           d: 0, g1: STATIC ? 0 : 1, g2: 1, q, F: 1, W: Wp, Rk: 0, mx: 0, mk: 0, pulse: 0, mAlpha: STATIC ? 1 : sm(intro),
-          G: 0.65, dimA: 0, dimProg: 0, hl: new Array(8).fill(0), filter, cables: [0, 1, 2, 3], labels: !flow, mobile: false, static: STATIC,
+          G: 0.65, dimA: 0, dimProg: 0, hl: new Array(8).fill(0), filter, cables: [0, 1, 2], labels: !flow, mobile: false, static: STATIC,
         };
         const dpr = R.dpr;
-        const Sc = Math.min(cw / 21, ch / 24);
+        const Sc = Math.min(cw / 17, ch / 12.5);
         const yaw = STATIC ? 0 : -0.28 + 0.07 * s.B + Math.sin(t * 0.28) * 0.05;
-        const view = { cx: cw * dpr * 0.5, cy: ch * dpr * 0.54, S: Sc * dpr, zc: 2.8, yaw };
+        const view = { cx: cw * dpr * 0.5, cy: ch * dpr * 0.54, S: Sc * dpr, zc: 2.0, yaw };
         R.draw(st, view, t);
 
         // leader from the active text block to the part being seated
         if (!flow) {
           const k = s.act, c = Math.cos(yaw), sn = Math.sin(yaw);
-          const [x, yy, z] = STEPS[k].at;
+          const [x, yy, z] = AT[k];
           const xr = x * c - yy * sn, yr = x * sn + yy * c;
           const cr = canvas.getBoundingClientRect();
-          const px = cr.left + cw * 0.5 + (xr - yr) * 0.866 * Sc, py = cr.top + ch * 0.54 + (xr + yr) * 0.5 * Sc - (z - 2.8) * Sc;
+          const px = cr.left + cw * 0.5 + (xr - yr) * 0.866 * Sc, py = cr.top + ch * 0.5 + (xr + yr) * 0.5 * Sc - (z - 2.0) * Sc;
           const lr = lis[k].getBoundingClientRect();
           const target = (s.P > 0.17 && s.P < 0.985 ? s.on[k] : 0) * (s.qs[k] > 0.25 ? 1 : 0);
           leader.v += (target - leader.v) * 0.2;
@@ -177,7 +164,6 @@ export default function BuildScene({ children }) {
       off(); ro?.disconnect();
       window.removeEventListener('resize', onResize); window.removeEventListener('load', onResize);
       leader.g.remove();
-      parts.forEach((p, i) => { p.g = saved[i]; });
     };
   }, []);
 
