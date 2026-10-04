@@ -72,7 +72,7 @@ export default function Stage() {
     const dash = (c, a, d) => {
       c.hl.setAttribute('d', d); c.p.setAttribute('d', d);
       const l = c.p.getTotalLength() + 1;
-      for (const n of [c.p, c.hl]) { n.style.strokeDasharray = l; n.style.strokeDashoffset = (l * (1 - a)).toFixed(1); }
+      for (const n of [c.p, c.hl]) { n.style.visibility = 'visible'; n.style.strokeDasharray = `${l} ${l}`; n.style.strokeDashoffset = (l * (1 - a)).toFixed(1); }
     };
 
     function updateDOM(s, y) {
@@ -129,9 +129,12 @@ export default function Stage() {
         else if (c.isRow) target = s.pr > 0 && s.pr < 1 && c.el === rows[Math.min(3, Math.floor(s.pr * 4))] ? 1 : 0;
         else if (c.el.hasAttribute('data-ro')) target = s.P > 0 && s.P < 1 && s.pe >= 1 ? 1 : 0;
         else target = sm(clamp((1 - Math.abs(cy - (top + Vh * 0.5)) / (Vh * 0.42)) * 2.2));
+        // no leaders while the machine is hidden (Work, Notes), or from text that has left the screen
+        target *= 1 - (s.hide || 0);
+        if (cy < 72 || cy > Vh - 8) target = 0;
         c.a += (target - c.a) * 0.18; if (Math.abs(target - c.a) < 0.003) c.a = target;
         const a = c.a;
-        if (a < 0.01) { c.p.style.strokeDashoffset = '9999'; c.hl.style.strokeDashoffset = '9999'; c.c.style.opacity = 0; continue; }
+        if (a < 0.01) { c.p.style.visibility = 'hidden'; c.hl.style.visibility = 'hidden'; c.c.style.opacity = 0; continue; }
         const an = R.anchors[c.anchor]; if (!an) continue;
         const px = cvLeft + an[0], py = cvTop + an[1];
         if (mobile) {

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import PremoPlate from './PremoPlate';
 
 // The one case study shown on the home page. The copy is the Premo entry from
 // the previous site; nothing is added to it.
@@ -20,16 +21,7 @@ export default function Work() {
       <Link className="sheet sheet-lg land" to={PREMO.href}>
         <i className="cr a" /><i className="cr b" />
         <div className="fr">
-          <div className="sheet-img">
-            <img
-              src="/case-studies/premo-website.png"
-              alt="Premo’s public marketing homepage."
-              width="2880"
-              height="2000"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
+          <PremoPlate />
           <div className="ti">
             <div className="mono">{PREMO.tag}</div>
             <div className="ba"><span className="mono">Before</span><p>{PREMO.before}</p></div>

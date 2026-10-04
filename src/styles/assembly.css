@@ -150,6 +150,10 @@ body.menu-open .menu > a, body.menu-open .menu .foot { opacity: 1; transform: no
 .sheet-img { flex: 1.25; border-right: 1px solid var(--line); background: #111; overflow: hidden; display: flex; align-items: stretch; }
 .sheet-img img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; filter: grayscale(1) contrast(1.05) brightness(0.92); transition: filter 0.5s; }
 .sheet-lg:hover .sheet-img img { filter: none; }
+.premo-plate { position: relative; min-height: clamp(360px, 38vw, 560px); background: #0c0c0d; background-image: radial-gradient(rgba(241, 237, 228, 0.07) 1px, transparent 1px); background-size: 18px 18px; }
+.premo-plate canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.pp-tag { position: absolute; left: 16px; right: 16px; bottom: 14px; display: flex; justify-content: space-between; gap: 12px; font-size: 10px; letter-spacing: 0.14em; color: var(--soft); pointer-events: none; }
+.pp-tag b { color: var(--amber); font-weight: 400; }
 .sheet-lg .ti { flex: 1; gap: 22px; padding: 28px 28px 24px; }
 .sheet-lg .ba p { margin-top: 8px; color: #c9c4b9; font-size: clamp(15px, 1.1vw, 17px); line-height: 1.55; }
 .sheet-lg .ba + .ba { margin-top: -6px; }
