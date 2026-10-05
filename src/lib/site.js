@@ -3,7 +3,7 @@ export const EMAIL = 'hello@acumei.com';
 export const MAILTO = `mailto:${EMAIL}`;
 
 // Opens as a modal from the discovery-call CTA — see components/BookCall.jsx.
-export const CALENDLY_URL = 'https://calendly.com/hassaansohail-acumei/30min';
+export const CALENDLY_URL = 'https://calendly.com/hello-acumei/30min';
 
 // TODO: confirm the real company LinkedIn URL before launch — this is a guess
 // from the company name, not a verified page.
