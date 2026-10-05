@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import BookCall from '../BookCall';
 import { EMAIL, MAILTO } from '../../lib/site';
 
@@ -12,6 +13,7 @@ export default function Closing() {
         </h2>
         <div className="cta" data-cc>
           <BookCall className="btn">Book a scoping call</BookCall>
+          <Link className="lnk" to="/workbench">Build an agent yourself</Link>
           <a className="mono mail" href={MAILTO}>{EMAIL}</a>
         </div>
       </div>

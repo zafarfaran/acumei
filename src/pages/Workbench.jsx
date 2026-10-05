@@ -8,6 +8,7 @@ import Tray from '../components/workbench/Tray';
 import Inspector from '../components/workbench/Inspector';
 import AnswerCard from '../components/workbench/AnswerCard';
 import LiveAsk from '../components/workbench/LiveAsk';
+import useLiveRun from '../components/workbench/useLiveRun';
 import usePlayback from '../components/workbench/usePlayback';
 import { run, SCENARIOS } from '../lib/workbench/engine';
 import { DEFAULT_BUILD, decodeBuild, encodeBuild, fit, remove, hasPart } from '../lib/workbench/build';
@@ -65,7 +66,7 @@ export default function Workbench() {
   // A run is pinned to the build and scenario it started with; changing either ends it.
   const [runCfg, setRunCfg] = useState(null);
   const [choices, setChoices] = useState({});
-  const [live, setLive] = useState(null); // { id, events, streaming }
+  const [live, setLive] = useState(null); // { id, code, question, events, streaming }
   const scripted = runCfg && runCfg.code === code && runCfg.scenarioId === scenarioId;
   const liveOn = live && live.code === code;
   const events = useMemo(
@@ -75,6 +76,8 @@ export default function Workbench() {
   const runId = liveOn ? live.id : scripted ? runCfg.id : null;
   const pb = usePlayback(events, runId, !(liveOn && live.streaming));
   const answer = pb.done ? pb.current?.answer : null;
+  const liveRun = useLiveRun(useCallback((next) => setLive({ ...next, code: encodeBuild(next.build || build) }), [build]));
+  const [askedLive, setAskedLive] = useState(false);
 
   const [selected, setSelected] = useState(null);
   const [menu, setMenu] = useState(null);
@@ -167,7 +170,12 @@ export default function Workbench() {
           selected={selected}
           onSlot={onSlot}
           onCallout={openAt}
-          onChoose={(id, opt) => setChoices((c) => ({ ...c, [id]: opt }))}
+          onChoose={(id, opt) => {
+            if (liveOn) {
+              const label = pb.current?.pause?.options.find((o) => o.id === opt)?.label || opt;
+              liveRun.ask({ build, question: live.question, clarify: label });
+            } else setChoices((c) => ({ ...c, [id]: opt }));
+          }}
           header={header}
         />
 
@@ -187,11 +195,11 @@ export default function Workbench() {
 
         <Tray build={build} selected={selected} onSelect={setSelected} onDrop={onDrop} />
 
-        {pb.done && (
+        {(pb.done || askedLive || liveOn) && (
           <LiveAsk
             build={build}
-            onEvents={(next) => setLive(next ? { ...next, code } : null)}
-            live={liveOn ? live : null}
+            live={{ ...liveRun, ask: (a) => { setAskedLive(true); setStatus(''); return liveRun.ask(a); } }}
+            onScripted={startRun}
           />
         )}
 
