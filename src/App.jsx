@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ScrollManager from './components/ScrollManager';
 import Home from './pages/Home';
@@ -20,6 +21,9 @@ import Cookies from './pages/Cookies';
 import DataProcessing from './pages/DataProcessing';
 import NotFound from './pages/NotFound';
 
+// Code-split: the Workbench (and its engine) only loads when someone visits it.
+const Workbench = lazy(() => import('./pages/Workbench'));
+
 export default function App() {
   return (
     <>
@@ -29,6 +33,7 @@ export default function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/case-studies/premo" element={<CaseStudyPremo />} />
+        <Route path="/workbench" element={<Suspense fallback={null}><Workbench /></Suspense>} />
         <Route path="/notes" element={<NotesIndex />} />
         <Route path="/notes/voicemail-dispatch-cost" element={<NoteVoicemailDispatchCost />} />
         <Route path="/notes/when-to-wake-a-human" element={<NoteWhenAgentShouldWakeHuman />} />

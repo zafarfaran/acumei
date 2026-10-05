@@ -15,6 +15,8 @@ const PAD_Y = -2.45; // branch block centre
 const CHAIN_Y = 1.22;
 
 export const TOKEN_G = 30;
+// The rail, necks and pads are the floor: draw them before anything that stands on them.
+const FLOOR = -100;
 const G = { rail: 10, module: (i) => 11 + i, branch: (j) => 20 + j, chain: 26, token: TOKEN_G };
 export const GROUPS = 32;
 
@@ -38,7 +40,7 @@ export function buildMachine(build) {
   // rail: one segment per module
   MODULES.forEach((_, i) => add(box({
     g: G.rail, pos: [modX(i) + 0.325, (RAIL.y0 + RAIL.y1) / 2, (RAIL.z0 + RAIL.z1) / 2],
-    size: [PITCH, RAIL.y1 - RAIL.y0, RAIL.z1 - RAIL.z0], rail: true,
+    size: [PITCH, RAIL.y1 - RAIL.y0, RAIL.z1 - RAIL.z0], rail: true, dens: 0.4, kb: FLOOR,
   })));
 
   // modules
@@ -48,15 +50,15 @@ export function buildMachine(build) {
     const x = modX(i) + 0.325;
     fitted[slot] = add(box({ g: G.module(i), pos: [x, MOD_Y, h / 2], size: [w, d, h], ex: [0, 0, 3.2], code: p.code, slot }));
     slotPos[slot] = [x, MOD_Y, h + 0.45];
-    labelPos[slot] = [x - w / 2, MOD_Y + d / 2, h * 0.5];
+    labelPos[slot] = [x - 0.4, RAIL.y1, RAIL.z0];
   });
 
   // branches on outriggers behind the rail
   Object.entries(BRANCH_AT).forEach(([code, i], j) => {
     const x = modX(i) + 0.325;
     // neck from the rail's back edge (y −0.7) to the pad's front edge (y −1.9)
-    add(box({ g: G.rail, pos: [x, -1.3, -0.25], size: [0.5, 1.2, 0.2], neck: true }));
-    add(box({ g: G.rail, pos: [x, PAD_Y, -0.25], size: [1.3, 1.1, 0.2], pad: true }));
+    add(box({ g: G.rail, pos: [x, -1.3, -0.25], size: [0.5, 1.2, 0.2], neck: true, dens: 0.4, kb: FLOOR }));
+    add(box({ g: G.rail, pos: [x, PAD_Y, -0.25], size: [1.3, 1.1, 0.2], pad: true, dens: 0.4, kb: FLOOR }));
     const size = [0.9, 0.9, 0.6], c = [x, PAD_Y, -0.15 + 0.3];
     if (build.branches.includes(code)) fitted[code] = add(box({ g: G.branch(j), pos: c, size, ex: [0, 0, 2.6], code, slot: code }));
     else sockets[code] = corners(c, size);
@@ -73,7 +75,7 @@ export function buildMachine(build) {
     sockets['G-05'] = corners([0.325, CHAIN_Y, chainSize[2] / 2], [PITCH * 5 + chainSize[0], chainSize[1], chainSize[2]]);
   }
   slotPos['G-05'] = [modX(5) + 0.325 + 0.6, CHAIN_Y, 0.6];
-  labelPos['G-05'] = [modX(0) + 0.325 - 0.35, CHAIN_Y + 0.22, 0.12];
+  labelPos['G-05'] = [modX(5) + 0.325 + 1.1, CHAIN_Y, 0.12];
 
   const token = add(box({ g: G.token, pos: [...slotPos['D-01']], size: [0.5, 0.4, 0.3], lamp: true, tokenPart: true }));
 

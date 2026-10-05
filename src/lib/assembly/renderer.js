@@ -68,7 +68,7 @@ export function createRenderer(canvas, model = machineModel) {
     const T = [pj(x - a, y - b, z + c), pj(x + a, y - b, z + c), pj(x + a, y + b, z + c), pj(x - a, y + b, z + c)];
     const R = [pj(x + a, y - b, z + c), pj(x + a, y + b, z + c), pj(x + a, y + b, z - c), pj(x + a, y - b, z - c)];
     const Lf = [pj(x - a, y + b, z + c), pj(x + a, y + b, z + c), pj(x + a, y + b, z - c), pj(x - a, y + b, z - c)];
-    const f = st.fill * (st.hlBoost || 1);
+    const f = st.fill * (st.hlBoost || 1) * (p.dens || 1); // p.dens: optional per-part density (Workbench)
     face(Lf, 0.5 * f * sh, st); face(R, 0.22 * f * sh, st); face(T, 0.9 * f * sh, st);
     if (p.shine && st.fill > 0.5) {
       ctx.globalAlpha = st.alpha * 0.9; ctx.strokeStyle = 'rgb(241,237,228)'; ctx.lineWidth = 1.5 * dpr;
@@ -304,7 +304,7 @@ export function createRenderer(canvas, model = machineModel) {
     for (const it of items) {
       const [x, y, z] = it.pos;
       const xr = x * yawM.c - y * yawM.s, yr = x * yawM.s + y * yawM.c;
-      it.key = it.demo ? 999 : (xr + yr) + z * 0.02;
+      it.key = it.demo ? 999 : (xr + yr) + z * 0.02 + (it.p.kb || 0); // p.kb: optional depth bias (Workbench floor)
       scr[it.p.i] = pj(x, y, z);
     }
     items.sort((a, b) => a.key - b.key);

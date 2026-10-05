@@ -1,0 +1,255 @@
+/* Workbench: the agent playground. Same tokens as the rest of the Assembly design;
+   red only marks blocked, leaked, flagged and empty states. */
+
+.wb { --red: #d9614c; --wb-pad: clamp(16px, 4vw, 56px); }
+.wb section:not(.wb-answer) { padding: 0; }
+.wb-main { padding: calc(var(--hdr) + clamp(28px, 6vh, 64px)) var(--wb-pad) 0; }
+
+/* ------------------------------------------------------------ heading */
+.wb-head { max-width: 980px; margin-bottom: clamp(24px, 4vh, 40px); }
+.wb-head .titleblock { margin-bottom: 26px; }
+.wb-head h1 { font-size: clamp(34px, 5vw, 68px); letter-spacing: -0.045em; line-height: 0.98; margin: 0 0 18px; }
+.wb-head .lede { max-width: 62ch; color: #c9c4b9; margin: 0; }
+
+/* ------------------------------------------------------------ the sheet */
+.wb-sheet { border: 1px solid rgba(241, 237, 228, 0.28); padding: 7px; background: var(--bg); }
+.wb-sheet-hd {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  border: 1px solid var(--line); border-bottom: 0; padding: 9px 14px; font-size: 10px; letter-spacing: 0.12em; color: var(--dim);
+}
+.wb-scn { display: inline-flex; align-items: center; gap: 10px; color: var(--soft); }
+.wb-scn select {
+  background: var(--bg); color: var(--ink); border: 1px solid rgba(241, 237, 228, 0.3); padding: 6px 28px 6px 10px;
+  font: 11px var(--mono); letter-spacing: 0.04em; appearance: none; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--soft) 50%), linear-gradient(135deg, var(--soft) 50%, transparent 50%);
+  background-position: calc(100% - 13px) 50%, calc(100% - 9px) 50%; background-size: 4px 4px; background-repeat: no-repeat;
+}
+.wb-scn select:focus-visible { outline: 1px solid var(--amber); outline-offset: 2px; }
+
+.wb-stage { position: relative; height: clamp(440px, 66vh, 680px); border: 1px solid var(--line); overflow: hidden; }
+.wb-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.wb-ov { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+
+.wb-lbl path { fill: none; stroke: rgba(241, 237, 228, 0.45); stroke-width: 0.8; }
+.wb-lbl text { font: 10.5px var(--mono); fill: var(--soft); letter-spacing: 0.02em; }
+.wb-lbl .c { fill: var(--ink); }
+.wb-lbl.is-short text { fill: var(--dim); }
+.wb-lbl.is-on path { stroke: var(--amber); }
+.wb-lbl.is-on text, .wb-lbl.is-on .c { fill: var(--amber); }
+.wb-lbl.is-empty path { stroke: rgba(217, 97, 76, 0.55); }
+.wb-lbl.is-empty text, .wb-lbl.is-empty .c { fill: var(--red); }
+
+.wb-sock line { stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.8; }
+.wb-sock.is-target line { stroke: var(--amber); opacity: 1; animation: wb-march 0.8s linear infinite; }
+@keyframes wb-march { to { stroke-dashoffset: -12; } }
+
+.wb-lead { fill: none; stroke: var(--amber); stroke-width: 0.9; }
+.wb-lead.is-red { stroke: var(--red); }
+
+/* slot buttons sit over the drawing, centred on each slot */
+.wb-slot {
+  position: absolute; width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 50%;
+  background: transparent; border: 1px dashed transparent; cursor: pointer; padding: 0; transition: border-color 0.2s, background 0.2s;
+}
+.wb-slot:hover, .wb-slot:focus-visible { border-color: rgba(241, 237, 228, 0.55); outline: 0; background: rgba(241, 237, 228, 0.04); }
+.wb-slot.is-target { border: 1px solid var(--amber); background: rgba(232, 160, 75, 0.08); animation: wb-pulse 1.2s ease-in-out infinite; }
+@keyframes wb-pulse { 50% { box-shadow: 0 0 0 7px rgba(232, 160, 75, 0.12); } }
+
+/* numbered step markers */
+.wb-num {
+  position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; padding: 0;
+  background: var(--bg); border: 1px solid rgba(241, 237, 228, 0.5); color: var(--soft); font-size: 10px; cursor: pointer;
+  display: grid; place-items: center; transition: border-color 0.2s, color 0.2s;
+}
+.wb-num:hover, .wb-num:focus-visible { border-color: var(--ink); color: var(--ink); outline: 0; }
+.wb-num.is-cur, .wb-num.v-paused, .wb-num.v-fixed { border-color: var(--amber); color: var(--amber); }
+.wb-num.v-blocked, .wb-num.v-leaked, .wb-num.v-flagged { border-color: var(--red); color: var(--red); }
+
+/* the current step's callout */
+.wb-callout {
+  position: absolute; background: rgba(10, 10, 11, 0.94); border: 1px solid var(--amber); padding: 11px 13px 10px;
+  animation: wb-in 0.35s var(--ease) both;
+}
+.wb-callout.v-blocked, .wb-callout.v-leaked, .wb-callout.v-flagged { border-color: var(--red); }
+@keyframes wb-in { from { opacity: 0; transform: translateY(4px); } }
+.wb-callout-k { display: flex; justify-content: space-between; gap: 10px; font-size: 9.5px; letter-spacing: 0.1em; color: var(--amber); text-transform: uppercase; }
+.wb-callout.v-blocked .wb-callout-k, .wb-callout.v-leaked .wb-callout-k, .wb-callout.v-flagged .wb-callout-k { color: var(--red); }
+.wb-callout p { margin: 7px 0 6px; font-size: 13.5px; line-height: 1.4; color: var(--ink); }
+.wb-verdict { white-space: nowrap; }
+.wb-more { background: none; border: 0; padding: 0; color: var(--soft); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+.wb-more:hover { color: var(--ink); }
+.wb-choices { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.wb-choices button {
+  background: var(--ink); color: #0a0a0b; border: 0; padding: 8px 10px; font-size: 10.5px; letter-spacing: 0.06em; cursor: pointer;
+}
+.wb-choices button:hover, .wb-choices button:focus-visible { background: var(--amber); outline: 0; }
+
+/* ------------------------------------------------------------ controls */
+.wb-ctl { display: flex; justify-content: space-between; align-items: center; gap: 18px; flex-wrap: wrap; padding: 18px 0 6px; }
+.wb-q { margin: 0; color: var(--ink); font-size: 16px; max-width: 64ch; }
+.wb-q .mono { color: var(--dim); font-size: 11px; }
+.wb-who { color: var(--dim); font-size: 14px; }
+.wb-ctl-r { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.wb-ctl-r .lnk { background: none; border-left: 0; border-right: 0; border-top: 0; cursor: pointer; }
+.wb-ctl-r .lnk::after { content: none; }
+.wb-run { border: 0; cursor: pointer; min-width: 150px; }
+.wb-run:disabled { opacity: 0.55; cursor: progress; }
+.wb-status { min-height: 18px; margin: 0 0 22px; color: var(--soft); font-size: 11px; letter-spacing: 0.04em; }
+
+/* ------------------------------------------------------------ parts tray */
+.wb-tray { border-top: 1px solid var(--line); padding-top: 18px; }
+.wb-tray-hd { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.14em; color: var(--dim); margin-bottom: 14px; text-transform: uppercase; }
+.wb-tray-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px 22px; }
+.wb-group-k { font-size: 10px; color: var(--dim); letter-spacing: 0.1em; margin-bottom: 8px; text-transform: uppercase; }
+.wb-group-k b { color: var(--soft); font-weight: 400; margin-right: 6px; }
+.wb-chips { display: flex; flex-direction: column; gap: 6px; }
+.wb-chip {
+  display: grid; grid-template-columns: 18px 44px 1fr auto; align-items: center; gap: 8px; text-align: left;
+  background: transparent; border: 1px solid var(--line); color: var(--ink); padding: 8px 10px; cursor: grab;
+  font: 13.5px var(--body); touch-action: none; user-select: none; transition: border-color 0.2s, background 0.2s;
+}
+.wb-chip:hover, .wb-chip:focus-visible { border-color: rgba(241, 237, 228, 0.5); outline: 0; }
+.wb-chip.is-sel { border-color: var(--amber); background: rgba(232, 160, 75, 0.07); }
+.wb-chip.is-fitted { border-color: rgba(241, 237, 228, 0.3); }
+.wb-chip .c { font-size: 10.5px; color: var(--soft); }
+.wb-chip.is-short .n { color: var(--soft); }
+.wb-chip .f { font-size: 9px; letter-spacing: 0.12em; color: var(--amber); text-transform: uppercase; }
+.wb-cube {
+  width: 16px; height: 16px; display: inline-block; border: 1px solid rgba(241, 237, 228, 0.7);
+  background-image: radial-gradient(rgba(241, 237, 228, 0.9) 0.8px, transparent 0.9px); background-size: 3px 3px;
+}
+.wb-chip.is-sel .wb-cube, .wb-ghost .wb-cube { border-color: var(--amber); background-image: radial-gradient(rgba(232, 160, 75, 0.95) 0.8px, transparent 0.9px); }
+.wb-ghost {
+  position: fixed; z-index: 60; pointer-events: none; transform: translate(-50%, -130%);
+  display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--bg); border: 1px solid var(--amber); color: var(--amber); font-size: 11px;
+}
+
+/* ------------------------------------------------------------ slot popover */
+.wb-pop {
+  position: fixed; z-index: 55; width: 260px; background: #0e0e10; border: 1px solid rgba(241, 237, 228, 0.35); padding: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.wb-pop-k { font-size: 10px; letter-spacing: 0.12em; color: var(--soft); text-transform: uppercase; }
+.wb-pop-k b { color: var(--ink); font-weight: 400; margin-right: 6px; }
+.wb-pop-r { margin: 4px 0 10px; font-size: 13px; color: var(--dim); }
+.wb-pop-b {
+  display: block; width: 100%; text-align: left; background: none; border: 1px solid var(--line); color: var(--ink);
+  padding: 8px 10px; margin-top: 6px; font: 13.5px var(--body); cursor: pointer;
+}
+.wb-pop-b b { font-weight: 400; font-size: 10.5px; color: var(--soft); margin-right: 4px; }
+.wb-pop-b span { display: block; color: var(--dim); font-size: 12px; margin-top: 2px; }
+.wb-pop-b:hover, .wb-pop-b:focus-visible { border-color: var(--amber); outline: 0; }
+.wb-pop-b.is-on { border-color: rgba(241, 237, 228, 0.4); }
+.wb-pop-b.is-rm { color: var(--red); }
+
+/* ------------------------------------------------------------ answer */
+.wb-answer { margin: 6px 0 34px; border: 1px solid rgba(241, 237, 228, 0.28); padding: 20px 22px; animation: wb-in 0.5s var(--ease) both; }
+.wb-answer.is-flagged { border-color: var(--red); }
+.wb-answer-k { font-size: 10px; letter-spacing: 0.14em; color: var(--dim); text-transform: uppercase; }
+.wb-flag { margin: 12px 0 0; color: var(--red); font-size: 15px; }
+.wb-answer-main { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 32px; margin-top: 16px; align-items: start; }
+.wb-answer.is-compact .wb-answer-main { grid-template-columns: 1fr; gap: 18px; }
+.wb-headline { font-size: clamp(44px, 6vw, 84px); font-weight: 500; letter-spacing: -0.05em; line-height: 0.95; }
+.wb-answer.is-flagged .wb-headline { color: var(--red); }
+.wb-answer h3 { font-size: 17px; letter-spacing: -0.02em; margin: 12px 0 8px; }
+.wb-answer p { color: #c9c4b9; margin: 0; line-height: 1.5; }
+.wb-contrast { margin: 18px 0 0 !important; padding-top: 14px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--amber) !important; letter-spacing: 0.02em; }
+
+.wb-bars { display: flex; flex-direction: column; gap: 7px; }
+.wb-bar { display: grid; grid-template-columns: minmax(90px, 0.9fr) 1.6fr 64px; align-items: center; gap: 10px; font-size: 12.5px; }
+.wb-bar .l { color: var(--soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wb-bar .t { position: relative; height: 12px; }
+.wb-bar i {
+  position: absolute; top: 0; bottom: 0; left: 0; width: var(--w);
+  background-image: radial-gradient(rgba(241, 237, 228, 0.9) 0.8px, transparent 0.9px); background-size: 3px 3px;
+  border: 1px solid rgba(241, 237, 228, 0.55);
+}
+.has-neg .wb-bar .t::before { content: ''; position: absolute; left: 50%; top: -3px; bottom: -3px; border-left: 1px solid var(--line); }
+.has-neg .wb-bar i { left: 50%; }
+.has-neg .wb-bar i.is-neg { left: auto; right: 50%; border-color: var(--red); background-image: radial-gradient(rgba(217, 97, 76, 0.95) 0.8px, transparent 0.9px); }
+.wb-bar .v { text-align: right; color: var(--ink); font-size: 11px; }
+
+/* ------------------------------------------------------------ inspector */
+.wb-insp {
+  position: fixed; z-index: 45; top: var(--hdr); right: 0; bottom: 0; width: min(440px, 100vw);
+  background: #0c0c0d; border-left: 1px solid rgba(241, 237, 228, 0.28); display: flex; flex-direction: column;
+  transform: translateX(102%); transition: transform 0.45s var(--ease), visibility 0.45s; visibility: hidden; outline: 0;
+}
+.wb-insp.is-open { transform: none; visibility: visible; }
+.wb-insp-hd { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.wb-tabs { display: flex; gap: 2px; flex: 1; }
+.wb-tabs button {
+  background: none; border: 1px solid transparent; color: var(--dim); padding: 6px 10px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+}
+.wb-tabs button.is-on { color: var(--ink); border-color: var(--line); }
+.wb-tabs button:focus-visible, .wb-x:focus-visible { outline: 1px solid var(--amber); }
+.wb-all { font-size: 10px; letter-spacing: 0.12em; color: var(--soft); display: flex; gap: 6px; align-items: center; text-transform: uppercase; cursor: pointer; }
+.wb-all input { accent-color: var(--amber); }
+.wb-x { background: none; border: 0; color: var(--soft); cursor: pointer; font-size: 13px; padding: 4px 6px; }
+.wb-insp-body { overflow-y: auto; padding: 14px 16px 40px; flex: 1; }
+.wb-empty { color: var(--dim); font-size: 14px; }
+.wb-empty b { color: var(--ink); font-weight: 400; }
+
+.wb-ev { border: 1px solid var(--line); padding: 12px 13px; margin-bottom: 12px; }
+.wb-ev header { display: flex; justify-content: space-between; gap: 10px; font-size: 10px; letter-spacing: 0.1em; color: var(--soft); text-transform: uppercase; }
+.wb-ev.v-paused header, .wb-ev.v-fixed header { color: var(--amber); }
+.wb-ev.v-blocked, .wb-ev.v-leaked, .wb-ev.v-flagged { border-color: rgba(217, 97, 76, 0.6); }
+.wb-ev.v-blocked header, .wb-ev.v-leaked header, .wb-ev.v-flagged header { color: var(--red); }
+.wb-ev-sum { margin: 8px 0 4px; font-size: 14.5px; color: var(--ink); line-height: 1.4; }
+.wb-ev h4 { margin: 12px 0 5px; font-size: 9.5px; letter-spacing: 0.14em; color: var(--dim); text-transform: uppercase; font-weight: 400; }
+.wb-ev p { margin: 0; font-size: 13.5px; color: #c9c4b9; line-height: 1.45; }
+.wb-pre { margin: 0; padding: 9px 10px; background: #111113; border: 1px solid var(--line); font: 11px/1.5 var(--mono); color: var(--ink); white-space: pre-wrap; overflow-x: auto; }
+.wb-sql { color: #e6c79b; }
+.wb-note { font-size: 10px !important; color: var(--dim) !important; margin-top: 8px !important; letter-spacing: 0.06em; }
+.wb-rows { overflow-x: auto; }
+.wb-rows table { border-collapse: collapse; width: 100%; font: 11px var(--mono); }
+.wb-rows th, .wb-rows td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.wb-rows th { color: var(--dim); font-weight: 400; }
+.wb-rows th.is-masked { color: var(--amber); }
+.wb-rows td { color: var(--ink); }
+.wb-pn { display: flex; justify-content: space-between; }
+.wb-pn button { background: none; border: 0; color: var(--soft); font-size: 10.5px; letter-spacing: 0.1em; cursor: pointer; padding: 6px 0; }
+.wb-pn button:disabled { opacity: 0.3; cursor: default; }
+.wb-audit { list-style: none; margin: 0; padding: 0; font-size: 11px; }
+.wb-audit li { padding: 6px 0; border-bottom: 1px solid var(--line); color: var(--ink); white-space: pre-wrap; }
+.wb-audit span { color: var(--dim); margin-right: 12px; }
+
+/* ------------------------------------------------------------ live */
+.wb-live { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 22px; }
+.wb-live-k { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-size: 10px; letter-spacing: 0.14em; color: var(--dim); text-transform: uppercase; margin-bottom: 12px; }
+.wb-live-k .is-live { color: var(--amber); }
+.wb-live form { display: flex; gap: 10px; flex-wrap: wrap; }
+.wb-live input {
+  flex: 1 1 320px; background: transparent; border: 1px solid rgba(241, 237, 228, 0.35); color: var(--ink); padding: 13px 14px; font: 15px var(--body);
+}
+.wb-live input:focus-visible { outline: 0; border-color: var(--amber); }
+.wb-live .btn { border: 0; cursor: pointer; }
+.wb-live .btn:disabled { opacity: 0.5; cursor: progress; }
+.wb-live-err { margin: 12px 0 0; color: var(--red); font-size: 14px; }
+.wb-live-err button { background: none; border: 0; color: var(--ink); text-decoration: underline; cursor: pointer; font: inherit; margin-left: 8px; }
+
+/* ------------------------------------------------------------ closing */
+.wb-close { margin: clamp(60px, 10vh, 110px) 0 clamp(60px, 10vh, 100px); border-top: 1px solid var(--line); padding-top: 30px; max-width: 900px; }
+.wb-kick { display: flex; align-items: center; gap: 10px; font-size: 10.5px; letter-spacing: 0.14em; color: var(--soft); margin-bottom: 18px; }
+.wb-kick::before { content: ''; width: 22px; height: 1px; background: var(--amber); }
+.wb-close h2 { font-size: clamp(26px, 3vw, 40px); letter-spacing: -0.035em; line-height: 1.05; margin: 0 0 26px; }
+
+/* ------------------------------------------------------------ phones */
+@media (max-width: 720px) {
+  .wb-stage { height: 600px; }
+  .wb-sheet { padding: 4px; }
+  .wb-callout { left: 6px !important; right: 6px; top: auto !important; bottom: 6px; width: auto !important; }
+  .wb-callout p { font-size: 12.5px; }
+  .wb-lead { display: none; }
+  .wb-answer-main { grid-template-columns: 1fr; gap: 20px; }
+  .wb-insp { top: auto; left: 0; width: 100%; height: min(72vh, 620px); border-left: 0; border-top: 1px solid rgba(241, 237, 228, 0.28); transform: translateY(102%); }
+  .wb-insp.is-open { transform: none; }
+  .wb-ctl-r { width: 100%; justify-content: space-between; gap: 14px; }
+  .wb-run { flex: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wb-callout, .wb-answer { animation: none; }
+  .wb-sock.is-target line, .wb-slot.is-target { animation: none; }
+  .wb-insp { transition: none; }
+}
