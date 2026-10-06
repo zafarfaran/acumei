@@ -25,7 +25,7 @@ function fitView(parts, yaw, cw, ch, pad) {
     }
   }
   y0 -= 1.4; // room above for the request token
-  y1 += 2.4; // room below for the dimension line
+  y1 += 0.6;
   const S = Math.min((cw - pad.l - pad.r) / (x1 - x0), (ch - pad.t - pad.b) / (y1 - y0));
   return {
     S,
@@ -61,7 +61,7 @@ function Label({ p, code, name, dir, tone, drop }) {
  * timeline. On wide screens the drawing sits to the right of `leftPad`
  * (the narration column overlays the left).
  */
-export default function Sheet({ build, revealed, current, running, selected, onSlot, onMarker, leftPad = 0, stateLabel }) {
+export default function Sheet({ build, revealed, current, running, selected, onSlot, onMarker, leftPad = 0 }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
   const live = useRef({ m: null, R: null, anim: {}, intro: false, tok: { from: null, to: null, t0: 0 }, t: 0, view: null, cw: 0, ch: 0, mobile: false, snap: false, running: false, leftPad: 0 });
@@ -110,10 +110,10 @@ export default function Sheet({ build, revealed, current, running, selected, onS
     L.cw = Math.round(r.width); L.ch = Math.round(r.height);
     if (!L.cw || !L.ch) return;
     L.mobile = L.cw < 720;
-    L.yaw = L.mobile ? 0.74 : -0.34; // phones: the rail runs down the screen
+    L.yaw = -0.34;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     L.R.resize(L.cw, L.ch, dpr);
-    const pad = L.mobile ? { l: 18, r: 92, t: 30, b: 70 } : { l: L.leftPad + 130, r: 230, t: 30, b: 70 };
+    const pad = L.mobile ? { l: 10, r: 10, t: 34, b: 34 } : { l: L.leftPad + 110, r: 190, t: 30, b: 60 };
     const v = fitView(L.m.model.parts.filter((p) => !p.tokenPart), L.yaw, L.cw, L.ch, pad);
     L.view = { cx: v.cx * dpr, cy: v.cy * dpr, S: v.S * dpr, zc: 0, yaw: L.yaw };
     L.snap = true;
@@ -194,24 +194,11 @@ export default function Sheet({ build, revealed, current, running, selected, onS
     return 'done';
   });
 
-  const dimA = at('dimA'), dimB = at('dimB');
-  const dimAngle = dimA && dimB ? (Math.atan2(dimB[1] - dimA[1], dimB[0] - dimA[0]) * 180) / Math.PI : 0;
 
   return (
     <div className={`wb-stage${shake ? ` is-shake-${shake % 2}` : ''}`} ref={wrapRef}>
       <canvas ref={canvasRef} aria-hidden="true" />
       <svg className={`wb-ov${ready ? ' is-ready' : ''}`} width={snap.cw} height={snap.ch} aria-hidden="true">
-        {/* dimension line in front of the rail */}
-        {dimA && dimB && (
-          <g className="wb-dim">
-            <line x1={dimA[0]} y1={dimA[1]} x2={dimB[0]} y2={dimB[1]} />
-            {[dimA, dimB].map((p, i) => <line key={i} className="t" x1={p[0] - 5} y1={p[1] + 5} x2={p[0] + 5} y2={p[1] - 5} />)}
-            <text x={(dimA[0] + dimB[0]) / 2} y={(dimA[1] + dimB[1]) / 2 + 18} transform={`rotate(${dimAngle} ${(dimA[0] + dimB[0]) / 2} ${(dimA[1] + dimB[1]) / 2 + 18})`} textAnchor="middle">
-              RAIL 13.4 U · 6 MODULES · {build.branches.length} OF 5 GUARDRAILS
-            </text>
-          </g>
-        )}
-
         {/* dashed outlines where a branch could go */}
         {BRANCHES.map((code) => {
           if (build.branches.includes(code) || !at(`sock:${code}:0`)) return null;
@@ -228,13 +215,13 @@ export default function Sheet({ build, revealed, current, running, selected, onS
           const part = partByCode(build[code]);
           const evs = stops.filter((e) => e.step === code);
           const tone = cur?.step === code ? (RED.has(cur.verdict) ? 'red' : 'on') : evs.some((e) => RED.has(e.verdict)) ? 'red' : part.shortcut ? 'short' : '';
-          return <Label key={code} p={p} code={code} name={part.name} dir="l" drop tone={tone} />;
+          return <Label key={code} p={p} code={part.name} dir="l" drop tone={tone} />;
         })}
-        {BRANCHES.map((code) => {
+        {!snap.mobile && BRANCHES.map((code) => {
           const p = at(`label:${code}`); if (!p) return null;
           const fitted = build.branches.includes(code);
           const tone = fits(code) ? 'on' : cur?.step === code ? 'on' : fitted ? '' : 'empty';
-          return <Label key={code} p={p} code={code} name={snap.mobile ? (fitted ? '' : 'empty') : `${slotByCode(code).name}${fitted ? '' : ' · empty'}`} dir="r" drop={code === 'G-05'} tone={tone} />;
+          return <Label key={code} p={p} code={slotByCode(code).name} dir="r" drop={code === 'G-05'} tone={tone} />;
         })}
 
         {/* the route the request has taken, drawn in as it goes */}
@@ -293,22 +280,12 @@ export default function Sheet({ build, revealed, current, running, selected, onS
         </span>
       )}
 
-      {/* step timeline and title block, under the drawing */}
-      <div className="wb-under" style={snap.mobile ? undefined : { left: leftPad + 60 }}>
-        <ol className="wb-tl mono" aria-label="Steps">
-          {MODULES.map((code, i) => (
-            <li key={code} className={`is-${status[i]}${cur?.step === code ? ' is-cur' : ''}`}>
-              <i aria-hidden="true" /><span>0{i + 1} {STEP_NAMES[i]}</span>
-            </li>
-          ))}
-        </ol>
-        <div className="wb-tb mono" aria-label="Drawing title block">
-          <div><span>DWG</span><b>W-01</b></div>
-          <div className="w"><span>SUBJECT</span><b>NORTHWIND · DATA AGENT</b></div>
-          <div><span>STATE</span><b className="st">{stateLabel}</b></div>
-          <div><span>REV</span><b>A</b></div>
-        </div>
-      </div>
+      {/* progress: one bar per module */}
+      <ol className="wb-tl" aria-label="Progress" style={snap.mobile ? undefined : { left: leftPad + 60 }}>
+        {MODULES.map((code, i) => (
+          <li key={code} className={`is-${status[i]}${cur?.step === code ? ' is-cur' : ''}`} aria-label={`${STEP_NAMES[i]}: ${status[i]}`} />
+        ))}
+      </ol>
     </div>
   );
 }

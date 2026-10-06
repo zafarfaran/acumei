@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { slotByCode } from '../../lib/workbench/parts';
-import { verdictWord } from '../../lib/workbench/words';
 import { STATIC } from '../../lib/motion';
 
 const RED = new Set(['blocked', 'leaked', 'flagged']);
@@ -24,11 +22,10 @@ function Typed({ text }) {
   );
 }
 
-// Colour the first figure in a verdict ("12 people’s salaries", "$11.50") in the tone colour.
+// Colour the first figure in a verdict ("12 people’s salaries", "$11.50"), or the second sentence.
 function Emph({ text }) {
   const m = text.match(/(\$[\d.,]+|\d[\d,.]*\s+\S+(?:\s+salaries)?)/);
   if (!m) {
-    // no figure: accent the second sentence instead ("Names were hidden. Only averages went out.")
     const k = text.indexOf('. ');
     return k > 0 ? <>{text.slice(0, k + 1)} <em>{text.slice(k + 2)}</em></> : text;
   }
@@ -36,16 +33,14 @@ function Emph({ text }) {
   return <>{text.slice(0, i)}<em>{m[0]}</em>{text.slice(i + m[0].length)}</>;
 }
 
-const Kicker = ({ children, tone }) => <div className={`wb-k mono${tone ? ` is-${tone}` : ''}`}><i aria-hidden="true" />{children}</div>;
-
-function Log({ events, current }) {
+// 1 Break it → 2 Watch → 3 Fix it: where you are, always visible.
+function Steps({ at, done }) {
+  const steps = ['Break it', 'Watch', 'Fix it'];
   return (
-    <ol className="wb-log">
-      {events.map((e, i) => (
-        <li key={e.id} className={`${current?.id === e.id ? 'is-cur' : ''} v-${e.verdict}`} style={{ '--i': i }}>
-          <span className="n mono">{String(i + 1).padStart(2, '0')}</span>
-          <span className="h">{slotByCode(e.step)?.name || e.step}</span>
-          <span className={`v mono${RED.has(e.verdict) ? ' is-red' : e.verdict === 'fixed' || e.verdict === 'paused' ? ' is-amb' : ''}`}>{verdictWord(e.verdict)}</span>
+    <ol className="wb-steps mono" aria-label="How it works">
+      {steps.map((s, i) => (
+        <li key={s} className={i === at ? 'is-on' : i < at || done ? 'is-done' : ''} aria-current={i === at ? 'step' : undefined}>
+          <b>{i + 1}</b>{s}
         </li>
       ))}
     </ol>
@@ -53,79 +48,64 @@ function Log({ events, current }) {
 }
 
 /**
- * The left column: big display type that narrates what the machine is doing.
- * idle → four ways to break it; run → the live step log; done → the verdict
- * and the one button that fixes it.
+ * The left column. One headline and one obvious thing to do at a time:
+ * idle → pick a way to break it; run → what the machine is doing now;
+ * done → what happened, and the one button that fixes it.
  */
-export default function Narration({
-  mode, challenges, challengeId, onPick, onRunAsBuilt, scenarios, scenarioId, onScenario,
-  events, current, waiting, onChoose, verdict, fix, onFix, onDetails, onBack, title,
-}) {
-  const steps = events.filter((e) => e.kind !== 'answer' && e.step);
-
+export default function Narration({ mode, challenges, onPick, events, current, waiting, onChoose, verdict, fix, onFix, onDetails, onBack }) {
   if (mode === 'idle') {
     return (
       <div className="wb-nar">
-        <Kicker>FIG. W-01 · WORKBENCH · DATA ANALYSIS AGENT</Kicker>
-        <h1 className="wb-h1">Build an agent.<span className="amb"> Then break it.</span></h1>
-        <p className="wb-lede">A data agent for a made-up company. Pick a way to break it, watch what goes wrong, then fix it.</p>
-        <ol className="wb-ch">
+        <Steps at={0} />
+        <h1 className="wb-h1">Break the agent.</h1>
+        <ul className="wb-ch">
           {challenges.map((c, i) => (
             <li key={c.id} style={{ '--i': i }}>
-              <button type="button" onClick={() => onPick(c)} className={challengeId === c.id ? 'is-last' : ''}>
-                <span className="n mono">0{i + 1}</span>
-                <span className="h">{c.title}<span className="s mono">{c.blurb}</span></span>
-                <span className="go mono" aria-hidden="true">Break it →</span>
+              <button type="button" onClick={() => onPick(c)}>
+                <span className="h">{c.short}</span>
+                <span className="go" aria-hidden="true">→</span>
               </button>
             </li>
           ))}
-        </ol>
-        <div className="wb-alt">
-          <button type="button" className="lnk wb-asbuilt" onClick={onRunAsBuilt}>▶ Run it as built</button>
-          <label className="wb-scn mono">
-            <span>Question</span>
-            <select value={scenarioId} onChange={(e) => onScenario(e.target.value)}>
-              {scenarios.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
-            </select>
-          </label>
-        </div>
+        </ul>
       </div>
     );
   }
 
   if (mode === 'run') {
-    const n = steps.length;
+    const steps = events.filter((e) => e.kind !== 'answer' && e.step);
     const cur = current && current.kind !== 'answer' ? current : steps[steps.length - 1];
     const red = cur && RED.has(cur.verdict);
+    const asking = waiting && cur?.kind === 'pause' && !cur.pause.chosen;
     return (
       <div className="wb-nar">
-        <Kicker tone={red ? 'red' : 'amb'}>RUNNING · {title.toUpperCase()} · STEP {String(n).padStart(2, '0')}</Kicker>
+        <Steps at={1} />
+        <p className="wb-count mono">{asking ? 'It’s asking you' : `Step ${steps.length}`}</p>
         <p className={`wb-say${red ? ' is-red' : ''}`} key={cur?.id}>{cur ? <Typed text={cur.summary} /> : 'Starting…'}</p>
-        {waiting && cur?.kind === 'pause' && !cur.pause.chosen && (
+        {asking && (
           <div className="wb-opts">
             {cur.pause.options.length
               ? cur.pause.options.map((o) => <button key={o.id} type="button" className="btn" onClick={() => onChoose(cur.pause.id, o.id)}>{o.label}</button>)
-              : <p className="wb-lede">{cur.pause.prompt}</p>}
+              : null}
           </div>
         )}
-        <Log events={steps} current={cur} />
       </div>
     );
   }
 
   // done
+  const bad = verdict?.tone === 'bad';
   return (
     <div className="wb-nar">
-      <Kicker tone={verdict?.tone === 'bad' ? 'red' : verdict?.tone === 'good' ? 'green' : 'amb'}>RUN COMPLETE · {title.toUpperCase()} · {steps.length} STEPS</Kicker>
+      <Steps at={bad ? 2 : 3} done={!bad} />
       <h2 className={`wb-verdict-h is-${verdict?.tone || 'good'}`}>{verdict ? <Emph text={verdict.title} /> : 'Done.'}</h2>
-      <Log events={steps} current={null} />
       <div className="wb-acts">
-        {fix && verdict?.tone === 'bad' && (
-          <button type="button" className="btn wb-fix" onClick={onFix}>Fix it · {fix.label}</button>
-        )}
-        <button type="button" className="lnk" onClick={onDetails}>See every step</button>
-        <button type="button" className="lnk wb-back" onClick={onBack}>Try another way to break it</button>
+        {bad && fix
+          ? <button type="button" className="btn wb-fix" onClick={onFix}>Fix it →</button>
+          : <button type="button" className="btn wb-again" onClick={onBack}>Break it another way →</button>}
+        <button type="button" className="wb-small mono" onClick={onDetails}>See every step</button>
       </div>
+      {bad && fix && <p className="wb-hint mono">or drag the glowing part onto the machine</p>}
     </div>
   );
 }

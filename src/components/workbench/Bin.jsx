@@ -45,9 +45,9 @@ export default function Bin({ build, selected, onSelect, onDrop, onToggle, lift,
 
   return (
     <div className="wb-bin" aria-label="Safety parts" ref={binRef}>
-      <div className="wb-k mono"><i aria-hidden="true" />BIN · G-01 – G-05 · DRAG A PART ONTO THE MACHINE, OR TAP IT</div>
+      <div className="wb-k mono"><i aria-hidden="true" />Safety parts · drag onto the machine</div>
       <div className="wb-shelf">
-        {Object.entries(SAFETY).map(([code, line], i) => {
+        {Object.keys(SAFETY).map((code, i) => {
           const on = build.branches.includes(code);
           return (
             <button
@@ -55,6 +55,7 @@ export default function Bin({ build, selected, onSelect, onDrop, onToggle, lift,
               ref={(el) => { itemRefs.current[code] = el; }}
               type="button"
               aria-pressed={on}
+              aria-description={SAFETY[code]}
               className={`wb-part${on ? ' is-on' : ''}${selected === code ? ' is-sel' : ''}${lift === code ? ' is-lift' : ''}`}
               style={{ '--i': i }}
               {...dragProps(code)}
@@ -62,9 +63,8 @@ export default function Bin({ build, selected, onSelect, onDrop, onToggle, lift,
             >
               <span className="cube"><IsoCube amber={on || lift === code} /><i className="shadow" aria-hidden="true" /></span>
               <span className="t">
-                <span className="c mono">{code}{on ? ' · ON ✓' : ''}</span>
                 <b>{partByCode(code).name}</b>
-                <span className="l mono">{line}</span>
+                {on && <span className="c mono">On ✓</span>}
               </span>
             </button>
           );

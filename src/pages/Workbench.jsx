@@ -193,10 +193,6 @@ export default function Workbench() {
   const closeInsp = useCallback(() => setInsp((s) => ({ ...s, open: false })), []);
 
   const mode = runId == null ? 'idle' : pb.done ? 'done' : 'run';
-  const stepNo = pb.revealed.filter((e) => e.kind !== 'answer').length;
-  const stateLabel = mode === 'idle' ? 'IDLE · READY'
-    : mode === 'run' ? (pb.waiting ? 'WAITING ON YOU' : `RUNNING · STEP ${String(stepNo).padStart(2, '0')}`)
-      : verdict?.tone === 'bad' ? 'UNSAFE' : 'SAFE';
   const lift = mode === 'done' && verdict?.tone === 'bad' && fix && fix.code.startsWith('G-') ? fix.code : null;
 
   return (
@@ -213,19 +209,12 @@ export default function Workbench() {
             onSlot={onSlot}
             onMarker={openAt}
             leftPad={leftPad}
-            stateLabel={stateLabel}
           />
           <div className="wb-col" ref={narRef}>
             <Narration
               mode={mode}
-              title={scenario.title}
               challenges={CHALLENGES}
-              challengeId={challengeId}
               onPick={pickChallenge}
-              onRunAsBuilt={startRun}
-              scenarios={SCENARIOS}
-              scenarioId={scenarioId}
-              onScenario={(id) => { setChallengeId(null); setBuildAndScenario(build, id); }}
               events={pb.revealed}
               current={pb.current}
               waiting={pb.waiting}
@@ -249,15 +238,22 @@ export default function Workbench() {
         <div className="wb-below">
           {answer && (
             <section className="wb-sec" aria-label="Answer readout">
-              <div className="wb-k mono"><i aria-hidden="true" />FIG. W-02 · READOUT · WHAT J. ORTIZ RECEIVED</div>
+              <div className="wb-k mono"><i aria-hidden="true" />What got sent</div>
               <AnswerCard answer={answer} />
             </section>
           )}
 
           <section className="wb-sec">
-            <div className="wb-k mono"><i aria-hidden="true" />FIG. W-03 · SWAP THE MAIN PARTS</div>
+            <div className="wb-k mono"><i aria-hidden="true" />Build your own · swap the main parts</div>
             <Tray build={build} selected={selected} onSelect={setSelected} onDrop={onDrop} />
             <div className="wb-tools">
+              <label className="wb-scn mono">
+                <span>Question</span>
+                <select value={scenarioId} onChange={(e) => { setChallengeId(null); setBuildAndScenario(build, e.target.value); }}>
+                  {SCENARIOS.map((x) => <option key={x.id} value={x.id}>{x.title}</option>)}
+                </select>
+              </label>
+              <button type="button" className="lnk" onClick={() => { startRun(); showSheet(); }}>Run this machine</button>
               <button type="button" className="lnk" onClick={() => { setBuild(DEFAULT_BUILD); setStatus('Build reset.'); }}>Reset the machine</button>
               <button type="button" className="lnk" onClick={() => setInsp((s) => ({ ...s, open: !s.open }))}>{insp.open ? 'Close' : 'Open'} the inspector</button>
             </div>
@@ -265,7 +261,7 @@ export default function Workbench() {
 
           {(pb.done || askedLive || liveOn) && (
             <section className="wb-sec">
-              <div className="wb-k mono"><i aria-hidden="true" />FIG. W-04 · ASK YOUR OWN QUESTION</div>
+              <div className="wb-k mono"><i aria-hidden="true" />Ask your own question</div>
               <LiveAsk
                 build={build}
                 live={{ ...liveRun, ask: (a) => { setAskedLive(true); setStatus(''); showSheet(); return liveRun.ask(a); } }}
