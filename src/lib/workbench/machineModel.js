@@ -88,6 +88,9 @@ export function buildMachine(build) {
         set(`label:${code}`, pj(...labelPos[code]));
       }
       for (const [code, cs] of Object.entries(sockets)) cs.forEach((c, k) => set(`sock:${code}:${k}`, pj(...c)));
+      // ends of the dimension line drawn in front of the rail
+      set('dimA', pj(modX(0) + 0.325 - PITCH / 2, RAIL.y1 + 3.1, RAIL.z0));
+      set('dimB', pj(modX(5) + 0.325 + PITCH / 2, RAIL.y1 + 3.1, RAIL.z0));
       set('token', scr[token.i]);
     },
   };

@@ -4,15 +4,15 @@ import { buildMachine, setActive, GROUPS } from '../../lib/workbench/machineMode
 import { MODULES, BRANCHES, partByCode, slotByCode } from '../../lib/workbench/parts';
 import { onFrame, invalidate, STATIC } from '../../lib/motion';
 import { clamp, sm, lerp, hash } from '../../lib/assembly/math';
-import { verdictWord } from '../../lib/workbench/words';
 
 const ALL = [...MODULES, ...BRANCHES];
 const RED = new Set(['blocked', 'leaked', 'flagged']);
+const STEP_NAMES = ['Intake', 'Understand', 'Access', 'Query', 'Validate', 'Deliver'];
 // socket box corners: 0-3 top, 4-7 bottom (same order)
 const EDGES = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]];
 
-// Fit the whole drawing into the canvas: project every part's corners at S = 1.
-function fitView(parts, yaw, cw, ch, mobile) {
+// Fit the whole drawing into the area right of `padL`: project every part's corners at S = 1.
+function fitView(parts, yaw, cw, ch, pad) {
   const c = Math.cos(yaw), s = Math.sin(yaw);
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
   for (const p of parts) {
@@ -24,46 +24,47 @@ function fitView(parts, yaw, cw, ch, mobile) {
       x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
     }
   }
-  y0 -= 1.6; // room above for the token and callouts
-  const padL = mobile ? 18 : 150, padR = mobile ? 96 : 150, padT = mobile ? 28 : 40, padB = mobile ? 190 : 70; // phones: room for the docked callout
-  const S = Math.min((cw - padL - padR) / (x1 - x0), (ch - padT - padB) / (y1 - y0));
+  y0 -= 1.4; // room above for the request token
+  y1 += 2.4; // room below for the dimension line
+  const S = Math.min((cw - pad.l - pad.r) / (x1 - x0), (ch - pad.t - pad.b) / (y1 - y0));
   return {
     S,
-    cx: padL + (cw - padL - padR - (x1 - x0) * S) / 2 - x0 * S,
-    cy: padT + (ch - padT - padB - (y1 - y0) * S) / 2 - y0 * S,
+    cx: pad.l + (cw - pad.l - pad.r - (x1 - x0) * S) / 2 - x0 * S,
+    cy: pad.t + (ch - pad.t - pad.b - (y1 - y0) * S) / 2 - y0 * S,
   };
 }
 
 const lerp3 = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
 
-// Types the callout out in about half a second. The full text is always in the DOM for screen readers.
-function Typed({ text }) {
-  const [n, setN] = useState(STATIC ? text.length : 0);
-  useEffect(() => {
-    if (STATIC) return undefined;
-    setN(0);
-    let i = 0;
-    const per = Math.max(2, Math.ceil(text.length / 14)); // finishes in about half a second
-    const id = setInterval(() => { i += per; setN(Math.min(text.length, i)); if (i >= text.length) clearInterval(id); }, 32);
-    return () => clearInterval(id);
-  }, [text]);
+// Red dots spilling out of a module that leaked data.
+const SPILL = Array.from({ length: 22 }, (_, i) => ({
+  dx: (hash(i) - 0.5) * 160, dy: 40 + hash(i + 40) * 110, d: Math.round(hash(i + 80) * 300), s: 3 + Math.round(hash(i + 120) * 3),
+}));
+
+// A homepage-style label: a "+" on the part, an angled leader, the code bright and the name dim.
+function Label({ p, code, name, dir, tone, drop }) {
+  const dx = dir === 'l' ? -1 : 1, ex = p[0] + dx * 20, ey = p[1] + (drop ? 24 : -14);
   return (
-    <p>
-      <span className="wb-sr">{text}</span>
-      <span aria-hidden="true">{text.slice(0, n)}{n < text.length && <i className="wb-caret" />}</span>
-    </p>
+    <g className={`wb-xl${tone ? ` is-${tone}` : ''}`}>
+      <path className="x" d={`M${p[0] - 3.5} ${p[1]}H${p[0] + 3.5}M${p[0]} ${p[1] - 3.5}V${p[1] + 3.5}`} />
+      <path className="ld" d={`M${p[0] + dx * 4} ${p[1] + (drop ? 3 : -2)}L${ex} ${ey}H${ex + dx * 8}`} />
+      <text x={ex + dx * 12} y={ey + 3.5} textAnchor={dir === 'l' ? 'end' : 'start'}>
+        <tspan className="c">{code}</tspan><tspan className="n">{name ? `  ${name}` : ''}</tspan>
+      </text>
+    </g>
   );
 }
 
-// Red dots spilling out of a module that leaked data.
-const SPILL = Array.from({ length: 18 }, (_, i) => ({
-  dx: (hash(i) - 0.5) * 140, dy: 40 + hash(i + 40) * 90, d: Math.round(hash(i + 80) * 260), s: 3 + Math.round(hash(i + 120) * 3),
-}));
-
-export default function Sheet({ build, revealed, current, running, waiting, selected, onSlot, onCallout, onChoose, onRun, idle, header }) {
+/**
+ * The machine, drawn straight onto the page like the homepage hero: no frame,
+ * crosshair labels, a dimension line, the route the request took, and a step
+ * timeline. On wide screens the drawing sits to the right of `leftPad`
+ * (the narration column overlays the left).
+ */
+export default function Sheet({ build, revealed, current, running, selected, onSlot, onMarker, leftPad = 0, stateLabel }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
-  const live = useRef({ m: null, R: null, anim: {}, intro: false, tok: { from: null, to: null, t0: 0 }, t: 0, view: null, cw: 0, ch: 0, mobile: false, snap: false, running: false });
+  const live = useRef({ m: null, R: null, anim: {}, intro: false, tok: { from: null, to: null, t0: 0 }, t: 0, view: null, cw: 0, ch: 0, mobile: false, snap: false, running: false, leftPad: 0 });
   const [snap, setSnap] = useState({ a: {}, cw: 0, ch: 0, mobile: false });
   const [flashes, setFlashes] = useState([]); // rings where a part just landed
   const [shake, setShake] = useState(0);
@@ -75,7 +76,6 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
     const prev = L.m;
     const m = buildMachine(build);
     if (prev) {
-      // a part that is new or swapped drops in, and a ring flashes where it lands
       const landed = [];
       for (const [slot, p] of Object.entries(m.fitted)) if (prev.fitted[slot]?.code !== p.code) { L.anim[p.g] = L.t; landed.push(slot); }
       if (landed.length) setFlashes((f) => [...f, ...landed.map((slot) => ({ slot, key: `${slot}-${Date.now()}` }))]);
@@ -86,6 +86,8 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
     layout();
     invalidate();
   }, [build]);
+
+  useEffect(() => { live.current.leftPad = leftPad; layout(); }, [leftPad]);
 
   // token travel + active module
   useEffect(() => {
@@ -111,7 +113,8 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
     L.yaw = L.mobile ? 0.74 : -0.34; // phones: the rail runs down the screen
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     L.R.resize(L.cw, L.ch, dpr);
-    const v = fitView(L.m.model.parts.filter((p) => !p.tokenPart), L.yaw, L.cw, L.ch, L.mobile);
+    const pad = L.mobile ? { l: 18, r: 92, t: 30, b: 70 } : { l: L.leftPad + 130, r: 230, t: 30, b: 70 };
+    const v = fitView(L.m.model.parts.filter((p) => !p.tokenPart), L.yaw, L.cw, L.ch, pad);
     L.view = { cx: v.cx * dpr, cy: v.cy * dpr, S: v.S * dpr, zc: 0, yaw: L.yaw };
     L.snap = true;
     invalidate();
@@ -141,7 +144,7 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
       if (L.snap) { L.snap = false; setSnap({ a: { ...R.anchors }, cw: L.cw, ch: L.ch, mobile: L.mobile }); }
     };
     const off = onFrame(frame);
-    // First time the sheet is on screen: the rail rises, then the modules drop
+    // First time the drawing is on screen: the rail rises, then the modules drop
     // in one by one, then the branches. Group numbers come from machineModel.
     const io = typeof IntersectionObserver === 'function' && !STATIC ? new IntersectionObserver(([e]) => {
       if (!e.isIntersecting || L.intro) return;
@@ -153,7 +156,7 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
       L.anim[26] = t + 1.2;
       setTimeout(() => setReady(true), 1250);
       io.disconnect();
-    }, { threshold: 0.35 }) : null;
+    }, { threshold: 0.5 }) : null;
     if (io) io.observe(wrapRef.current); else { L.intro = true; setReady(true); }
     const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(layout) : null;
     ro?.observe(wrapRef.current);
@@ -166,150 +169,145 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
   const at = (k) => a[k] || null;
   const fits = (code) => selected && partByCode(selected)?.slot === code;
 
-  // numbered callouts: one per revealed event (answers excluded), stacked per step
-  const stack = {};
-  const callouts = revealed.filter((e) => e.kind !== 'answer' && e.step).map((e) => {
-    const n = (stack[e.step] = (stack[e.step] || 0) + 1) - 1;
-    return { e, n };
-  });
-  // trail segments between consecutive stops
-  const stops = callouts.map(({ e }) => e);
+  // the stops the request has made, in order (answers excluded)
+  const stops = revealed.filter((e) => e.kind !== 'answer' && e.step);
   const trail = [];
   for (let i = 1; i < stops.length; i++) {
     const pa = at(`slot:${stops[i - 1].step}`), pb = at(`slot:${stops[i].step}`);
     if (pa && pb && stops[i - 1].step !== stops[i].step) trail.push({ key: stops[i].id, a: pa, b: pb, red: RED.has(stops[i].verdict) });
   }
+  // one marker per step code (the latest event there), numbered by first visit
+  const markers = [];
+  const seen = new Map();
+  stops.forEach((e) => {
+    if (!seen.has(e.step)) { seen.set(e.step, markers.length); markers.push({ step: e.step, n: markers.length + 1, e }); }
+    else markers[seen.get(e.step)].e = e;
+  });
   const cur = current && current.kind !== 'answer' && current.step ? current : null;
   const curAt = cur && at(`slot:${cur.step}`);
-  let box = null;
-  if (curAt) {
-    const w = Math.min(300, snap.cw - 24);
-    let left = curAt[0] + 54, top = curAt[1] - 118;
-    if (left + w > snap.cw - 8) left = Math.max(8, curAt[0] - 54 - w);
-    top = clamp(top, 8, snap.ch - 150);
-    box = { left, top, w };
-  }
+
+  // module status for the timeline
+  const status = MODULES.map((code) => {
+    const evs = stops.filter((e) => e.step === code);
+    if (!evs.length) return 'todo';
+    if (evs.some((e) => RED.has(e.verdict))) return 'red';
+    return 'done';
+  });
+
+  const dimA = at('dimA'), dimB = at('dimB');
+  const dimAngle = dimA && dimB ? (Math.atan2(dimB[1] - dimA[1], dimB[0] - dimA[0]) * 180) / Math.PI : 0;
 
   return (
-    <div className="wb-sheet">
-      <div className="wb-sheet-hd mono">{header}</div>
-      <div className={`wb-stage${shake ? ` is-shake-${shake % 2}` : ''}`} ref={wrapRef}>
-        <canvas ref={canvasRef} aria-hidden="true" />
-        <svg className={`wb-ov${ready ? ' is-ready' : ''}`} width={snap.cw} height={snap.ch} aria-hidden="true">
-          {/* dashed outlines where a branch could go */}
-          {BRANCHES.map((code) => {
-            if (build.branches.includes(code) || !at(`sock:${code}:0`)) return null;
-            return (
-              <g key={code} className={`wb-sock${fits(code) ? ' is-target' : ''}`}>
-                {EDGES.map(([i, j]) => { const p = at(`sock:${code}:${i}`), q = at(`sock:${code}:${j}`); return <line key={`${i}${j}`} x1={p[0]} y1={p[1]} x2={q[0]} y2={q[1]} />; })}
-              </g>
-            );
-          })}
-          {/* part labels */}
-          {!snap.mobile && MODULES.map((code) => {
-            const p = at(`label:${code}`); if (!p) return null;
-            const part = partByCode(build[code]);
-            const on = cur?.step === code;
-            return (
-              <g key={code} className={`wb-lbl${on ? ' is-on' : ''}${part.shortcut ? ' is-short' : ''}`}>
-                <path d={`M${p[0]} ${p[1]} L${p[0] - 18} ${p[1] + 26} H${p[0] - 30}`} />
-                <text x={p[0] - 34} y={p[1] + 29} textAnchor="end"><tspan className="c">{code}</tspan> {part.name}</text>
-              </g>
-            );
-          })}
-          {BRANCHES.map((code) => {
-            const p = at(`label:${code}`); if (!p) return null;
-            const fitted = build.branches.includes(code);
-            const chain = code === 'G-05';
-            const dx = 1;
-            return (
-              <g key={code} className={`wb-lbl${fitted ? '' : ' is-empty'}${cur?.step === code ? ' is-on' : ''}`}>
-                <path d={`M${p[0]} ${p[1]} L${p[0] + dx * 16} ${p[1] + (chain ? 16 : -16)} H${p[0] + dx * 26}`} />
-                <text x={p[0] + dx * 30} y={p[1] + (chain ? 19 : -13)}>
-                  <tspan className="c">{code}</tspan>{snap.mobile ? '' : ` ${slotByCode(code).name}`}{fitted ? '' : ' · empty'}
-                </text>
-              </g>
-            );
-          })}
-          {/* the path the request has travelled, drawn in as it goes */}
-          {trail.map((t) => (
-            <g key={t.key} className={`wb-trail${t.red ? ' is-red' : ''}`}>
-              <line className="glow" x1={t.a[0]} y1={t.a[1]} x2={t.b[0]} y2={t.b[1]} pathLength="1" />
-              <line x1={t.a[0]} y1={t.a[1]} x2={t.b[0]} y2={t.b[1]} pathLength="1" />
+    <div className={`wb-stage${shake ? ` is-shake-${shake % 2}` : ''}`} ref={wrapRef}>
+      <canvas ref={canvasRef} aria-hidden="true" />
+      <svg className={`wb-ov${ready ? ' is-ready' : ''}`} width={snap.cw} height={snap.ch} aria-hidden="true">
+        {/* dimension line in front of the rail */}
+        {dimA && dimB && (
+          <g className="wb-dim">
+            <line x1={dimA[0]} y1={dimA[1]} x2={dimB[0]} y2={dimB[1]} />
+            {[dimA, dimB].map((p, i) => <line key={i} className="t" x1={p[0] - 5} y1={p[1] + 5} x2={p[0] + 5} y2={p[1] - 5} />)}
+            <text x={(dimA[0] + dimB[0]) / 2} y={(dimA[1] + dimB[1]) / 2 + 18} transform={`rotate(${dimAngle} ${(dimA[0] + dimB[0]) / 2} ${(dimA[1] + dimB[1]) / 2 + 18})`} textAnchor="middle">
+              RAIL 13.4 U · 6 MODULES · {build.branches.length} OF 5 GUARDRAILS
+            </text>
+          </g>
+        )}
+
+        {/* dashed outlines where a branch could go */}
+        {BRANCHES.map((code) => {
+          if (build.branches.includes(code) || !at(`sock:${code}:0`)) return null;
+          return (
+            <g key={code} className={`wb-sock${fits(code) ? ' is-target' : ''}`}>
+              {EDGES.map(([i, j]) => { const p = at(`sock:${code}:${i}`), q = at(`sock:${code}:${j}`); return <line key={`${i}${j}`} x1={p[0]} y1={p[1]} x2={q[0]} y2={q[1]} />; })}
             </g>
+          );
+        })}
+
+        {/* part labels */}
+        {!snap.mobile && MODULES.map((code) => {
+          const p = at(`label:${code}`); if (!p) return null;
+          const part = partByCode(build[code]);
+          const evs = stops.filter((e) => e.step === code);
+          const tone = cur?.step === code ? (RED.has(cur.verdict) ? 'red' : 'on') : evs.some((e) => RED.has(e.verdict)) ? 'red' : part.shortcut ? 'short' : '';
+          return <Label key={code} p={p} code={code} name={part.name} dir="l" drop tone={tone} />;
+        })}
+        {BRANCHES.map((code) => {
+          const p = at(`label:${code}`); if (!p) return null;
+          const fitted = build.branches.includes(code);
+          const tone = fits(code) ? 'on' : cur?.step === code ? 'on' : fitted ? '' : 'empty';
+          return <Label key={code} p={p} code={code} name={snap.mobile ? (fitted ? '' : 'empty') : `${slotByCode(code).name}${fitted ? '' : ' · empty'}`} dir="r" drop={code === 'G-05'} tone={tone} />;
+        })}
+
+        {/* the route the request has taken, drawn in as it goes */}
+        {trail.map((t) => (
+          <g key={t.key} className={`wb-trail${t.red ? ' is-red' : ''}`}>
+            <line className="glow" x1={t.a[0]} y1={t.a[1]} x2={t.b[0]} y2={t.b[1]} pathLength="1" />
+            <line x1={t.a[0]} y1={t.a[1]} x2={t.b[0]} y2={t.b[1]} pathLength="1" />
+          </g>
+        ))}
+      </svg>
+
+      {/* slot buttons: the real controls */}
+      {ALL.map((code) => {
+        const p = at(`slot:${code}`); if (!p) return null;
+        const s = slotByCode(code);
+        const fitted = s.kind === 'module' ? partByCode(build[code]).name : build.branches.includes(code) ? 'fitted' : 'empty';
+        const target = fits(code);
+        return (
+          <button
+            key={code}
+            type="button"
+            data-slot={code}
+            className={`wb-slot${target ? ' is-target' : ''}${cur?.step === code ? ' is-on' : ''}`}
+            style={{ left: p[0], top: p[1] }}
+            aria-label={`${code} ${s.name}: ${fitted}. ${target ? `Fit ${partByCode(selected).name} here` : 'Change part'}`}
+            onClick={(e) => onSlot(code, e.currentTarget)}
+          />
+        );
+      })}
+
+      {/* square step markers along the route */}
+      {markers.map(({ step, n, e }) => {
+        const p = at(`slot:${step}`); if (!p) return null;
+        return (
+          <button
+            key={step}
+            type="button"
+            className={`wb-mk mono v-${e.verdict}${cur?.step === step ? ' is-cur' : ''}`}
+            style={{ left: p[0], top: p[1] - 4 }}
+            onClick={() => onMarker(e.id)}
+            aria-label={`Step ${n}, ${slotByCode(step).name}: ${e.summary}. Open in inspector`}
+          >{n}</button>
+        );
+      })}
+
+      {flashes.map((f) => {
+        const p = at(`slot:${f.slot}`); if (!p) return null;
+        return <span key={f.key} className="wb-ring" style={{ left: p[0], top: p[1] + 30 }} onAnimationEnd={() => setFlashes((all) => all.filter((x) => x.key !== f.key))} aria-hidden="true" />;
+      })}
+      {cur && curAt && RED.has(cur.verdict) && !STATIC && (
+        <span key={`rip-${cur.id}`} className="wb-ripple" style={{ left: curAt[0], top: curAt[1] + 30 }} aria-hidden="true" />
+      )}
+      {cur && curAt && cur.verdict === 'leaked' && !STATIC && (
+        <span key={`spill-${cur.id}`} className="wb-spill" style={{ left: curAt[0], top: curAt[1] + 20 }} aria-hidden="true">
+          {SPILL.map((d, i) => <i key={i} style={{ '--dx': `${d.dx}px`, '--dy': `${d.dy}px`, '--d': `${d.d}ms`, '--s': `${d.s}px` }} />)}
+        </span>
+      )}
+
+      {/* step timeline and title block, under the drawing */}
+      <div className="wb-under" style={snap.mobile ? undefined : { left: leftPad + 60 }}>
+        <ol className="wb-tl mono" aria-label="Steps">
+          {MODULES.map((code, i) => (
+            <li key={code} className={`is-${status[i]}${cur?.step === code ? ' is-cur' : ''}`}>
+              <i aria-hidden="true" /><span>0{i + 1} {STEP_NAMES[i]}</span>
+            </li>
           ))}
-          {/* current step: leader to the callout box */}
-          {box && curAt && (
-            <path className={`wb-lead${RED.has(cur.verdict) ? ' is-red' : ''}`} d={`M${curAt[0]} ${curAt[1]} L${box.left < curAt[0] ? box.left + box.w : box.left} ${box.top + 16}`} />
-          )}
-        </svg>
-
-        {/* slot buttons: the real controls */}
-        {ALL.map((code) => {
-          const p = at(`slot:${code}`); if (!p) return null;
-          const s = slotByCode(code);
-          const fitted = s.kind === 'module' ? partByCode(build[code]).name : build.branches.includes(code) ? 'fitted' : 'empty';
-          const target = fits(code);
-          return (
-            <button
-              key={code}
-              type="button"
-              data-slot={code}
-              className={`wb-slot${target ? ' is-target' : ''}${cur?.step === code ? ' is-on' : ''}`}
-              style={{ left: p[0], top: p[1] }}
-              aria-label={`${code} ${s.name}: ${fitted}. ${target ? `Fit ${partByCode(selected).name} here` : 'Change part'}`}
-              onClick={(e) => onSlot(code, e.currentTarget)}
-            />
-          );
-        })}
-
-        {callouts.map(({ e, n }) => {
-          const p = at(`slot:${e.step}`); if (!p) return null;
-          return (
-            <button
-              key={e.id}
-              type="button"
-              className={`wb-num mono v-${e.verdict}${cur?.id === e.id ? ' is-cur' : ''}`}
-              style={{ left: p[0], top: p[1] - 6 - n * 24 }}
-              onClick={() => onCallout(e.id)}
-              aria-label={`Step ${e.id + 1}: ${e.summary}. Open in inspector`}
-            >{e.id + 1}</button>
-          );
-        })}
-
-        {flashes.map((f) => {
-          const p = at(`slot:${f.slot}`); if (!p) return null;
-          return <span key={f.key} className="wb-ring" style={{ left: p[0], top: p[1] + 30 }} onAnimationEnd={() => setFlashes((all) => all.filter((x) => x.key !== f.key))} aria-hidden="true" />;
-        })}
-
-        {cur && curAt && RED.has(cur.verdict) && !STATIC && (
-          <span key={`rip-${cur.id}`} className="wb-ripple" style={{ left: curAt[0], top: curAt[1] + 30 }} aria-hidden="true" />
-        )}
-        {cur && curAt && cur.verdict === 'leaked' && !STATIC && (
-          <span key={`spill-${cur.id}`} className="wb-spill" style={{ left: curAt[0], top: curAt[1] + 20 }} aria-hidden="true">
-            {SPILL.map((d, i) => <i key={i} style={{ '--dx': `${d.dx}px`, '--dy': `${d.dy}px`, '--d': `${d.d}ms`, '--s': `${d.s}px` }} />)}
-          </span>
-        )}
-
-        {idle && ready && (
-          <button type="button" className="wb-go mono" onClick={onRun}><span className="wb-go-dot" aria-hidden="true" />Press to run</button>
-        )}
-
-        {box && (
-          <div key={cur.id} className={`wb-callout v-${cur.verdict}`} style={{ left: box.left, top: box.top, width: box.w }}>
-            <div className="wb-callout-k mono">
-              <span>Step {cur.id + 1} · {slotByCode(cur.step)?.name}</span>
-              <span className="wb-verdict">{verdictWord(cur.verdict)}</span>
-            </div>
-            <Typed text={cur.summary} />
-            {waiting && cur.kind === 'pause' && !cur.pause.chosen && (
-              <div className="wb-choices">
-                {cur.pause.options.map((o) => <button key={o.id} type="button" className="mono" onClick={() => onChoose(cur.pause.id, o.id)}>{o.label}</button>)}
-              </div>
-            )}
-            <button type="button" className="wb-more mono" onClick={() => onCallout(cur.id)}>Inspect ▸</button>
-          </div>
-        )}
+        </ol>
+        <div className="wb-tb mono" aria-label="Drawing title block">
+          <div><span>DWG</span><b>W-01</b></div>
+          <div className="w"><span>SUBJECT</span><b>NORTHWIND · DATA AGENT</b></div>
+          <div><span>STATE</span><b className="st">{stateLabel}</b></div>
+          <div><span>REV</span><b>A</b></div>
+        </div>
       </div>
     </div>
   );

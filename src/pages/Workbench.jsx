@@ -5,15 +5,14 @@ import Footer from '../components/Footer';
 import BookCall from '../components/BookCall';
 import Sheet from '../components/workbench/Sheet';
 import Tray from '../components/workbench/Tray';
-import SafetyStrip from '../components/workbench/SafetyStrip';
 import Inspector from '../components/workbench/Inspector';
 import AnswerCard from '../components/workbench/AnswerCard';
 import LiveAsk from '../components/workbench/LiveAsk';
 import useLiveRun from '../components/workbench/useLiveRun';
 import usePlayback from '../components/workbench/usePlayback';
-import Challenges from '../components/workbench/Challenges';
-import ResultBanner from '../components/workbench/ResultBanner';
-import { challengeById } from '../lib/workbench/challenges';
+import Narration from '../components/workbench/Narration';
+import Bin from '../components/workbench/Bin';
+import { CHALLENGES, challengeById } from '../lib/workbench/challenges';
 import { verdictOf } from '../lib/workbench/verdict';
 import { run, SCENARIOS } from '../lib/workbench/engine';
 import { DEFAULT_BUILD, decodeBuild, encodeBuild, fit, remove, hasPart } from '../lib/workbench/build';
@@ -86,7 +85,6 @@ export default function Workbench() {
 
   const [challengeId, setChallengeId] = useState(null);
   const challenge = challengeById(challengeId);
-  const sheetRef = useRef(null);
   const verdict = useMemo(() => (pb.done || pb.waiting ? verdictOf(pb.revealed) : null), [pb.done, pb.waiting, pb.revealed]);
   const fix = challenge && !hasPart(build, challenge.fix) ? { code: challenge.fix, label: challenge.fixLabel } : null;
 
@@ -132,7 +130,25 @@ export default function Workbench() {
     return undefined;
   }
 
-  const showSheet = () => sheetRef.current?.scrollIntoView({ behavior: STATIC ? 'auto' : 'smooth', block: 'center' });
+  const heroRef = useRef(null);
+  const narRef = useRef(null);
+  const [leftPad, setLeftPad] = useState(0);
+  // the drawing sits to the right of the narration column on wide screens
+  useEffect(() => {
+    const measure = () => {
+      const h = heroRef.current, n = narRef.current;
+      if (!h || !n) return;
+      const wide = window.innerWidth > 1000;
+      setLeftPad(wide ? Math.round(n.getBoundingClientRect().right - h.getBoundingClientRect().left) : 0);
+    };
+    measure();
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
+    ro?.observe(heroRef.current);
+    window.addEventListener('resize', measure);
+    return () => { ro?.disconnect(); window.removeEventListener('resize', measure); };
+  }, []);
+
+  const showSheet = () => heroRef.current?.scrollIntoView({ behavior: STATIC ? 'auto' : 'smooth', block: 'start' });
 
   // One tap: set up the broken machine and run it.
   function pickChallenge(c) {
@@ -168,98 +184,102 @@ export default function Workbench() {
     setStatus(`Running: “${scenario.question}”`);
   }
 
+  function backToStart() {
+    setRunCfg(null); setLive(null); setChoices({});
+    setStatus('');
+  }
+
   const openAt = (id) => setInsp((s) => ({ ...s, open: true, tab: 'step', focusId: id }));
   const closeInsp = useCallback(() => setInsp((s) => ({ ...s, open: false })), []);
 
-  const header = (
-    <>
-      <span>SHEET W-01 · NORTHWIND LOGISTICS · DATA ANALYSIS AGENT</span>
-      <label className="wb-scn">
-        <span>Scenario</span>
-        <select value={scenarioId} onChange={(e) => { setChallengeId(null); setBuildAndScenario(build, e.target.value); }}>
-          {SCENARIOS.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
-        </select>
-      </label>
-    </>
-  );
+  const mode = runId == null ? 'idle' : pb.done ? 'done' : 'run';
+  const stepNo = pb.revealed.filter((e) => e.kind !== 'answer').length;
+  const stateLabel = mode === 'idle' ? 'IDLE · READY'
+    : mode === 'run' ? (pb.waiting ? 'WAITING ON YOU' : `RUNNING · STEP ${String(stepNo).padStart(2, '0')}`)
+      : verdict?.tone === 'bad' ? 'UNSAFE' : 'SAFE';
+  const lift = mode === 'done' && verdict?.tone === 'bad' && fix && fix.code.startsWith('G-') ? fix.code : null;
 
   return (
     <div className={`asm wb${STATIC ? ' asm-static' : ''}`}>
       <Nav />
       <main className="wb-main">
-        <header className="wb-head">
-          <div className="titleblock mono">
-            <div><span>SHEET</span><b>W-01</b></div>
-            <div className="tb-label"><span>SUBJECT</span><b>Workbench · data analysis agent</b></div>
-            <div><span>REV</span><b>A</b></div>
-          </div>
-          <h1>Build an agent. <span className="amb">Then try to break it.</span></h1>
-          <p className="lede">
-            This is a data analysis agent for a made-up company. Pick a way to break it, watch what goes wrong, then fix it with one tap.
-          </p>
-        </header>
-
-        <Challenges active={runId != null && !pb.done && !pb.waiting ? challengeId : null} onPick={pickChallenge} />
-
-        <div ref={sheetRef}>
-        <Sheet
-          build={build}
-          idle={runId == null}
-          onRun={startRun}
-          revealed={pb.revealed}
-          current={pb.current}
-          running={runId != null}
-          waiting={pb.waiting}
-          selected={selected}
-          onSlot={onSlot}
-          onCallout={openAt}
-          onChoose={(id, opt) => {
-            if (liveOn) {
-              const label = pb.current?.pause?.options.find((o) => o.id === opt)?.label || opt;
-              liveRun.ask({ build, question: live.question, clarify: label });
-            } else setChoices((c) => ({ ...c, [id]: opt }));
-          }}
-          header={header}
-        />
-        <SafetyStrip build={build} selected={selected} onSelect={setSelected} onDrop={onDrop} onToggle={toggleSafety} />
-        </div>
-
-        <ResultBanner
-          verdict={verdict}
-          fix={fix}
-          onFix={fixIt}
-          onDetails={() => setInsp((s) => ({ ...s, open: true, tab: 'step', showAll: true }))}
-        />
-
-        <div className="wb-ctl">
-          <p className="wb-q"><span className="mono">Q ·</span> “{scenario.question}” <span className="wb-who">— J. Ortiz, EMEA operations</span></p>
-          <div className="wb-ctl-r">
-            <button type="button" className="lnk wb-reset" onClick={() => { setBuild(DEFAULT_BUILD); setStatus('Build reset.'); }}>Reset build</button>
-            <button type="button" className="lnk" onClick={() => setInsp((s) => ({ ...s, open: !s.open }))}>{insp.open ? 'Close' : 'Open'} inspector</button>
-            <button type="button" className="btn wb-run" onClick={startRun} disabled={pb.playing && !pb.waiting}>
-              {pb.playing && !pb.waiting ? 'Running…' : runId != null ? '▶ Run again' : '▶ Run'}
-            </button>
-          </div>
-        </div>
-        <p className="wb-status mono" role="status" aria-live="polite">{pb.current ? `${pb.current.id + 1}. ${pb.current.summary}` : status}</p>
-
-        {answer && <AnswerCard answer={answer} />}
-
-        <Tray build={build} selected={selected} onSelect={setSelected} onDrop={onDrop} />
-
-        {(pb.done || askedLive || liveOn) && (
-          <LiveAsk
+        <section className={`wb-hero is-${mode}${verdict ? ` is-${verdict.tone}` : ''}`} ref={heroRef} aria-label="Workbench">
+          <Sheet
             build={build}
-            live={{ ...liveRun, ask: (a) => { setAskedLive(true); setStatus(''); return liveRun.ask(a); } }}
-            onScripted={startRun}
+            revealed={pb.revealed}
+            current={pb.current}
+            running={runId != null}
+            selected={selected}
+            onSlot={onSlot}
+            onMarker={openAt}
+            leftPad={leftPad}
+            stateLabel={stateLabel}
           />
-        )}
-
-        <section className="wb-close">
-          <div className="wb-kick mono">NEXT</div>
-          <h2>We build agents like this for real, on your data, with the guardrails your teams need.</h2>
-          <BookCall className="btn">Book a 30-minute discovery call <span>→</span></BookCall>
+          <div className="wb-col" ref={narRef}>
+            <Narration
+              mode={mode}
+              title={scenario.title}
+              challenges={CHALLENGES}
+              challengeId={challengeId}
+              onPick={pickChallenge}
+              onRunAsBuilt={startRun}
+              scenarios={SCENARIOS}
+              scenarioId={scenarioId}
+              onScenario={(id) => { setChallengeId(null); setBuildAndScenario(build, id); }}
+              events={pb.revealed}
+              current={pb.current}
+              waiting={pb.waiting}
+              onChoose={(id, opt) => {
+                if (liveOn) {
+                  const label = pb.current?.pause?.options.find((o) => o.id === opt)?.label || opt;
+                  liveRun.ask({ build, question: live.question, clarify: label });
+                } else setChoices((c) => ({ ...c, [id]: opt }));
+              }}
+              verdict={verdict}
+              fix={fix}
+              onFix={fixIt}
+              onDetails={() => setInsp((s) => ({ ...s, open: true, tab: 'step', showAll: true }))}
+              onBack={backToStart}
+            />
+          </div>
+          <Bin build={build} selected={selected} onSelect={setSelected} onDrop={onDrop} onToggle={toggleSafety} lift={lift} frameRef={heroRef} />
         </section>
+        <p className="wb-sr" role="status" aria-live="polite">{pb.current ? `${pb.current.id + 1}. ${pb.current.summary}` : status}</p>
+
+        <div className="wb-below">
+          {answer && (
+            <section className="wb-sec" aria-label="Answer readout">
+              <div className="wb-k mono"><i aria-hidden="true" />FIG. W-02 · READOUT · WHAT J. ORTIZ RECEIVED</div>
+              <AnswerCard answer={answer} />
+            </section>
+          )}
+
+          <section className="wb-sec">
+            <div className="wb-k mono"><i aria-hidden="true" />FIG. W-03 · SWAP THE MAIN PARTS</div>
+            <Tray build={build} selected={selected} onSelect={setSelected} onDrop={onDrop} />
+            <div className="wb-tools">
+              <button type="button" className="lnk" onClick={() => { setBuild(DEFAULT_BUILD); setStatus('Build reset.'); }}>Reset the machine</button>
+              <button type="button" className="lnk" onClick={() => setInsp((s) => ({ ...s, open: !s.open }))}>{insp.open ? 'Close' : 'Open'} the inspector</button>
+            </div>
+          </section>
+
+          {(pb.done || askedLive || liveOn) && (
+            <section className="wb-sec">
+              <div className="wb-k mono"><i aria-hidden="true" />FIG. W-04 · ASK YOUR OWN QUESTION</div>
+              <LiveAsk
+                build={build}
+                live={{ ...liveRun, ask: (a) => { setAskedLive(true); setStatus(''); showSheet(); return liveRun.ask(a); } }}
+                onScripted={startRun}
+              />
+            </section>
+          )}
+
+          <section className="wb-close">
+            <div className="wb-k mono"><i aria-hidden="true" />NEXT</div>
+            <h2>We build agents like this for real, on your data, with the guardrails your teams need.</h2>
+            <BookCall className="btn">Book a 30-minute discovery call <span>→</span></BookCall>
+          </section>
+        </div>
       </main>
 
       {menu && (
