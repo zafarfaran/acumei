@@ -3,7 +3,8 @@ import { createRenderer } from '../../lib/assembly/renderer';
 import { buildMachine, setActive, GROUPS } from '../../lib/workbench/machineModel';
 import { MODULES, BRANCHES, partByCode, slotByCode } from '../../lib/workbench/parts';
 import { onFrame, invalidate, STATIC } from '../../lib/motion';
-import { clamp, sm, lerp } from '../../lib/assembly/math';
+import { clamp, sm, lerp, hash } from '../../lib/assembly/math';
+import { verdictWord } from '../../lib/workbench/words';
 
 const ALL = [...MODULES, ...BRANCHES];
 const RED = new Set(['blocked', 'leaked', 'flagged']);
@@ -35,20 +36,51 @@ function fitView(parts, yaw, cw, ch, mobile) {
 
 const lerp3 = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
 
-export default function Sheet({ build, revealed, current, running, waiting, selected, onSlot, onCallout, onChoose, header }) {
+// Types the callout out in about half a second. The full text is always in the DOM for screen readers.
+function Typed({ text }) {
+  const [n, setN] = useState(STATIC ? text.length : 0);
+  useEffect(() => {
+    if (STATIC) return undefined;
+    setN(0);
+    let i = 0;
+    const per = Math.max(2, Math.ceil(text.length / 14)); // finishes in about half a second
+    const id = setInterval(() => { i += per; setN(Math.min(text.length, i)); if (i >= text.length) clearInterval(id); }, 32);
+    return () => clearInterval(id);
+  }, [text]);
+  return (
+    <p>
+      <span className="wb-sr">{text}</span>
+      <span aria-hidden="true">{text.slice(0, n)}{n < text.length && <i className="wb-caret" />}</span>
+    </p>
+  );
+}
+
+// Red dots spilling out of a module that leaked data.
+const SPILL = Array.from({ length: 18 }, (_, i) => ({
+  dx: (hash(i) - 0.5) * 140, dy: 40 + hash(i + 40) * 90, d: Math.round(hash(i + 80) * 260), s: 3 + Math.round(hash(i + 120) * 3),
+}));
+
+export default function Sheet({ build, revealed, current, running, waiting, selected, onSlot, onCallout, onChoose, onRun, idle, header }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
-  const live = useRef({ m: null, R: null, anim: {}, tok: { from: null, to: null, t0: 0 }, t: 0, view: null, cw: 0, ch: 0, mobile: false, snap: false, running: false });
+  const live = useRef({ m: null, R: null, anim: {}, intro: false, tok: { from: null, to: null, t0: 0 }, t: 0, view: null, cw: 0, ch: 0, mobile: false, snap: false, running: false });
   const [snap, setSnap] = useState({ a: {}, cw: 0, ch: 0, mobile: false });
+  const [flashes, setFlashes] = useState([]); // rings where a part just landed
+  const [shake, setShake] = useState(0);
+  const [ready, setReady] = useState(STATIC); // labels fade in once the machine has assembled
 
   // (re)build the machine when the build changes; new parts drop in
   useEffect(() => {
     const L = live.current;
     const prev = L.m;
     const m = buildMachine(build);
-    for (const [slot, p] of Object.entries(m.fitted)) if (!prev || prev.fitted[slot]?.code !== p.code) L.anim[slot] = prev ? L.t : -10;
-    for (const slot of Object.keys(L.anim)) if (!m.fitted[slot]) delete L.anim[slot];
-    if (prev) m.token.pos = [...prev.token.pos];
+    if (prev) {
+      // a part that is new or swapped drops in, and a ring flashes where it lands
+      const landed = [];
+      for (const [slot, p] of Object.entries(m.fitted)) if (prev.fitted[slot]?.code !== p.code) { L.anim[p.g] = L.t; landed.push(slot); }
+      if (landed.length) setFlashes((f) => [...f, ...landed.map((slot) => ({ slot, key: `${slot}-${Date.now()}` }))]);
+      m.token.pos = [...prev.token.pos];
+    }
     L.m = m;
     L.R = createRenderer(canvasRef.current, m.model);
     layout();
@@ -65,6 +97,7 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
     const to = step && L.m.slotPos[step];
     if (!running) { L.tok = { from: null, to: null, t0: 0 }; L.m.token.pos = [...L.m.slotPos['D-01']]; }
     else if (to) L.tok = { from: L.tok.to ? [...L.m.token.pos] : [to[0], to[1], to[2] + 2], to, t0: L.t };
+    if (running && RED.has(current?.verdict) && !STATIC) setShake((n) => n + 1);
     invalidate();
   }, [current, running]);
 
@@ -97,21 +130,36 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
         p[2] += STATIC ? 0 : Math.sin(t * 2.2) * 0.06;
         m.token.pos = p;
       }
-      const q = new Array(GROUPS).fill(1);
-      for (const [slot, t0] of Object.entries(L.anim)) { const p = m.fitted[slot]; if (p) q[p.g] = STATIC ? 1 : clamp((t - t0) / 0.75); }
+      // q[g] seats each renderer group: 0 = exploded ghost, 1 = in place.
+      const q = new Array(GROUPS).fill(STATIC || L.intro ? 1 : 0);
+      for (const [g, t0] of Object.entries(L.anim)) q[g] = STATIC ? 1 : clamp((t - t0) / 0.8);
       R.draw({
-        d: 0, g1: 0, g2: 1, q, F: 1, W: 1, Rk: 0, mx: 0, mk: 0, pulse: 0, mAlpha: 1, G: 0,
+        d: 0, g1: 1, g2: 1, q, F: 1, W: 1, Rk: 0, mx: 0, mk: 0, pulse: 0, mAlpha: 1, G: 0,
         dimA: 0, dimProg: 0, hl: [0, 0, 0, 0, 0, 0, 0, 0], filter: (p) => L.running || !p.tokenPart,
         cables: [], labels: false, mobile: L.mobile, static: STATIC,
       }, view, t);
       if (L.snap) { L.snap = false; setSnap({ a: { ...R.anchors }, cw: L.cw, ch: L.ch, mobile: L.mobile }); }
     };
     const off = onFrame(frame);
+    // First time the sheet is on screen: the rail rises, then the modules drop
+    // in one by one, then the branches. Group numbers come from machineModel.
+    const io = typeof IntersectionObserver === 'function' && !STATIC ? new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting || L.intro) return;
+      L.intro = true;
+      const t = L.t;
+      L.anim[10] = t;
+      for (let i = 0; i < 6; i++) L.anim[11 + i] = t + 0.35 + i * 0.09;
+      for (let j = 0; j < 4; j++) L.anim[20 + j] = t + 0.95 + j * 0.07;
+      L.anim[26] = t + 1.2;
+      setTimeout(() => setReady(true), 1250);
+      io.disconnect();
+    }, { threshold: 0.35 }) : null;
+    if (io) io.observe(wrapRef.current); else { L.intro = true; setReady(true); }
     const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(layout) : null;
     ro?.observe(wrapRef.current);
     window.addEventListener('resize', layout);
     document.fonts?.ready.then(layout);
-    return () => { off(); ro?.disconnect(); window.removeEventListener('resize', layout); };
+    return () => { off(); io?.disconnect(); ro?.disconnect(); window.removeEventListener('resize', layout); };
   }, []);
 
   const a = snap.a;
@@ -124,6 +172,13 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
     const n = (stack[e.step] = (stack[e.step] || 0) + 1) - 1;
     return { e, n };
   });
+  // trail segments between consecutive stops
+  const stops = callouts.map(({ e }) => e);
+  const trail = [];
+  for (let i = 1; i < stops.length; i++) {
+    const pa = at(`slot:${stops[i - 1].step}`), pb = at(`slot:${stops[i].step}`);
+    if (pa && pb && stops[i - 1].step !== stops[i].step) trail.push({ key: stops[i].id, a: pa, b: pb, red: RED.has(stops[i].verdict) });
+  }
   const cur = current && current.kind !== 'answer' && current.step ? current : null;
   const curAt = cur && at(`slot:${cur.step}`);
   let box = null;
@@ -138,9 +193,9 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
   return (
     <div className="wb-sheet">
       <div className="wb-sheet-hd mono">{header}</div>
-      <div className="wb-stage" ref={wrapRef}>
+      <div className={`wb-stage${shake ? ` is-shake-${shake % 2}` : ''}`} ref={wrapRef}>
         <canvas ref={canvasRef} aria-hidden="true" />
-        <svg className="wb-ov" width={snap.cw} height={snap.ch} aria-hidden="true">
+        <svg className={`wb-ov${ready ? ' is-ready' : ''}`} width={snap.cw} height={snap.ch} aria-hidden="true">
           {/* dashed outlines where a branch could go */}
           {BRANCHES.map((code) => {
             if (build.branches.includes(code) || !at(`sock:${code}:0`)) return null;
@@ -176,6 +231,13 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
               </g>
             );
           })}
+          {/* the path the request has travelled, drawn in as it goes */}
+          {trail.map((t) => (
+            <g key={t.key} className={`wb-trail${t.red ? ' is-red' : ''}`}>
+              <line className="glow" x1={t.a[0]} y1={t.a[1]} x2={t.b[0]} y2={t.b[1]} pathLength="1" />
+              <line x1={t.a[0]} y1={t.a[1]} x2={t.b[0]} y2={t.b[1]} pathLength="1" />
+            </g>
+          ))}
           {/* current step: leader to the callout box */}
           {box && curAt && (
             <path className={`wb-lead${RED.has(cur.verdict) ? ' is-red' : ''}`} d={`M${curAt[0]} ${curAt[1]} L${box.left < curAt[0] ? box.left + box.w : box.left} ${box.top + 16}`} />
@@ -215,13 +277,31 @@ export default function Sheet({ build, revealed, current, running, waiting, sele
           );
         })}
 
+        {flashes.map((f) => {
+          const p = at(`slot:${f.slot}`); if (!p) return null;
+          return <span key={f.key} className="wb-ring" style={{ left: p[0], top: p[1] + 30 }} onAnimationEnd={() => setFlashes((all) => all.filter((x) => x.key !== f.key))} aria-hidden="true" />;
+        })}
+
+        {cur && curAt && RED.has(cur.verdict) && !STATIC && (
+          <span key={`rip-${cur.id}`} className="wb-ripple" style={{ left: curAt[0], top: curAt[1] + 30 }} aria-hidden="true" />
+        )}
+        {cur && curAt && cur.verdict === 'leaked' && !STATIC && (
+          <span key={`spill-${cur.id}`} className="wb-spill" style={{ left: curAt[0], top: curAt[1] + 20 }} aria-hidden="true">
+            {SPILL.map((d, i) => <i key={i} style={{ '--dx': `${d.dx}px`, '--dy': `${d.dy}px`, '--d': `${d.d}ms`, '--s': `${d.s}px` }} />)}
+          </span>
+        )}
+
+        {idle && ready && (
+          <button type="button" className="wb-go mono" onClick={onRun}><span className="wb-go-dot" aria-hidden="true" />Press to run</button>
+        )}
+
         {box && (
-          <div className={`wb-callout v-${cur.verdict}`} style={{ left: box.left, top: box.top, width: box.w }}>
+          <div key={cur.id} className={`wb-callout v-${cur.verdict}`} style={{ left: box.left, top: box.top, width: box.w }}>
             <div className="wb-callout-k mono">
-              <span>{String(cur.id + 1).padStart(2, '0')} · {cur.step} {slotByCode(cur.step)?.name}</span>
-              <span className="wb-verdict">{cur.verdict}</span>
+              <span>Step {cur.id + 1} · {slotByCode(cur.step)?.name}</span>
+              <span className="wb-verdict">{verdictWord(cur.verdict)}</span>
             </div>
-            <p>{cur.summary}</p>
+            <Typed text={cur.summary} />
             {waiting && cur.kind === 'pause' && !cur.pause.chosen && (
               <div className="wb-choices">
                 {cur.pause.options.map((o) => <button key={o.id} type="button" className="mono" onClick={() => onChoose(cur.pause.id, o.id)}>{o.label}</button>)}

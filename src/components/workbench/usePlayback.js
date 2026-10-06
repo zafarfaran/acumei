@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { STATIC } from '../../lib/motion';
 
-const STEP_MS = 1100;
+const STEP_MS = 1500;
 
 /**
  * Reveals a run's events one at a time. `index` is the last revealed event

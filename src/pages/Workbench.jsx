@@ -5,11 +5,16 @@ import Footer from '../components/Footer';
 import BookCall from '../components/BookCall';
 import Sheet from '../components/workbench/Sheet';
 import Tray from '../components/workbench/Tray';
+import SafetyStrip from '../components/workbench/SafetyStrip';
 import Inspector from '../components/workbench/Inspector';
 import AnswerCard from '../components/workbench/AnswerCard';
 import LiveAsk from '../components/workbench/LiveAsk';
 import useLiveRun from '../components/workbench/useLiveRun';
 import usePlayback from '../components/workbench/usePlayback';
+import Challenges from '../components/workbench/Challenges';
+import ResultBanner from '../components/workbench/ResultBanner';
+import { challengeById } from '../lib/workbench/challenges';
+import { verdictOf } from '../lib/workbench/verdict';
 import { run, SCENARIOS } from '../lib/workbench/engine';
 import { DEFAULT_BUILD, decodeBuild, encodeBuild, fit, remove, hasPart } from '../lib/workbench/build';
 import { partByCode, partsForSlot, slotByCode } from '../lib/workbench/parts';
@@ -79,6 +84,12 @@ export default function Workbench() {
   const liveRun = useLiveRun(useCallback((next) => setLive({ ...next, code: encodeBuild(next.build || build) }), [build]));
   const [askedLive, setAskedLive] = useState(false);
 
+  const [challengeId, setChallengeId] = useState(null);
+  const challenge = challengeById(challengeId);
+  const sheetRef = useRef(null);
+  const verdict = useMemo(() => (pb.done || pb.waiting ? verdictOf(pb.revealed) : null), [pb.done, pb.waiting, pb.revealed]);
+  const fix = challenge && !hasPart(build, challenge.fix) ? { code: challenge.fix, label: challenge.fixLabel } : null;
+
   const [selected, setSelected] = useState(null);
   const [menu, setMenu] = useState(null);
   const [status, setStatus] = useState('');
@@ -121,6 +132,34 @@ export default function Workbench() {
     return undefined;
   }
 
+  const showSheet = () => sheetRef.current?.scrollIntoView({ behavior: STATIC ? 'auto' : 'smooth', block: 'center' });
+
+  // One tap: set up the broken machine and run it.
+  function pickChallenge(c) {
+    setLive(null); setChoices({}); setSelected(null); setMenu(null);
+    setChallengeId(c.id);
+    setBuildAndScenario(c.build, c.scenario);
+    setRunCfg({ id: Date.now(), code: encodeBuild(c.build), scenarioId: c.scenario });
+    setStatus(`Running: “${SCENARIOS.find((x) => x.id === c.scenario).question}”`);
+    showSheet();
+  }
+
+  // Fit the part that fixes it, let it land, then run again.
+  function fixIt() {
+    const next = fit(build, challenge.fix);
+    setBuild(next);
+    setRunCfg(null); setChoices({});
+    setStatus(`${partByCode(challenge.fix).name} fitted. Running again…`);
+    showSheet();
+    setTimeout(() => setRunCfg({ id: Date.now(), code: encodeBuild(next), scenarioId }), STATIC ? 0 : 1100);
+  }
+
+  function toggleSafety(c) {
+    const on = build.branches.includes(c);
+    setBuild(on ? remove(build, c) : fit(build, c));
+    setStatus(`${slotByCode(c).name} ${on ? 'removed' : 'fitted'}. Press run to see the difference.`);
+  }
+
   function startRun() {
     setLive(null);
     setChoices({});
@@ -137,7 +176,7 @@ export default function Workbench() {
       <span>SHEET W-01 · NORTHWIND LOGISTICS · DATA ANALYSIS AGENT</span>
       <label className="wb-scn">
         <span>Scenario</span>
-        <select value={scenarioId} onChange={(e) => setBuildAndScenario(build, e.target.value)}>
+        <select value={scenarioId} onChange={(e) => { setChallengeId(null); setBuildAndScenario(build, e.target.value); }}>
           {SCENARIOS.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
         </select>
       </label>
@@ -156,13 +195,17 @@ export default function Workbench() {
           </div>
           <h1>Build an agent. <span className="amb">Then try to break it.</span></h1>
           <p className="lede">
-            Assemble a data analysis agent for Northwind Logistics, a made-up company with a made-up warehouse.
-            Run it, open up every step, then take a guardrail out and watch what changes.
+            This is a data analysis agent for a made-up company. Pick a way to break it, watch what goes wrong, then fix it with one tap.
           </p>
         </header>
 
+        <Challenges active={runId != null && !pb.done && !pb.waiting ? challengeId : null} onPick={pickChallenge} />
+
+        <div ref={sheetRef}>
         <Sheet
           build={build}
+          idle={runId == null}
+          onRun={startRun}
           revealed={pb.revealed}
           current={pb.current}
           running={runId != null}
@@ -177,6 +220,15 @@ export default function Workbench() {
             } else setChoices((c) => ({ ...c, [id]: opt }));
           }}
           header={header}
+        />
+        <SafetyStrip build={build} selected={selected} onSelect={setSelected} onDrop={onDrop} onToggle={toggleSafety} />
+        </div>
+
+        <ResultBanner
+          verdict={verdict}
+          fix={fix}
+          onFix={fixIt}
+          onDetails={() => setInsp((s) => ({ ...s, open: true, tab: 'step', showAll: true }))}
         />
 
         <div className="wb-ctl">

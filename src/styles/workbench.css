@@ -26,7 +26,7 @@
 }
 .wb-scn select:focus-visible { outline: 1px solid var(--amber); outline-offset: 2px; }
 
-.wb-stage { position: relative; height: clamp(440px, 66vh, 680px); border: 1px solid var(--line); overflow: hidden; }
+.wb-stage { position: relative; height: clamp(420px, 58vh, 640px); border: 1px solid var(--line); overflow: hidden; }
 .wb-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .wb-ov { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
 
@@ -67,7 +67,7 @@
 
 /* the current step's callout */
 .wb-callout {
-  position: absolute; background: rgba(10, 10, 11, 0.94); border: 1px solid var(--amber); padding: 11px 13px 10px;
+  position: absolute; background: var(--bg); border: 1px solid var(--amber); padding: 11px 13px 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
   animation: wb-in 0.35s var(--ease) both;
 }
 .wb-callout.v-blocked, .wb-callout.v-leaked, .wb-callout.v-flagged { border-color: var(--red); }
@@ -119,10 +119,7 @@
   background-image: radial-gradient(rgba(241, 237, 228, 0.9) 0.8px, transparent 0.9px); background-size: 3px 3px;
 }
 .wb-chip.is-sel .wb-cube, .wb-ghost .wb-cube { border-color: var(--amber); background-image: radial-gradient(rgba(232, 160, 75, 0.95) 0.8px, transparent 0.9px); }
-.wb-ghost {
-  position: fixed; z-index: 60; pointer-events: none; transform: translate(-50%, -130%);
-  display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--bg); border: 1px solid var(--amber); color: var(--amber); font-size: 11px;
-}
+
 
 /* ------------------------------------------------------------ slot popover */
 .wb-pop {
@@ -252,4 +249,246 @@
   .wb-callout, .wb-answer { animation: none; }
   .wb-sock.is-target line, .wb-slot.is-target { animation: none; }
   .wb-insp { transition: none; }
+}
+
+/* ============================================================ motion
+   Rare, explanatory motion: it shows where the request is and what went
+   wrong. Curves come from --ease (theme.css). Reduced motion keeps fades only. */
+
+.wb-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* labels and sockets fade in once the machine has assembled */
+.wb-ov { opacity: 0; transition: opacity 0.5s var(--ease); }
+.wb-ov.is-ready { opacity: 1; }
+
+/* the travelled path: an amber "power line" drawn in behind the request */
+.wb-trail line { fill: none; stroke: var(--amber); stroke-width: 1.4; stroke-dasharray: 1; stroke-dashoffset: 1; animation: wb-draw 0.6s var(--ease) forwards; }
+.wb-trail .glow { stroke-width: 7; opacity: 0.16; }
+.wb-trail.is-red line { stroke: var(--red); }
+@keyframes wb-draw { to { stroke-dashoffset: 0; } }
+
+/* step markers pop in */
+.wb-num { animation: wb-pop 0.32s var(--ease) both; }
+@keyframes wb-pop { from { opacity: 0; transform: translateY(6px) scale(0.85); } }
+
+/* typing caret */
+.wb-caret { display: inline-block; width: 7px; height: 1em; margin-left: 2px; vertical-align: -2px; background: var(--amber); animation: wb-blink 0.9s steps(1) infinite; }
+@keyframes wb-blink { 50% { opacity: 0; } }
+
+/* a part lands: an amber ring flashes on the rail */
+.wb-ring {
+  position: absolute; width: 90px; height: 46px; margin: -23px 0 0 -45px; border: 1.5px solid var(--amber); border-radius: 50%;
+  pointer-events: none; opacity: 0; animation: wb-ring 0.7s var(--ease) 0.38s forwards;
+}
+@keyframes wb-ring { 0% { opacity: 1; transform: scale(0.5); } 100% { opacity: 0; transform: scale(1.9); } }
+
+/* a guardrail fires or something goes wrong: red ripple and a short shake */
+.wb-ripple {
+  position: absolute; width: 120px; height: 62px; margin: -31px 0 0 -60px; border-radius: 50%; pointer-events: none;
+  border: 1.5px solid var(--red); box-shadow: 0 0 24px rgba(217, 97, 76, 0.35) inset; opacity: 0;
+  animation: wb-ripple 0.9s var(--ease) 0.15s 2;
+}
+@keyframes wb-ripple { 0% { opacity: 0.9; transform: scale(0.4); } 100% { opacity: 0; transform: scale(2.1); } }
+.wb-stage.is-shake-0 canvas, .wb-stage.is-shake-1 canvas { will-change: transform; }
+.wb-stage.is-shake-0 canvas { animation: wb-shake-a 0.42s var(--ease); }
+.wb-stage.is-shake-1 canvas { animation: wb-shake-b 0.42s var(--ease); }
+@keyframes wb-shake-a { 15% { transform: translateX(-5px); } 35% { transform: translateX(4px); } 55% { transform: translateX(-3px); } 75% { transform: translateX(2px); } }
+@keyframes wb-shake-b { 15% { transform: translateX(-5px); } 35% { transform: translateX(4px); } 55% { transform: translateX(-3px); } 75% { transform: translateX(2px); } }
+
+/* leaked data spills out of the module */
+.wb-spill { position: absolute; width: 0; height: 0; pointer-events: none; }
+.wb-spill i {
+  position: absolute; width: var(--s); height: var(--s); background: var(--red); opacity: 0;
+  animation: wb-spill 1.3s cubic-bezier(0.33, 0, 0.67, 1) var(--d) forwards;
+}
+@keyframes wb-spill {
+  0% { opacity: 1; transform: translate(0, 0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+}
+
+/* "Press to run" on the drawing when nothing is happening */
+.wb-go {
+  position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 12px; padding: 14px 22px; cursor: pointer;
+  background: var(--ink); color: #0a0a0b; border: 0; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+  animation: wb-rise 0.5s var(--ease) both; transition: background 0.2s ease;
+}
+.wb-go:focus-visible { outline: 1px solid var(--amber); outline-offset: 3px; }
+.wb-go-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 0 rgba(232, 160, 75, 0.6); animation: wb-beacon 1.6s ease-out infinite; }
+@keyframes wb-beacon { 70% { box-shadow: 0 0 0 10px rgba(232, 160, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(232, 160, 75, 0); } }
+@keyframes wb-rise { from { opacity: 0; transform: translate(-50%, 10px); } }
+@media (hover: hover) and (pointer: fine) {
+  .wb-go:hover { background: var(--amber); }
+}
+.wb-go:active { transform: translateX(-50%) scale(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wb-trail line { animation: none; stroke-dashoffset: 0; }
+  .wb-num, .wb-go { animation: wb-fade 0.2s ease both; }
+  .wb-go-dot, .wb-caret { animation: none; }
+  .wb-ring, .wb-ripple, .wb-spill { display: none; }
+  .wb-stage canvas { animation: none !important; }
+}
+@keyframes wb-fade { from { opacity: 0; } }
+
+/* ============================================================ challenges */
+.wb-chal { margin: 0 0 22px; }
+.wb-chal-k { font-size: 10.5px; letter-spacing: 0.16em; color: var(--amber); text-transform: uppercase; margin-bottom: 12px; display: flex; gap: 10px; align-items: center; }
+.wb-chal-k::before { content: ''; width: 22px; height: 1px; background: var(--amber); }
+.wb-chal-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.wb-card {
+  position: relative; display: flex; flex-direction: column; gap: 8px; text-align: left; cursor: pointer;
+  background: #0d0d0e; border: 1px solid rgba(241, 237, 228, 0.22); color: var(--ink); padding: 16px 16px 14px; font: inherit;
+  animation: wb-card-in 0.5s var(--ease) both; animation-delay: calc(var(--i) * 60ms);
+  transition: border-color 0.2s ease, transform 0.25s var(--ease), background 0.2s ease;
+}
+.wb-card::after { /* dither corner, like the drawings */
+  content: ''; position: absolute; right: 10px; top: 10px; width: 26px; height: 26px; opacity: 0.5;
+  background-image: radial-gradient(rgba(241, 237, 228, 0.9) 0.8px, transparent 0.9px); background-size: 3px 3px;
+  transition: opacity 0.2s ease;
+}
+@keyframes wb-card-in { from { opacity: 0; transform: translateY(10px); } }
+@media (hover: hover) and (pointer: fine) {
+  .wb-card:hover { border-color: var(--amber); transform: translateY(-3px); background: #111012; }
+  .wb-card:hover::after { opacity: 1; background-image: radial-gradient(rgba(232, 160, 75, 0.95) 0.8px, transparent 0.9px); }
+  .wb-card:hover .wb-card-go i { transform: translateX(4px); }
+}
+.wb-card:active { transform: scale(0.98); }
+.wb-card:focus-visible { outline: 1px solid var(--amber); outline-offset: 2px; }
+.wb-card.is-on { border-color: var(--amber); }
+.wb-card-n { font-size: 10px; color: var(--dim); letter-spacing: 0.14em; }
+.wb-card-t { font-size: 19px; font-weight: 500; letter-spacing: -0.025em; line-height: 1.1; padding-right: 30px; }
+.wb-card-b { font-size: 13.5px; color: var(--soft); line-height: 1.4; flex: 1; }
+.wb-card-go { font-size: 10.5px; letter-spacing: 0.16em; color: var(--amber); text-transform: uppercase; margin-top: 4px; }
+.wb-card-go i { display: inline-block; font-style: normal; transition: transform 0.2s var(--ease); }
+.wb-card.is-on .wb-card-go { animation: wb-blink 0.9s steps(1) infinite; }
+
+/* ============================================================ result banner */
+.wb-result {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
+  margin-top: 10px; padding: 16px 18px; border: 1px solid var(--line); background: #0d0d0e;
+  animation: wb-banner 0.45s var(--ease) both;
+}
+@keyframes wb-banner { from { opacity: 0; transform: translateY(-6px); } }
+.wb-result.is-bad { border-color: var(--red); background: rgba(217, 97, 76, 0.07); }
+.wb-result.is-good { border-color: rgba(143, 181, 115, 0.6); background: rgba(143, 181, 115, 0.06); }
+.wb-result.is-wait { border-color: var(--amber); background: rgba(232, 160, 75, 0.06); }
+.wb-result-i { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; font-size: 15px; border: 1px solid currentColor; animation: wb-pop 0.4s var(--ease) 0.1s both; }
+.is-bad .wb-result-i { color: var(--red); }
+.is-good .wb-result-i { color: #8fb573; }
+.is-wait .wb-result-i { color: var(--amber); font-size: 10px; }
+.wb-result-t strong { display: block; font-size: clamp(17px, 1.6vw, 21px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; }
+.wb-result-t span { display: block; margin-top: 4px; color: var(--soft); font-size: 14px; line-height: 1.4; }
+.wb-result-a { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
+.wb-result-a .lnk { background: none; border-left: 0; border-right: 0; border-top: 0; cursor: pointer; white-space: nowrap; }
+.wb-fix { border: 0; cursor: pointer; background: var(--amber); color: #0a0a0b; white-space: nowrap; animation: wb-nudge 2.4s var(--ease) 0.8s infinite; }
+.wb-fix span { opacity: 0.6; margin-left: 6px; }
+@media (hover: hover) and (pointer: fine) { .wb-fix:hover { background: var(--ink); } }
+.wb-fix:active { transform: scale(0.97); }
+@keyframes wb-nudge { 0%, 70%, 100% { box-shadow: 0 0 0 0 rgba(232, 160, 75, 0.5); } 85% { box-shadow: 0 0 0 8px rgba(232, 160, 75, 0); } }
+
+/* ============================================================ safety switches */
+.wb-safety { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+.wb-switch {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; text-align: left; cursor: pointer;
+  background: transparent; border: 1px solid var(--line); color: var(--ink); padding: 12px 14px; font: inherit;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+@media (hover: hover) and (pointer: fine) { .wb-switch:hover { border-color: rgba(241, 237, 228, 0.45); } }
+.wb-switch:focus-visible { outline: 1px solid var(--amber); outline-offset: 2px; }
+.wb-switch.is-on { border-color: rgba(232, 160, 75, 0.7); background: rgba(232, 160, 75, 0.05); }
+.wb-switch .t b { display: block; font-weight: 500; font-size: 15px; }
+.wb-switch .t span { display: block; font-size: 12.5px; color: var(--soft); margin-top: 2px; }
+.wb-switch .c { font-size: 10px; color: var(--dim); }
+.wb-knob { position: relative; width: 36px; height: 20px; border: 1px solid rgba(241, 237, 228, 0.4); border-radius: 20px; transition: border-color 0.2s ease, background 0.2s ease; }
+.wb-knob i { position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--soft); transition: transform 0.22s var(--ease), background 0.2s ease; }
+.is-on .wb-knob { border-color: var(--amber); background: rgba(232, 160, 75, 0.15); }
+.is-on .wb-knob i { transform: translateX(16px); background: var(--amber); }
+
+.wb-adv { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; }
+.wb-adv summary { cursor: pointer; list-style: none; font-size: 10.5px; letter-spacing: 0.14em; color: var(--soft); text-transform: uppercase; display: flex; justify-content: space-between; }
+.wb-adv summary::-webkit-details-marker { display: none; }
+.wb-adv summary span { transition: transform 0.2s var(--ease); }
+.wb-adv[open] summary span { transform: rotate(45deg); }
+.wb-adv-hint { color: var(--dim); font-size: 13px; margin: 10px 0 14px; }
+
+/* ============================================================ answer motion */
+.wb-bar { animation: wb-fade 0.4s var(--ease) both; animation-delay: calc(var(--i) * 45ms + 150ms); }
+.wb-bar i { transform-origin: left center; animation: wb-grow 0.7s var(--ease) both; animation-delay: calc(var(--i) * 45ms + 200ms); }
+.has-neg .wb-bar i.is-neg { transform-origin: right center; }
+@keyframes wb-grow { from { transform: scaleX(0); } }
+
+@media (max-width: 900px) { .wb-chal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) {
+  .wb-result { grid-template-columns: auto 1fr; }
+  .wb-result-a { grid-column: 1 / -1; justify-content: flex-start; }
+  .wb-card-t { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wb-card, .wb-result, .wb-result-i, .wb-bar, .wb-bar i { animation: wb-fade 0.2s ease both; }
+  .wb-fix, .wb-card.is-on .wb-card-go { animation: none; }
+  .wb-knob i, .wb-card { transition: none; }
+}
+
+/* ============================================================ drag and drop */
+.wb-guard {
+  display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 12px; text-align: left;
+  background: #0d0d0e; border: 1px solid var(--line); color: var(--ink); padding: 10px 14px 10px 10px; font: inherit;
+  cursor: grab; touch-action: none; user-select: none;
+  animation: wb-card-in 0.45s var(--ease) both; animation-delay: calc(var(--i) * 50ms);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.25s var(--ease);
+}
+.wb-guard:active { cursor: grabbing; }
+.wb-guard:focus-visible { outline: 1px solid var(--amber); outline-offset: 2px; }
+.wb-guard .wb-isocube { width: 46px; height: 46px; transition: transform 0.35s var(--ease); }
+.wb-guard .t b { display: block; font-weight: 500; font-size: 15px; }
+.wb-guard .t span { display: block; font-size: 12.5px; color: var(--soft); margin-top: 2px; }
+.wb-guard .s { font-size: 9.5px; letter-spacing: 0.14em; color: var(--dim); text-transform: uppercase; white-space: nowrap; }
+.wb-guard.is-on { border-color: rgba(232, 160, 75, 0.7); background: rgba(232, 160, 75, 0.05); }
+.wb-guard.is-on .s { color: var(--amber); }
+.wb-guard.is-sel { border-color: var(--amber); opacity: 0.45; }
+@media (hover: hover) and (pointer: fine) {
+  .wb-guard:hover { border-color: rgba(241, 237, 228, 0.5); transform: translateY(-2px); }
+  .wb-guard:hover .wb-isocube { transform: translateY(-3px) rotate(-4deg); }
+}
+.wb-swap { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 16px; }
+.wb-chip { cursor: grab; }
+.wb-chip:active { cursor: grabbing; }
+
+/* the part in your hand: tilts as you move, snaps to the socket when close */
+.wb-ghost {
+  position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.6));
+  transition: transform 0.06s linear;
+}
+.wb-ghost .wb-isocube { width: 64px; height: 64px; animation: wb-lift 0.25s var(--ease) both; }
+.wb-ghost span { padding: 4px 8px; background: var(--bg); border: 1px solid var(--amber); color: var(--amber); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+.wb-ghost.is-snap { transition: transform 0.18s var(--ease); }
+.wb-ghost.is-snap span { background: var(--amber); color: #0a0a0b; }
+.wb-ghost.is-snap .wb-isocube { animation: wb-hover 0.9s ease-in-out infinite; }
+@keyframes wb-lift { from { transform: scale(0.8); opacity: 0.4; } }
+@keyframes wb-hover { 50% { transform: translateY(-5px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .wb-guard { animation: wb-fade 0.2s ease both; transition: none; }
+  .wb-ghost, .wb-ghost.is-snap { transition: none; }
+  .wb-ghost .wb-isocube { animation: none; }
+}
+
+/* guardrail strip, docked under the drawing inside the same frame */
+.wb-strip { border: 1px solid rgba(241, 237, 228, 0.28); border-top: 0; padding: 10px 7px 7px; background: var(--bg); }
+.wb-strip-k { font-size: 10px; letter-spacing: 0.14em; color: var(--amber); text-transform: uppercase; margin: 0 4px 8px; }
+.wb-strip-k span { color: var(--dim); }
+.wb-strip-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.wb-strip .wb-guard { grid-template-columns: 38px 1fr auto; gap: 9px; padding: 7px 10px 7px 7px; }
+.wb-strip .wb-guard .wb-isocube { width: 38px; height: 38px; }
+.wb-strip .wb-guard .t b { font-size: 14px; }
+.wb-strip .wb-guard .t span { font-size: 11.5px; }
+@media (max-width: 1100px) { .wb-strip-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 720px) {
+  .wb-strip-row { grid-template-columns: 1fr 1fr; }
+  .wb-strip-k span { display: none; }
+  .wb-strip .wb-guard .s { display: none; }
 }

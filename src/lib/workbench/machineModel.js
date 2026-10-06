@@ -40,7 +40,7 @@ export function buildMachine(build) {
   // rail: one segment per module
   MODULES.forEach((_, i) => add(box({
     g: G.rail, pos: [modX(i) + 0.325, (RAIL.y0 + RAIL.y1) / 2, (RAIL.z0 + RAIL.z1) / 2],
-    size: [PITCH, RAIL.y1 - RAIL.y0, RAIL.z1 - RAIL.z0], rail: true, dens: 0.4, kb: FLOOR,
+    size: [PITCH, RAIL.y1 - RAIL.y0, RAIL.z1 - RAIL.z0], rail: true, dens: 0.4, kb: FLOOR, ex: [0, 0, -1.4], delay: i * 0.14,
   })));
 
   // modules
@@ -57,8 +57,8 @@ export function buildMachine(build) {
   Object.entries(BRANCH_AT).forEach(([code, i], j) => {
     const x = modX(i) + 0.325;
     // neck from the rail's back edge (y −0.7) to the pad's front edge (y −1.9)
-    add(box({ g: G.rail, pos: [x, -1.3, -0.25], size: [0.5, 1.2, 0.2], neck: true, dens: 0.4, kb: FLOOR }));
-    add(box({ g: G.rail, pos: [x, PAD_Y, -0.25], size: [1.3, 1.1, 0.2], pad: true, dens: 0.4, kb: FLOOR }));
+    add(box({ g: G.rail, pos: [x, -1.3, -0.25], size: [0.5, 1.2, 0.2], neck: true, dens: 0.4, kb: FLOOR, ex: [0, -1.2, 0], delay: 0.9 }));
+    add(box({ g: G.rail, pos: [x, PAD_Y, -0.25], size: [1.3, 1.1, 0.2], pad: true, dens: 0.4, kb: FLOOR, ex: [0, -1.8, 0], delay: 0.95 }));
     const size = [0.9, 0.9, 0.6], c = [x, PAD_Y, -0.15 + 0.3];
     if (build.branches.includes(code)) fitted[code] = add(box({ g: G.branch(j), pos: c, size, ex: [0, 0, 2.6], code, slot: code }));
     else sockets[code] = corners(c, size);
